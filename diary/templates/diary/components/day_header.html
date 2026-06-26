@@ -1,0 +1,29 @@
+<!-- day_header -->
+
+<div class="page-header">
+
+    <h1>Diary</h1>
+
+    <div class="header-actions">
+
+        <a href="{% url 'diary_day' yesterday %}" class="btn btn-secondary">
+            ⬅ Yesterday
+        </a>
+
+        <a href="{% url 'diary_today' %}" class="btn btn-primary">
+            Go to today
+        </a>
+
+        <input
+            class="calendar-picker"
+            type="date"
+            value="{{ selected_date|date:'Y-m-d' }}"
+            onchange="goToDate(this.value)"
+        >
+
+        <a href="{% url 'diary_day' tomorrow %}" class="btn btn-secondary">
+            Tomorrow ➡
+        </a>
+
+    </div>
+</div>

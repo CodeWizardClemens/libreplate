@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load script_extras %}
+
+
+{% block content %}
+
+<h1>Edit Script</h1>
+
+<form method="post">
+    {% csrf_token %}
+
+    <input type="text" name="name" value="{{ script.name }}">
+    <br>
+    <textarea name="description">{{ script.description }}</textarea>
+
+    <button type="submit">Save</button>
+</form>
+
+<hr>
+
+<h2>Add function</h2>
+
+<form method="post" action="{% url 'add_step' script.id %}">
+    {% csrf_token %}
+
+    <select name="function_key">
+        {% for key, func in functions.items %}
+            <option value="{{ key }}">
+                {{ func.name }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Add</button>
+</form>
+
+<hr>
+
+<h2>Steps</h2>
+
+{% for step in script.steps.all %}
+
+<div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+
+    <form method="post" action="{% url 'update_step' step.id %}">
+        {% csrf_token %}
+
+        <b>{{ step.function_key }}</b>
+
+        {% with func=functions|get_item:step.function_key %}
+
+        {% for field in func.fields %}
+
+            <div style="margin-top:10px;">
+
+                <label>{{ field.label }}</label>
+
+                {% if field.type == "integer" %}
+
+                    <input type="number"
+                           name="{{ field.name }}"
+                           value="{{ step.config|get_item:field.name|default:field.default }}">
+
+                {% elif field.type == "choice" %}
+
+                    <select name="{{ field.name }}">
+
+                        {% for option in field.choices %}
+                            <option value="{{ option }}"
+                                {% if step.config|get_item:field.name == option %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ option }}
+                            </option>
+                        {% endfor %}
+
+                    </select>
+
+                {% elif field.type == "food" %}
+
+                    {% with food_id=step.config|get_item:field.name %}
+                        {% if food_id %}
+                            {% with food_obj=None %}
+                                {% for f in foods %}
+                                    {% if f.id == food_id %}
+                                        {% with food_obj=f %}{% endwith %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+
+                            <a class="food-button"
+                            href="{% url 'foods' %}?select_step={{ step.id }}">
+                                {{ food_obj.name|default:"Change food" }}
+                            </a>
+
+                        {% else %}
+                            <a class="food-button"
+                            href="{% url 'foods' %}?select_step={{ step.id }}">
+                                Select food
+                            </a>
+                        {% endif %}
+                    {% endwith %}
+
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+        {% endwith %}
+
+        <button type="submit">Save</button>
+    </form>
+
+    <form method="post" action="{% url 'delete_step' step.id %}">
+        {% csrf_token %}
+        <button type="submit">Delete</button>
+    </form>
+
+</div>
+
+{% endfor %}
+
+{% endblock %}

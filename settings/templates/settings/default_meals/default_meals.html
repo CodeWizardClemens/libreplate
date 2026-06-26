@@ -1,0 +1,325 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="page-header">
+        <h1>Default Meals</h1>
+        <a href="{% url 'create_default_meal' %}" class="header-btn primary">
+            + New default meal
+        </a>
+    </div>
+
+
+    {% if default_meals %}
+
+    <ul id="default-meal-list">
+
+        {% for default_meal in default_meals %}
+
+        <li
+            draggable="true"
+            data-id="{{ default_meal.id }}"
+            class="default-meal-item"
+        >
+
+            <span class="drag-handle">
+                ☰
+            </span>
+
+
+            <strong>
+                {{ default_meal.name }}
+
+            </strong>
+
+
+            {% if default_meal.description %}
+                — {{ default_meal.description }}
+            {% endif %}
+
+
+            <span class="default-meal-actions">
+
+                {% if default_meal.user == user %}
+
+                    <a href="{% url 'edit_default_meal' default_meal.pk %}"
+                       class="edit-link">
+                        Edit
+                    </a>
+
+
+                    <a href="{% url 'delete_default_meal' default_meal.pk %}"
+                       class="delete-link">
+                        Delete
+                    </a>
+
+                {% elif default_meal.user is None %}
+
+                    <em>(Global DefaultMeal)</em>
+
+                {% endif %}
+
+            </span>
+
+        </li>
+
+        {% endfor %}
+
+    </ul>
+
+
+    {% else %}
+
+        <p>No default_meals available.</p>
+
+    {% endif %}
+
+</div>
+
+
+
+<style>
+
+.default-meal-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+
+#default-meal-list {
+    list-style:none;
+    padding:0;
+}
+
+
+.default-meal-item {
+    cursor:grab;
+    margin-bottom:10px;
+    padding:10px;
+    border-bottom:1px solid #eee;
+    background:#fff;
+}
+
+
+.drag-handle {
+    color:#aaa;
+    margin-right:10px;
+    cursor:grab;
+    font-size:18px;
+}
+
+
+.default-meal-actions {
+    float:right;
+}
+
+
+.edit-link {
+    color:blue;
+    margin-right:10px;
+}
+
+
+.delete-link {
+    color:red;
+    margin-right:10px;
+}
+
+
+.visibility-button {
+    border:none;
+    background:none;
+    cursor:pointer;
+}
+
+
+.visibility-button.visible {
+    color:green;
+}
+
+
+.visibility-button.hidden {
+    color:grey;
+}
+
+</style>
+
+
+
+<script>
+
+const list = document.getElementById("default-meal-list");
+
+let draggedItem = null;
+
+
+
+list.addEventListener("dragstart", function(event) {
+
+    draggedItem = event.target;
+
+    event.target.style.opacity = "0.5";
+
+});
+
+
+
+list.addEventListener("dragend", function(event) {
+
+    event.target.style.opacity = "1";
+
+});
+
+
+
+list.addEventListener("dragover", function(event) {
+
+    event.preventDefault();
+
+
+    const afterElement = getDragAfterElement(
+        list,
+        event.clientY
+    );
+
+
+    if (afterElement == null) {
+
+        list.appendChild(draggedItem);
+
+    } else {
+
+        list.insertBefore(
+            draggedItem,
+            afterElement
+        );
+
+    }
+
+});
+
+
+
+list.addEventListener("drop", function() {
+
+    saveOrder();
+
+});
+
+
+
+function getDragAfterElement(container, y) {
+
+    const elements = [
+        ...container.querySelectorAll("li:not(.dragging)")
+    ];
+
+
+    return elements.reduce(
+        (closest, child) => {
+
+            const box = child.getBoundingClientRect();
+
+            const offset =
+                y - box.top - box.height / 2;
+
+
+            if (
+                offset < 0 &&
+                offset > closest.offset
+            ) {
+
+                return {
+                    offset: offset,
+                    element: child
+                };
+
+            } else {
+
+                return closest;
+
+            }
+
+
+        },
+        {
+            offset: Number.NEGATIVE_INFINITY
+        }
+
+    ).element;
+
+}
+
+
+
+function saveOrder() {
+
+    let items = [];
+
+
+    document
+        .querySelectorAll("#default-meal-list li")
+        .forEach(function(item, index) {
+
+            items.push({
+
+                id: item.dataset.id,
+
+                position: index
+
+            });
+
+        });
+
+
+
+    fetch("{% url 'reorder_default_meals' %}", {
+
+        method:"POST",
+
+        headers: {
+
+            "Content-Type":"application/json",
+
+            "X-CSRFToken":"{{ csrf_token }}"
+
+        },
+
+        body:JSON.stringify({
+
+            items:items
+
+        })
+
+    })
+
+
+    .then(response => response.json())
+
+
+    .then(data => {
+
+        console.log("Order saved");
+
+    })
+
+
+    .catch(error => {
+
+        console.error(
+            "Could not save order:",
+            error
+        );
+
+    });
+
+
+}
+
+</script>
+
+
+{% endblock %}

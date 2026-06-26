@@ -1,0 +1,26 @@
+{% load diary_filters %}
+
+<h3>Day total</h3>
+
+<table class="day-table">
+    <tr>
+        {% for nutrient in nutrients_total %}
+        <th>
+            {% if nutrient.abbreviation %}
+                {{ nutrient.abbreviation }}
+            {% else %}
+                {{ nutrient.name }}
+            {% endif %}
+        </th>
+        {% endfor %}
+    </tr>
+
+    <tr>
+        {% for nutrient in nutrients_total %}
+        <td class="day-total" data-nutrient="{{ nutrient.id }}">
+            {{ day_total|get_item:nutrient.id|default:"0" }}
+            {{ nutrient.unit }}
+        </td>
+        {% endfor %}
+    </tr>
+</table>

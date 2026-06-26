@@ -1,0 +1,7 @@
+<!-- add_meal -->
+
+<form method="post" action="{% url 'add_meal' selected_date %}">
+    {% csrf_token %}
+    {{ meal_form.name }}
+    <button type="submit">Add meal</button>
+</form>

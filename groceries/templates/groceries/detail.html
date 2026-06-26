@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<h1>
+
+<h1>
+{{ grocery }}
+</h1>
+
+{% if grocery.is_complete %}
+✓
+{% endif %}
+
+</h1>
+
+
+<ul>
+
+
+{% for item in grocery.items.all %}
+
+
+<li>
+
+{% if item.has_item %}
+
+<s>
+{{ item.food.name }}
+({{ item.amount }})
+</s>
+
+{% else %}
+
+{{ item.food.name }}
+({{ item.amount }})
+
+{% endif %}
+
+
+
+<a href="{% url 'toggle_item' item.id %}">
+    {% if item.has_item %}
+        Undo
+    {% else %}
+        Bought
+    {% endif %}
+</a>
+
+
+</li>
+
+
+{% endfor %}
+
+
+</ul>
+
+
+{% endblock %}

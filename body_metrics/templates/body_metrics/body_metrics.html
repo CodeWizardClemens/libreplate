@@ -1,0 +1,416 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="body_metric-header">
+        <h1>Body Metrics</h1>
+
+        <a href="{% url 'create_body_metric' %}" class="btn btn-success">
+            + New Body Metric
+        </a>
+    </div>
+
+
+    {% if body_metrics %}
+
+    <ul id="body_metric-list">
+
+        {% for body_metric in body_metrics %}
+
+        <li
+            draggable="true"
+            data-id="{{ body_metric.id }}"
+            class="body_metric-item"
+        >
+
+            <span class="drag-handle">
+                ☰
+            </span>
+
+
+            <strong>
+                {{ body_metric.name }}
+
+                {% if body_metric.abbreviation %}
+                    / {{ body_metric.abbreviation }}
+                {% endif %}
+            </strong>
+
+
+            {% if body_metric.description %}
+                — {{ body_metric.description }}
+            {% endif %}
+
+
+            <span class="body_metric-actions">
+
+                {% if body_metric.user == user %}
+
+                    <a href="{% url 'edit_body_metric' body_metric.pk %}"
+                       class="edit-link">
+                        Edit
+                    </a>
+
+
+                    <a href="{% url 'delete_body_metric' body_metric.pk %}"
+                       class="delete-link">
+                        Delete
+                    </a>
+
+
+                    <button
+                        class="visibility-button {% if body_metric.show_in_diary_total %}visible{% else %}hidden{% endif %}"
+                        data-id="{{ body_metric.pk }}"
+                    >
+
+                        {% if body_metric.show_in_diary_total %}
+                            Visible
+                        {% else %}
+                            Hidden
+                        {% endif %}
+
+                    </button>
+
+
+                {% elif body_metric.user is None %}
+
+                    <em>(Global Body Metric)</em>
+
+                {% endif %}
+
+            </span>
+
+        </li>
+
+        {% endfor %}
+
+    </ul>
+
+
+    {% else %}
+
+        <p>No body metrics available.</p>
+
+    {% endif %}
+
+</div>
+
+
+
+<style>
+
+.body_metric-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+
+#body_metric-list {
+    list-style:none;
+    padding:0;
+}
+
+
+.body_metric-item {
+    cursor:grab;
+    margin-bottom:10px;
+    padding:10px;
+    border-bottom:1px solid #eee;
+    background:#fff;
+}
+
+
+.drag-handle {
+    color:#aaa;
+    margin-right:10px;
+    cursor:grab;
+    font-size:18px;
+}
+
+
+.body_metric-actions {
+    float:right;
+}
+
+
+.edit-link {
+    color:blue;
+    margin-right:10px;
+}
+
+
+.delete-link {
+    color:red;
+    margin-right:10px;
+}
+
+
+.visibility-button {
+    border:none;
+    background:none;
+    cursor:pointer;
+}
+
+
+.visibility-button.visible {
+    color:green;
+}
+
+
+.visibility-button.hidden {
+    color:grey;
+}
+
+</style>
+
+
+
+<script>
+
+const list = document.getElementById("body_metric-list");
+
+let draggedItem = null;
+
+
+
+list.addEventListener("dragstart", function(event) {
+
+    draggedItem = event.target;
+
+    event.target.style.opacity = "0.5";
+
+});
+
+
+
+list.addEventListener("dragend", function(event) {
+
+    event.target.style.opacity = "1";
+
+});
+
+
+
+list.addEventListener("dragover", function(event) {
+
+    event.preventDefault();
+
+
+    const afterElement = getDragAfterElement(
+        list,
+        event.clientY
+    );
+
+
+    if (afterElement == null) {
+
+        list.appendChild(draggedItem);
+
+    } else {
+
+        list.insertBefore(
+            draggedItem,
+            afterElement
+        );
+
+    }
+
+});
+
+
+
+list.addEventListener("drop", function() {
+
+    saveOrder();
+
+});
+
+
+
+function getDragAfterElement(container, y) {
+
+    const elements = [
+        ...container.querySelectorAll("li:not(.dragging)")
+    ];
+
+
+    return elements.reduce(
+        (closest, child) => {
+
+            const box = child.getBoundingClientRect();
+
+            const offset =
+                y - box.top - box.height / 2;
+
+
+            if (
+                offset < 0 &&
+                offset > closest.offset
+            ) {
+
+                return {
+                    offset: offset,
+                    element: child
+                };
+
+            } else {
+
+                return closest;
+
+            }
+
+
+        },
+        {
+            offset: Number.NEGATIVE_INFINITY
+        }
+
+    ).element;
+
+}
+
+
+
+function saveOrder() {
+
+    let items = [];
+
+
+    document
+        .querySelectorAll("#body_metric-list li")
+        .forEach(function(item, index) {
+
+            items.push({
+
+                id: item.dataset.id,
+
+                position: index
+
+            });
+
+        });
+
+
+
+    fetch("{% url 'reorder_body_metrics' %}", {
+
+        method:"POST",
+
+        headers: {
+
+            "Content-Type":"application/json",
+
+            "X-CSRFToken":"{{ csrf_token }}"
+
+        },
+
+        body:JSON.stringify({
+
+            items:items
+
+        })
+
+    })
+
+
+    .then(response => response.json())
+
+
+    .then(data => {
+
+        console.log("Order saved");
+
+    })
+
+
+    .catch(error => {
+
+        console.error(
+            "Could not save order:",
+            error
+        );
+
+    });
+
+
+}
+
+
+
+document
+.querySelectorAll(".visibility-button")
+.forEach(function(button) {
+
+
+    button.addEventListener(
+        "click",
+        function() {
+
+
+            const bodyMetricId = this.dataset.id;
+
+
+
+            fetch(
+                `/body-metrics/${bodyMetricId}/toggle-visibility/`,
+                {
+
+                    method:"POST",
+
+                    headers: {
+
+                        "X-CSRFToken":"{{ csrf_token }}"
+
+                    }
+
+                }
+
+            )
+
+
+            .then(response => response.json())
+
+
+            .then(data => {
+
+
+                if (data.show_in_diary_total) {
+
+                    this.innerHTML = "Visible";
+
+                    this.classList.remove("hidden");
+
+                    this.classList.add("visible");
+
+
+                } else {
+
+
+                    this.innerHTML = "Hidden";
+
+                    this.classList.remove("visible");
+
+                    this.classList.add("hidden");
+
+
+                }
+
+
+            });
+
+
+        }
+
+    );
+
+
+});
+
+
+</script>
+
+
+{% endblock %}

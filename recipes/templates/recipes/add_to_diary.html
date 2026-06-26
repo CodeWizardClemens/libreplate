@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+
+
+{% block content %}
+
+
+
+<h2>
+Add {{ recipe.name }} to diary
+</h2>
+
+
+
+<form method="post">
+
+
+{% csrf_token %}
+
+
+
+{{ form.as_p }}
+
+
+
+<button>
+Add recipe
+</button>
+
+
+
+</form>
+
+
+
+{% endblock %}

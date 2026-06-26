@@ -1,0 +1,312 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+
+<div class="page-header">
+    <h1>Nutrients</h1>
+
+    <a href="{% url 'create_nutrient' %}" class="header-btn primary">
+        + New Nutrient
+    </a>
+</div>
+
+
+    {% if nutrients %}
+
+    <ul id="nutrient-list">
+
+        {% for nutrient in nutrients %}
+
+        <li
+            draggable="true"
+            data-id="{{ nutrient.id }}"
+            class="nutrient-item"
+        >
+
+            <span class="drag-handle">
+                ☰
+            </span>
+
+
+            <strong>
+                {{ nutrient.name }}
+
+                {% if nutrient.abbreviation %}
+                    / {{ nutrient.abbreviation }}
+                {% endif %}
+            </strong>
+
+
+            {% if nutrient.description %}
+                — {{ nutrient.description }}
+            {% endif %}
+
+
+            <span class="nutrient-actions">
+
+                {% if nutrient.user == user %}
+
+                    <a href="{% url 'edit_nutrient' nutrient.pk %}"
+                       class="edit-link">
+                        Edit
+                    </a>
+
+
+                    <a href="{% url 'delete_nutrient' nutrient.pk %}"
+                       class="delete-link">
+                        Delete
+                    </a>
+
+                {% elif nutrient.user is None %}
+
+                    <em>(Global Nutrient)</em>
+
+                {% endif %}
+
+            </span>
+
+        </li>
+
+        {% endfor %}
+
+    </ul>
+
+
+    {% else %}
+
+        <p>No nutrients available.</p>
+
+    {% endif %}
+
+</div>
+
+
+
+<style>
+
+.nutrient-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+
+#nutrient-list {
+    list-style:none;
+    padding:0;
+}
+
+
+.nutrient-item {
+    cursor:grab;
+    margin-bottom:10px;
+    padding:10px;
+    border-bottom:1px solid #eee;
+    background:#fff;
+}
+
+
+.drag-handle {
+    color:#aaa;
+    margin-right:10px;
+    cursor:grab;
+    font-size:18px;
+}
+
+
+.nutrient-actions {
+    float:right;
+}
+
+
+.edit-link {
+    color:blue;
+    margin-right:10px;
+}
+
+
+.delete-link {
+    color:red;
+    margin-right:10px;
+}
+
+</style>
+
+
+
+<script>
+
+const list = document.getElementById("nutrient-list");
+
+let draggedItem = null;
+
+
+
+list.addEventListener("dragstart", function(event) {
+
+    draggedItem = event.target;
+
+    event.target.style.opacity = "0.5";
+
+});
+
+
+
+list.addEventListener("dragend", function(event) {
+
+    event.target.style.opacity = "1";
+
+});
+
+
+
+list.addEventListener("dragover", function(event) {
+
+    event.preventDefault();
+
+
+    const afterElement = getDragAfterElement(
+        list,
+        event.clientY
+    );
+
+
+    if (afterElement == null) {
+
+        list.appendChild(draggedItem);
+
+    } else {
+
+        list.insertBefore(
+            draggedItem,
+            afterElement
+        );
+
+    }
+
+});
+
+
+
+list.addEventListener("drop", function() {
+
+    saveOrder();
+
+});
+
+
+
+function getDragAfterElement(container, y) {
+
+    const elements = [
+        ...container.querySelectorAll("li:not(.dragging)")
+    ];
+
+
+    return elements.reduce(
+        (closest, child) => {
+
+            const box = child.getBoundingClientRect();
+
+            const offset =
+                y - box.top - box.height / 2;
+
+
+            if (
+                offset < 0 &&
+                offset > closest.offset
+            ) {
+
+                return {
+                    offset: offset,
+                    element: child
+                };
+
+            } else {
+
+                return closest;
+
+            }
+
+
+        },
+        {
+            offset: Number.NEGATIVE_INFINITY
+        }
+
+    ).element;
+
+}
+
+
+
+function saveOrder() {
+
+    let items = [];
+
+
+    document
+        .querySelectorAll("#nutrient-list li")
+        .forEach(function(item, index) {
+
+            items.push({
+
+                id: item.dataset.id,
+
+                position: index
+
+            });
+
+        });
+
+
+
+    fetch("{% url 'reorder_nutrients' %}", {
+
+        method:"POST",
+
+        headers: {
+
+            "Content-Type":"application/json",
+
+            "X-CSRFToken":"{{ csrf_token }}"
+
+        },
+
+        body:JSON.stringify({
+
+            items:items
+
+        })
+
+    })
+
+
+    .then(response => response.json())
+
+
+    .then(data => {
+
+        console.log("Order saved");
+
+    })
+
+
+    .catch(error => {
+
+        console.error(
+            "Could not save order:",
+            error
+        );
+
+    });
+
+
+}
+
+</script>
+
+
+{% endblock %}

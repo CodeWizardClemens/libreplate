@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="page-header">
+        <h1>Food Form</h1>
+
+        <div class="header-actions">
+            <a href="{% url 'foods' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" form="foodForm" class="btn btn-primary">
+                Save
+            </button>
+        </div>
+    </div>
+
+    <form method="post" id="foodForm" class="food-form">
+        {% csrf_token %}
+
+        <div class="form-section">
+            {% for field in form %}
+                {% if not field.name|slice:":9" == "nutrient_" %}
+                    <div class="form-row">
+                        <label for="{{ field.id_for_label }}" class="form-label">
+                            {{ field.label }}
+                        </label>
+
+                        <div class="form-input">
+                            {{ field }}
+
+                            {% if field.help_text %}
+                                <div class="form-help">{{ field.help_text }}</div>
+                            {% endif %}
+
+                            {% for error in field.errors %}
+                                <div class="form-error">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="section-header">
+            <h3>Nutrients</h3>
+
+            <button type="button" id="toggleNutrientsBtn" class="btn btn-secondary">
+                {% if show_all %}
+                    Show less nutrients
+                {% else %}
+                    Show more nutrients
+                {% endif %}
+            </button>
+        </div>
+
+        <div id="nutrientList" class="form-section">
+            {% for field in form %}
+                {% if field.name|slice:":9" == "nutrient_" %}
+                    <div class="form-row nutrient-row">
+                        <label for="{{ field.id_for_label }}" class="form-label">
+                            {{ field.label }}
+                        </label>
+
+                        <div class="form-input">
+                            {{ field }}
+
+                            {% if field.help_text %}
+                                <div class="form-help">{{ field.help_text }}</div>
+                            {% endif %}
+
+                            {% for error in field.errors %}
+                                <div class="form-error">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </form>
+
+</div>
+
+<style>
+/* ---------- Food Form ---------- */
+
+.food-form {
+    max-width: 700px;
+}
+
+.form-section {
+    margin-bottom: 14px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 135px 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #374151;
+}
+
+.form-input {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+/* Inputs */
+
+.form-input input,
+.form-input select,
+.form-input textarea {
+    width: 100%;
+    max-width: 200px;
+    padding: 8px 10px;
+    border: 1px solid #d5dbe3;
+    border-radius: 10px;
+    font: inherit;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.form-input textarea {
+    max-width: 460px;
+    min-height: 80px;
+    resize: vertical;
+}
+
+.form-input input:focus,
+.form-input select:focus,
+.form-input textarea:focus {
+    outline: none;
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 2px rgba(26,115,232,.15);
+}
+
+/* Checkbox */
+
+.form-input input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    max-width: none;
+    padding: 0;
+}
+
+/* Help & Errors */
+
+.form-help,
+.form-error {
+    font-size: 12px;
+}
+
+.form-help {
+    color: #777;
+}
+
+.form-error {
+    color: #d32f2f;
+}
+
+/* Nutrients */
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 16px 0 10px;
+    padding-top: 16px;
+    border-top: 1px solid #ececec;
+}
+
+.section-header h3 {
+    margin: 0;
+}
+
+.nutrient-row {
+    padding: 2px 0;
+}
+
+/* Mobile */
+
+@media (max-width: 700px) {
+
+    .food-form {
+        max-width: 100%;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 5px;
+        padding: 7px 0;
+    }
+
+    .form-input input,
+    .form-input select,
+    .form-input textarea {
+        max-width: none;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .section-header .btn {
+        width: 100%;
+    }
+}
+
+</style>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+        if (input.value !== "") {
+            const num = Number(input.value);
+            if (!Number.isNaN(num)) {
+                input.value = num.toString();
+            }
+        }
+    });
+});
+</script>
+
+<script src="{% static 'foods/js/food.js' %}"></script>
+{% endblock %}

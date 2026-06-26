@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'foods/css/food.css' %}">
+
+<div class="container">
+
+    <div class="page-header">
+        <h1>Foods</h1>
+
+        <div class="header-actions">
+            <a href="{% url 'openfood_search' %}" class="btn btn-secondary">
+                🔍 OpenFoodFacts
+            </a>
+
+            <a href="{% url 'create_food' %}" class="btn btn-primary">
+                + New Food
+            </a>
+        </div>
+    </div>
+
+    <div class="food-toolbar">
+
+        <div class="add-button">
+            <button
+                id="addSelectedBtn"
+                type="submit"
+                form="foodSelectionForm"
+                disabled>
+                Add
+            </button>
+        </div>
+
+        <div class="food-search">
+            <input
+                type="text"
+                id="foodSearch"
+                placeholder="Search foods..."
+            >
+        </div>
+
+        <div class="food-sort">
+            <select id="sortSelect">
+                <option value="last_used"
+                    {% if sort == "last_used" %}selected{% endif %}>
+                    Last used
+                </option>
+
+                <option value="last_added"
+                    {% if sort == "last_added" %}selected{% endif %}>
+                    Last added
+                </option>
+
+                <option value="name"
+                    {% if sort == "name" %}selected{% endif %}>
+                    Name
+                </option>
+            </select>
+        </div>
+
+    </div>
+
+    {% if foods %}
+
+    <form
+        id="foodSelectionForm"
+        method="post"
+        action="
+        {% if meal_id %}
+            {% url 'add_foods_to_meal_direct' meal_id %}
+        {% else %}
+            {% url 'select_meal' %}
+        {% endif %}
+        "
+    >
+        {% csrf_token %}
+
+        <div id="foodsContainer">
+            {% for food in foods %}
+                {% include "foods/partials/food_card.html" %}
+            {% endfor %}
+        </div>
+
+    </form>
+
+    {% else %}
+        <p>No foods available.</p>
+    {% endif %}
+
+</div>
+
+<script src="{% static 'foods/js/food.js' %}"></script>
+
+{% endblock %}

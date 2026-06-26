@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load diary_filters %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'diary/css/day.css' %}">
+
+{% include "diary/components/day_header.html" %}
+
+<div class="card">
+    {% include "diary/components/body_metrics.html" %}
+</div>
+
+<div class="card">
+    {% include "diary/components/day_totals.html" %}
+</div>
+
+{% for meal in meals %}
+    {% include "diary/components/meal.html" with meal=meal nutrients_meal=nutrients_meal %}
+{% empty %}
+    <p>No meals for this day.</p>
+{% endfor %}
+
+<div class="card">
+    {% include "diary/components/add_meal.html" %}
+</div>
+
+<script src="{% static 'diary/js/day.js' %}"></script>
+
+{% endblock %}

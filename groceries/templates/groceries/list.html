@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Grocery Lists</h1>
+    <a href="{% url 'grocery_create' %}" class="btn btn-primary">+ new grocery list</a>
+</div>
+
+{% for grocery in lists %}
+
+<div>
+
+<a href="{% url 'grocery_detail' grocery.id %}">
+
+{{ grocery }}
+
+</a>
+
+
+{% if grocery.is_complete %}
+✓
+{% endif %}
+
+
+<form method="post"
+      action="{% url 'grocery_delete' grocery.id %}"
+      style="display: inline;">
+
+    {% csrf_token %}
+
+    <button>
+        Delete
+    </button>
+
+</form>
+
+
+</div>
+
+
+{% empty %}
+
+<p>No grocery lists yet.</p>
+
+{% endfor %}
+
+
+{% endblock %}

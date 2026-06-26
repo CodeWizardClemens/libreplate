@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Add goals to: {{ group.name }}</h2>
+
+<form method="post" action="{% url 'add_goal_item_post' group.id %}">
+    {% csrf_token %}
+
+    <h3>Nutrients</h3>
+
+    {% for n in nutrients %}
+        <div style="margin-bottom:8px;">
+            {{ n.name }}
+            <input
+                type="number"
+                step="0.01"
+                name="nutrient_{{ n.id }}"
+                placeholder="amount"
+            >
+        </div>
+    {% endfor %}
+
+    <hr>
+
+    <h3>Body Metrics</h3>
+
+    {% for b in body_metrics %}
+        <div style="margin-bottom:8px;">
+            {{ b.name }}
+            <input
+                type="number"
+                step="0.01"
+                name="metric_{{ b.id }}"
+                placeholder="amount"
+            >
+        </div>
+    {% endfor %}
+
+    <br><br>
+
+    <button type="submit">
+        Add
+    </button>
+</form>
+
+{% endblock %}

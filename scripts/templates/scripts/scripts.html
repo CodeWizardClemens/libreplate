@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Scripts</h1>
+    <a href="{% url 'script_create' %}" class="btn btn-primary">+ new script</a>
+</div>
+
+{% for script in scripts %}
+
+<div>
+
+    <a href="{% url 'run_script' script.id %}">[run]</a>
+
+    {{ script.name }} -
+
+    {{ script.description}}
+
+    <a href="{% url 'edit_script' script.id %}">[edit]</a>
+
+    <a href="{% url 'delete_step' script.id %}">[delete]</a>
+
+</div>
+
+{% endfor %}
+
+{% endblock %}

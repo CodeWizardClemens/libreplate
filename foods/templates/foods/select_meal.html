@@ -1,0 +1,19 @@
+<h2>Select a meal</h2>
+
+<ul>
+{% for meal in meals %}
+    <li>
+        <form method="post" action="{% url 'add_foods_to_meal' meal.id %}">
+            {% csrf_token %}
+
+            {% for id in food_ids %}
+                <input type="hidden" name="foods" value="{{ id }}">
+            {% endfor %}
+
+            <button>
+                {{ meal.name }}
+            </button>
+        </form>
+    </li>
+{% endfor %}
+</ul>

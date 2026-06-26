@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Goals</h1>
+    <a href="{% url 'add_goal_group' %}" class="header-btn primary">
+        + Add goals
+    </a>
+</div>
+
+
+<!-- ADD GROUP -->
+<div style="border:1px solid #ccc; padding:10px; margin-bottom:20px;">
+    <h3>Add group</h3>
+
+    <form method="post" action="{% url 'add_goal_group' %}">
+        {% csrf_token %}
+
+        {{ form.name }}<br><br>
+        {{ form.start_date }} {{ form.end_date }}<br><br>
+        {{ form.note }}<br><br>
+
+        <button type="submit">Add</button>
+    </form>
+</div>
+
+<hr>
+
+<h3>Goal groups</h3>
+
+{% for group in groups %}
+    <div style="border:1px solid #999; padding:10px; margin-bottom:20px;">
+
+        <h3>
+            {{ group.name }} ({{ group.start_date }} - {{ group.end_date }})
+        </h3>
+
+        <form method="post" action="{% url 'delete_goal_group' group.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button>Delete</button>
+        </form>
+
+        <form method="post" action="{% url 'rename_goal_group' group.id %}" style="display:inline;">
+            {% csrf_token %}
+
+            <input
+                type="text"
+                name="name"
+                value="{{ group.name }}"
+                placeholder="name"
+            >
+
+            Note:
+
+            <input
+                type="text"
+                name="note"
+                value="{{ group.note }}"
+                placeholder="note"
+                style="width:200px;"
+            >
+
+            <button type="submit">Save</button>
+        </form>
+
+        <hr>
+
+        <h4>Goals</h4>
+
+        {% for g in group.nutrient_goals.all %}
+            <div>
+                {{ g.nutrient.name }} — {{ g.amount }}
+            </div>
+        {% endfor %}
+
+        {% for g in group.body_measurement_goals.all %}
+            <div>
+                {{ g.body_metric.name }} — {{ g.amount }}
+            </div>
+        {% endfor %}
+
+        <br>
+
+        <a href="{% url 'add_goal_item' group.id %}">
+            <button>Add goals</button>
+        </a>
+
+    </div>
+{% endfor %}
+
+{% endblock %}

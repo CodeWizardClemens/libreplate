@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+
+    <div class="page-header">
+        <h1>Units</h1>
+        <a href="{% url 'create_unit' %}" class="header-btn primary">+ New Unit</a>
+    </div>
+
+    {% if units %}
+        <ul>
+        {% for unit in units %}
+            <li style="margin-bottom: 10px; padding: 10px; border-bottom: 1px solid #eee;">
+                <strong>{{ unit.name }}
+                
+                <!-- Show abbreviation only if it exists -->
+                {% if unit.abbreviation %}
+                    / {{ unit.abbreviation }}
+                {% endif %}
+                
+                <!-- Show plural name only if it exists -->
+                {% if unit.name_plural %}
+                    / {{ unit.name_plural }}
+                {% endif %}
+                </strong>
+                <!-- Description if exists -->
+                {% if unit.description %}
+                    — {{ unit.description }}
+                {% endif %}
+
+                
+                <!-- Actions -->
+                <span style="float: right;">
+                    {% if unit.user == user %}
+                        <a href="{% url 'edit_unit' unit.pk %}" style="color: blue; margin-right: 10px;">Edit</a>
+                        <a href="{% url 'delete_unit' unit.pk %}" style="color: red;" onclick="return confirm('Delete this unit?');">Delete</a>
+                    {% elif unit.user is None %}
+                        <em>(Global Unit)</em>
+                        {# Optional: Add edit/delete buttons for global units here if desired #}
+                    {% endif %}
+                </span>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No units available.</p>
+    {% endif %}
+</div>
+{% endblock %}

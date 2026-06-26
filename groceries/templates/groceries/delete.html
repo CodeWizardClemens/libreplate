@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<h2>
+Delete grocery list?
+</h2>
+
+
+<form method="post">
+
+{% csrf_token %}
+
+<button>
+Yes delete
+</button>
+
+</form>
+
+
+{% endblock %}

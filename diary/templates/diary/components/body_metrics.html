@@ -1,0 +1,19 @@
+{% load diary_filters %}
+
+<h3>Body metrics</h3>
+
+<div class="body-metrics">
+    {% for metric in body_metrics %}
+    <div class="metric-row">
+        <label>{{ metric.name }}</label>
+
+        <input
+            type="number"
+            step="any"
+            value="{{ log_map|get_item:metric.id|default:'' }}"
+            data-metric-id="{{ metric.id }}"
+            oninput="saveMetric(this)"
+        />
+    </div>
+    {% endfor %}
+</div>

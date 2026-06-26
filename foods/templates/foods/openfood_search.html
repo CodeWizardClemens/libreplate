@@ -1,0 +1,50 @@
+<!-- #openfood_search.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+
+    <h1>Search OpenFoodFacts</h1>
+
+    <form method="get" style="margin-bottom: 20px;">
+        <input type="text" name="q" placeholder="Search food..." value="{{ query }}">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    {% if products %}
+        <ul>
+        {% for p in products %}
+            <li style="margin-bottom: 20px; padding: 10px; border-bottom: 1px solid #eee;">
+                
+                <strong>
+                    {{ p.product_name|default:"Unknown product" }}
+                </strong>
+                <br>
+
+                <small>Brand: {{ p.brands|default:"-" }}</small>
+                <br>
+                <small>Barcode: {{ p.code|default:"-" }}</small>
+
+                <form method="post" action="{% url 'import_openfood' %}" style="margin-top: 8px;">
+                    {% csrf_token %}
+
+                    <input type="hidden" name="name" value="{{ p.product_name }}">
+                    <input type="hidden" name="barcode" value="{{ p.code }}">
+                    <input type="hidden" name="brand" value="{{ p.brands }}">
+
+                    <button class="btn btn-success btn-sm">
+                        Import
+                    </button>
+                </form>
+
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        {% if query %}
+            <p>No results found.</p>
+        {% endif %}
+    {% endif %}
+
+</div>
+{% endblock %}

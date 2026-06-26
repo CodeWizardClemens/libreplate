@@ -1,0 +1,66 @@
+<div
+    class="food-card food-item"
+    data-name="{{ food.name|lower }}"
+    data-description="{{ food.description|lower }}"
+>
+
+    <div class="food-header">
+
+        <div class="food-left">
+
+            <input
+                type="checkbox"
+                class="food-checkbox"
+                name="foods"
+                value="{{ food.id }}"
+            >
+
+            <div class="food-info">
+
+                <div class="food-name">
+                    {{ food.name }}
+                </div>
+
+                <div class="serving">
+                    Portion: {{ food.serving|floatformat:"-1" }} {{ food.unit }}
+                </div>
+
+                <div class="nutrients-row">
+                    {% for n in food.nutrients %}
+                    <div class="nutrient-chip">
+
+                        <span class="nutrient-label">
+                            {{ n.abbr|default:n.name }}
+                        </span>
+
+                        <span class="nutrient-value">
+                            {% with v=n.value|floatformat:0 %}
+                                {% if v|slice:"-3:" == ".00" %}
+                                    {{ n.value|floatformat:0 }}
+                                {% else %}
+                                    {{ v }}
+                                {% endif %}
+                            {% endwith %}
+                        </span>
+
+                    </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="actions">
+            <a href="{% url 'edit_food' food.id %}" class="action-btn edit-btn">
+                Edit
+            </a>
+
+            <a href="{% url 'delete_food' food.id %}" class="action-btn delete-btn">
+                Delete
+            </a>
+        </div>
+
+    </div>
+
+</div>

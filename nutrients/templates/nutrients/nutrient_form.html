@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+
+    <h1>{% if form.instance.pk %}Edit Nutrient{% else %}New Nutrient{% endif %}</h1>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <p>
+            {{ form.name.label_tag }}<br>
+            {{ form.name }}
+        </p>
+
+        <p>
+            {{ form.abbreviation.label_tag }}<br>
+            {{ form.abbreviation }}
+        </p>
+
+        <p>
+            {{ form.description.label_tag }}<br>
+            {{ form.description }}
+        </p>
+
+        <h3>Display Options</h3>
+
+        <p>{{ form.show_in_diary_total }} {{ form.show_in_diary_total.label }}</p>
+
+        <p>{{ form.show_in_diary_meal }} {{ form.show_in_diary_meal.label }}</p>
+
+        <p>{{ form.show_in_food_edit }} {{ form.show_in_food_edit.label }}</p>
+
+        <p>{{ form.show_in_recipe }} {{ form.show_in_recipe.label }}</p>
+
+        <p>{{ form.show_in_foods }} {{ form.show_in_foods.label }}</p>
+
+        <button type="submit" class="btn btn-primary">
+            Save
+        </button>
+
+        <a href="{% url 'nutrients' %}">
+            Cancel
+        </a>
+
+    </form>
+
+</div>
+{% endblock %}

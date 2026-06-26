@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="profile-page">
+    <div class="profile-header">
+        <div class="avatar">
+            {{ user.username|first|upper }}
+        </div>
+
+        <div>
+            <h1>{{ user.username }}</h1>
+            <p>{{ user.email }}</p>
+        </div>
+    </div>
+
+    <div class="profile-section">
+        <h2>Account Details</h2>
+
+        <div class="detail">
+            <span>Username</span>
+            <strong>{{ user.username }}</strong>
+        </div>
+
+        <div class="detail">
+            <span>Email</span>
+            <strong>{{ user.email }}</strong>
+        </div>
+
+        <div class="detail">
+            <span>Full name</span>
+            <strong>{{ user.first_name }} {{user.last_name}}</strong>
+        </div>
+
+        <div class="detail">
+            <span>Last login</span>
+            <strong>{{ user.last_login}}</strong>
+        </div>
+    </div>
+
+    <div class="profile-actions">
+        <a href="{% url 'password_change' %}" class="action-link">
+            Change Password →
+        </a>
+
+        <a href="{% url 'logout' %}" class="action-link logout">
+            Logout →
+        </a>
+    </div>
+</div>
+
+<style>
+.profile-page {
+    max-width: 700px;
+    margin: 4rem auto;
+    padding: 0 1.5rem;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 3rem;
+}
+
+.avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #111827;
+    color: white;
+    display: grid;
+    place-items: center;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.profile-header h1 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+.profile-header p {
+    margin: 0.25rem 0 0;
+    color: #6b7280;
+}
+
+.profile-section {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 1.5rem;
+}
+
+.profile-section h2 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+}
+
+.detail {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.detail span {
+    color: #6b7280;
+}
+
+.profile-actions {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.action-link {
+    text-decoration: none;
+    color: #111827;
+    font-weight: 600;
+}
+
+.action-link:hover {
+    color: #2563eb;
+}
+
+.logout:hover {
+    color: #dc2626;
+}
+</style>
+{% endblock %}

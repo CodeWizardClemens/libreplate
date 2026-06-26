@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>{% if default_meal %}Edit Default Meal{% else %}New Default Meal{% endif %}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{% url 'default_meals' %}">Cancel</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+.settings-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.settings-title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+@media (min-width: 600px) {
+  .settings-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.settings-card {
+  display: flex;
+  gap: 15px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #f8f9fa;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+  border: 1px solid #e9ecef;
+}
+
+.settings-card:hover {
+  transform: translateY(-2px);
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.icon {
+  font-size: 1.8rem;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.text h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.text p {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+</style>
+
+<div class="settings-container">
+  <h1 class="settings-title">Settings</h1>
+
+  <div class="settings-grid">
+
+    <a class="settings-card" href="{% url 'profile' %}">
+      <div class="icon">👤</div>
+      <div class="text">
+        <h3>Profile</h3>
+        <p>Edit your personal information</p>
+      </div>
+    </a>
+
+    <a class="settings-card" href="{% url 'body_metrics' %}">
+      <div class="icon">📊</div>
+      <div class="text">
+        <h3>Body metrics</h3>
+        <p>Track weight, height, and progress</p>
+      </div>
+    </a>
+
+    <a class="settings-card" href="{% url 'units' %}">
+      <div class="icon">⚙️</div>
+      <div class="text">
+        <h3>Units</h3>
+        <p>Metric or imperial preferences</p>
+      </div>
+    </a>
+
+    <a class="settings-card" href="{% url 'nutrients' %}">
+      <div class="icon">🥗</div>
+      <div class="text">
+        <h3>Nutrients</h3>
+        <p>Adjust macro and calorie settings</p>
+      </div>
+    </a>
+
+    <a class="settings-card" href="{% url 'default_meals' %}">
+      <div class="icon">🍽️</div>
+      <div class="text">
+        <h3>Default meals</h3>
+        <p>Manage your meal templates</p>
+      </div>
+    </a>
+
+    <a class="settings-card" href="{% url 'default_meals' %}">
+      <div class="icon">🍎</div>
+      <div class="text">
+        <h3>Food settings</h3>
+        <p>How foods are displayed and Food API's</p>
+      </div>
+    </a>
+
+    <a class="settings-card" href="{% url 'default_meals' %}">
+      <div class="icon">🖥️</div>
+      <div class="text">
+        <h3>User interface settings</h3>
+        <p>How the user interface is displayed.</p>
+      </div>
+    </a>
+  
+    <a class="settings-card" href="{% url 'default_meals' %}">
+      <div class="icon">❓</div>
+      <div class="text">
+        <h3>Application Manual</h3>
+        <p>Tutorials on how to use the application.</p>
+      </div>
+    </a>
+
+    <a class="settings-card" href="{% url 'default_meals' %}">
+      <div class="icon">ℹ️</div>
+      <div class="text">
+        <h3>About LibrePlate</h3>
+        <p>FAQ, Links, Credits, licences</p>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+{% endblock %}

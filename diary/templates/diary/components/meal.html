@@ -1,0 +1,105 @@
+{% load diary_filters %}
+
+<div class="meal-card">
+
+    <div class="meal-header">
+        <div>
+            <h>{{ meal.name }}</h>
+            <a href="{% url 'foods' %}?meal={{ meal.id }}">+ Add food</a>
+        </div>
+
+        {% if not meal.is_virtual %}
+        <form method="post" action="{% url 'delete_meal' meal.id %}">
+            {% csrf_token %}
+            <button type="submit" class="action-btn delete-btn">Delete</button>
+        </form>
+        {% endif %}
+    </div>
+
+    {% if meal.meal_foods.all %}
+    <table class="meal-table">
+
+        <tr>
+            <th>Food</th>
+            <th>Serving size</th>
+            <th>Servings</th>
+
+            {% for nutrient in nutrients_meal %}
+                <th class="nutrient-header" data-nutrient="{{ nutrient.id }}">
+                    {% if nutrient.abbreviation %}
+                        {{ nutrient.abbreviation }}
+                    {% else %}
+                        {{ nutrient.name }}
+                    {% endif %}
+                </th>
+            {% endfor %}
+
+            <th></th>
+        </tr>
+
+        {% for meal_food in meal.meal_foods.all %}
+        <tr>
+            <td>{{ meal_food.food.name }}</td>
+
+            <td>
+                <input type="number"
+                       step="any"
+                       value="{{ meal_food.serving_size }}"
+                       data-meal-food="{{ meal_food.id }}"
+                       class="serving-size"
+                       oninput="saveMealFood(this)">
+            </td>
+
+            <td>
+                <input type="number"
+                       step="any"
+                       value="{{ meal_food.number_of_servings }}"
+                       data-meal-food="{{ meal_food.id }}"
+                       class="servings"
+                       oninput="saveMealFood(this)">
+            </td>
+
+            {% for nutrient in nutrients_meal %}
+                <td class="nutrient-cell"
+                    data-nutrient="{{ nutrient.id }}">
+                    {{ meal_food.nutrient_values|get_item:nutrient.id|default:"0" }}
+                </td>
+            {% endfor %}
+
+            <td>
+                <form method="post" action="{% url 'delete_meal_food' meal_food.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="action-btn delete-btn">×</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+
+        <!-- MEAL TOTALS -->
+        <tr>
+            <th colspan="3">Meal total</th>
+
+            {% for nutrient in nutrients_meal %}
+                <th class="meal-total"
+                    data-nutrient="{{ nutrient.id }}">
+                    {{ meal.total_nutrients|get_item:nutrient.id|default:"0" }}
+                </th>
+            {% endfor %}
+
+            <th></th>
+        </tr>
+
+    </table>
+    {% else %}
+        <p class="empty-meal">No foods added to this meal yet.</p>
+    {% endif %}
+
+    <form method="post" action="{% url 'update_note' meal.id %}">
+        {% csrf_token %}
+        <label>Note:</label>
+        <textarea rows="1"
+                  data-meal="{{ meal.id }}"
+                  oninput="saveNote(this)">{{ meal.note }}</textarea>
+    </form>
+
+</div>

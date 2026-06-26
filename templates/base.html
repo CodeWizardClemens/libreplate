@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<style>
+    /* ---------- Base Buttons ---------- */
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+
+        padding: 10px 18px;
+        border-radius: 10px;
+
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1;
+
+        text-decoration: none;
+        cursor: pointer;
+
+        border: 1px solid transparent;
+        transition: all .2s ease;
+
+        font-family: inherit;
+        box-sizing: border-box;
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .btn:active {
+        transform: translateY(0);
+    }
+
+    /* Primary */
+
+    .btn-primary {
+        background: #0b356d;
+        color: #fff;
+        border-color: #0b356d;
+    }
+
+    .btn-primary:hover {
+        background: #0f468f;
+        border-color: #0f468f;
+        box-shadow: 0 6px 16px rgba(11,53,109,.25);
+        color: #fff;
+    }
+
+    /* Secondary */
+
+    .btn-secondary {
+        background: #f4f6f9;
+        color: #0b356d;
+        border: 1px solid #d9e2ef;
+    }
+
+    .btn-secondary:hover {
+        background: #eaf1fb;
+        border-color: #bfd3f3;
+        color: #0b356d;
+    }
+
+    /* ---------- Header ---------- */
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 20px;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    @media (max-width: 700px) {
+        .page-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .header-actions {
+            width: 100%;
+            flex-direction: column;
+        }
+
+        .btn {
+            justify-content: center;
+        }
+
+        .actions {
+            margin-top: 10px;
+        }
+
+        .food-header {
+            flex-direction: column;
+        }
+    }
+
+    /* ---------- Actions ---------- */
+
+    .actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 7px 12px;
+
+        background: #f4f6f9;
+        color: #0b356d;
+
+        border: 1px solid #d9e2ef;
+        border-radius: 10px;
+
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+
+        transition: all .2s ease;
+    }
+
+    .action-btn:hover {
+        background: #eaf1fb;
+        border-color: #bfd3f3;
+        transform: translateY(-1px);
+    }
+
+    .action-btn:active {
+        transform: translateY(0);
+    }
+
+    .delete-btn:hover {
+        background: #fff5f5;
+        border-color: #efcaca;
+        color: #c0392b;
+    }
+</style>
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}My App{% endblock %}</title>
+
+    <style>
+        html, body {
+            margin: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+        }
+
+        #globalTopbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 48px;
+            background: #071428;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 14px;
+            z-index: 1000;
+            color: white;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+        }
+
+        .topbar-left,
+        .topbar-center,
+        .topbar-right {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .topbar-left { justify-content: flex-start; }
+        .topbar-center { justify-content: center; }
+        .topbar-right { justify-content: flex-end; }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .logout-btn-wide {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            width: auto;
+            padding: 0 12px;
+            font-size: 14px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .logo-emoji { margin-right: 8px; }
+        .logo-libre { color: #7dd3fc; }
+        .logo-plate { color: #ffffff; }
+
+        /* SIDEBAR (NO ANIMATION) */
+        #sidebar {
+            position: fixed;
+            top: 48px;
+            left: 0;
+            width: 150px;
+            height: calc(100vh - 48px);
+            background: #123052;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #sidebar.collapsed {
+            width: 60px;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .bottom-links {
+            padding: 10px;
+        }
+
+        .nav-links a,
+        .bottom-links a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        #sidebar.collapsed .label {
+            display: none;
+        }
+
+        #sidebar.collapsed a {
+            justify-content: center;
+        }
+
+        /* CONTENT */
+        #content {
+            margin-left: 150px;
+            margin-top: 48px;
+            height: calc(100vh - 48px);
+            padding: 20px;
+            overflow: auto;
+        }
+
+        #sidebar.collapsed ~ #content {
+            margin-left: 60px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="globalTopbar">
+
+    <div class="topbar-left">
+        <button id="toggleSidebar" class="icon-btn">☰</button>
+    </div>
+
+    <div class="topbar-center">
+        <div class="logo">
+            <span class="logo-emoji">🍽️</span>
+            <span class="logo-libre">Libre</span><span class="logo-plate">Plate</span>
+        </div>
+    </div>
+
+    <div class="topbar-right">
+        <form method="post" action="{% url 'logout' %}" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit" class="icon-btn logout-btn-wide">
+                Logout ➜
+            </button>
+        </form>
+    </div>
+
+</div>
+
+<div id="sidebar" class="{% if user_settings and user_settings.collapsed_sidebar %}collapsed{% endif %}">
+
+    <div class="nav-links">
+        <a href="{% url 'diary_today' %}"><span>📔</span><span class="label">Diary</span></a>
+        <a href="{% url 'scripts' %}"><span>🧾</span><span class="label">Scripts</span></a>
+        <a href="{% url 'groceries' %}"><span>🛒</span><span class="label">Groceries</span></a>
+        <a href="{% url 'recipes' %}"><span>🍲</span><span class="label">Recipes</span></a>
+        <a href="{% url 'foods' %}"><span>🍎</span><span class="label">Foods</span></a>
+        <a href="{% url 'user_statistics' %}"><span>📊</span><span class="label">Statistics</span></a>
+        <a href="{% url 'goals' %}"><span>🎯</span><span class="label">Goals</span></a>
+    </div>
+
+    <div class="bottom-links">
+        <a href="{% url 'settings' %}">
+            <span>⚙️</span><span class="label">Settings</span>
+        </a>
+    </div>
+
+</div>
+
+<div id="content">
+    {% block content %}{% endblock %}
+</div>
+
+<script>
+const sidebar = document.getElementById("sidebar");
+const toggleBtn = document.getElementById("toggleSidebar");
+
+toggleBtn.onclick = async function () {
+    const isCollapsed = sidebar.classList.toggle("collapsed");
+
+    try {
+        await fetch("{% url 'toggle_sidebar' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({
+                collapsed: isCollapsed
+            })
+        });
+    } catch (e) {
+        console.error("Failed to save sidebar state", e);
+    }
+};
+</script>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>
