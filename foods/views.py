@@ -130,6 +130,7 @@ def foods(request):
         },
     )
 
+
 @login_required
 def create_food(request):
     show_all = request.GET.get("all") == "1"

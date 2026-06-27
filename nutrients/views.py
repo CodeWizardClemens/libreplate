@@ -6,6 +6,7 @@ from .models import Nutrient
 import json
 from django.views.decorators.http import require_POST
 
+
 @login_required
 def nutrients(request):
     nutrients = Nutrient.objects.all()

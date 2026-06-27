@@ -17,7 +17,7 @@
 </div>
 
 {% for meal in meals %}
-    {% include "diary/components/meal.html" with meal=meal nutrients_meal=nutrients_meal %}
+    {% include "diary/components/meal.html" with meal=meal%}
 {% empty %}
     <p>No meals for this day.</p>
 {% endfor %}

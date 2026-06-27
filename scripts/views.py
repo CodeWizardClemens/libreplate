@@ -119,6 +119,7 @@ def run_script(request, script_id):
 
     return redirect("scripts")
 
+
 @login_required
 def select_food_for_step(request, step_id, food_id):
     step = get_object_or_404(ScriptStep, id=step_id, script__user=request.user)

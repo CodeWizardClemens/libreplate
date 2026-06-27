@@ -16,10 +16,9 @@ class FoodForm(forms.ModelForm):
             "description",
         ]
         widgets = {
-            "description": forms.Textarea(attrs={
-                "rows": 3,
-                "style": "resize: vertical;"
-            }),
+            "description": forms.Textarea(
+                attrs={"rows": 3, "style": "resize: vertical;"}
+            ),
         }
 
     def __init__(self, *args, **kwargs):
@@ -32,7 +31,9 @@ class FoodForm(forms.ModelForm):
         if show_all:
             nutrients = Nutrient.objects.all().order_by("order")
         else:
-            nutrients = Nutrient.objects.filter(show_in_food_edit=True).order_by("order")
+            nutrients = Nutrient.objects.filter(show_in_food_edit=True).order_by(
+                "order"
+            )
 
         for nutrient in nutrients:
             field_name = f"nutrient_{nutrient.id}"

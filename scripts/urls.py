@@ -9,7 +9,9 @@ urlpatterns = [
     path("<int:script_id>/add-step/", views.add_step, name="add_step"),
     path("step/<int:step_id>/update/", views.update_step, name="update_step"),
     path("step/<int:step_id>/delete/", views.delete_step, name="delete_step"),
-    path("step/<int:step_id>/select-food/<int:food_id>/",
+    path(
+        "step/<int:step_id>/select-food/<int:food_id>/",
         views.select_food_for_step,
-        name="select_food_for_step"),
+        name="select_food_for_step",
+    ),
 ]

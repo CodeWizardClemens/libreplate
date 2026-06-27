@@ -6,33 +6,49 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('nutrients', '0006_auto_20260623_1316'),
+        ("nutrients", "0006_auto_20260623_1316"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='nutrient',
-            name='show_in_diary_meal',
-            field=models.BooleanField(blank=True, help_text='Show this nutrient in individual diary meals.', null=True),
+            model_name="nutrient",
+            name="show_in_diary_meal",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Show this nutrient in individual diary meals.",
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='nutrient',
-            name='show_in_food_edit',
-            field=models.BooleanField(blank=True, help_text='Show this nutrient when editing a food.', null=True),
+            model_name="nutrient",
+            name="show_in_food_edit",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Show this nutrient when editing a food.",
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='nutrient',
-            name='show_in_foods',
-            field=models.BooleanField(blank=True, help_text='Show this nutrient in food detail/list pages.', null=True),
+            model_name="nutrient",
+            name="show_in_foods",
+            field=models.BooleanField(
+                blank=True,
+                help_text="Show this nutrient in food detail/list pages.",
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='nutrient',
-            name='show_in_recipe',
-            field=models.BooleanField(blank=True, help_text='Show this nutrient in recipes.', null=True),
+            model_name="nutrient",
+            name="show_in_recipe",
+            field=models.BooleanField(
+                blank=True, help_text="Show this nutrient in recipes.", null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='nutrient',
-            name='show_in_diary_total',
-            field=models.BooleanField(blank=True, help_text='Show this nutrient in diary totals.', null=True),
+            model_name="nutrient",
+            name="show_in_diary_total",
+            field=models.BooleanField(
+                blank=True, help_text="Show this nutrient in diary totals.", null=True
+            ),
         ),
     ]

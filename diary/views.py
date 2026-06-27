@@ -21,16 +21,66 @@ from collections import defaultdict
 
 import json
 
-# =========================================================
-# Helpers: virtual/default meal handling
-# =========================================================
-    
 class VirtualMealFoodManager:
     def all(self):
         return []
 
+
 def to_int_dict(d):
     return {k: int(v) for k, v in d.items()}
+
+def calculate_meal_food_totals(meal_food):
+    """
+    Calculate nutrients for a single MealFood.
+    Formula:
+        nutrient_per_100g * serving_size * servings / 100
+    """
+    totals = defaultdict(float)
+
+    serving_size = float(meal_food.serving_size or 0)
+    servings = float(meal_food.number_of_servings or 0)
+
+    for fn in meal_food.food.food_nutrients.all():
+        totals[fn.nutrient_id] += (
+            float(fn.amount)
+            * serving_size
+            * servings
+            / 100
+        )
+
+    return totals
+
+
+def calculate_meal_totals(meal):
+    totals = defaultdict(float)
+
+    for meal_food in meal.meal_foods.all():
+        food_totals = calculate_meal_food_totals(meal_food)
+
+        meal_food.nutrient_values = to_int_dict(food_totals)
+
+        for nutrient_id, value in food_totals.items():
+            totals[nutrient_id] += value
+
+    meal.total_nutrients = to_int_dict(totals)
+
+    return totals
+
+
+def calculate_day_totals(meals):
+    totals = defaultdict(float)
+
+    for meal in meals:
+        if isinstance(meal, VirtualMeal):
+            continue
+
+        meal_totals = calculate_meal_totals(meal)
+
+        for nutrient_id, value in meal_totals.items():
+            totals[nutrient_id] += value
+
+    return to_int_dict(totals)
+
 
 class VirtualMeal:
     """
@@ -120,18 +170,11 @@ def diary_day(request, date=None):
         .order_by("order")
     )
 
-
-    day_total = defaultdict(float)
-
-    # build lookup for real meals
     meal_map = {m.name: m for m in real_meals}
 
     meals = []
 
-    # DEFAULT + REAL MERGE
-    default_meals = DefaultMeal.objects.filter(user=request.user)
-
-    for dm in default_meals:
+    for dm in DefaultMeal.objects.filter(user=request.user).order_by("order"):
 
         if dm.name in meal_map:
             meal = meal_map[dm.name]
@@ -142,35 +185,21 @@ def diary_day(request, date=None):
 
         meals.append(meal)
 
-    # process nutrients for real meals only
-    for meal in meals:
+    day_total = calculate_day_totals(meals)
 
-        meal.total_nutrients = defaultdict(float)
+    body_metrics = BodyMetric.objects.filter(
+        show_in_diary_total=True
+    ).order_by("order")
 
-        meal.has_foods = False
+    logs = BodyMetricLog.objects.filter(
+        user=request.user,
+        date=selected_date,
+    )
 
-        if hasattr(meal, "meal_foods") and not isinstance(meal, VirtualMeal):
-
-            for meal_food in meal.meal_foods.all():
-                meal.has_foods = True
-
-                food_totals = defaultdict(float)
-
-                for food_nutrient in meal_food.food.food_nutrients.all():
-                    nutrient = food_nutrient.nutrient
-                    value = float(food_nutrient.amount) * meal_food.number_of_servings
-
-                    food_totals[nutrient.id] += value
-                    meal.total_nutrients[nutrient.id] += value
-                    day_total[nutrient.id] += value
-
-                meal_food.nutrient_values = to_int_dict(food_totals)
-
-    body_metrics = BodyMetric.objects.filter(show_in_diary_total=True).order_by("order")
-
-    logs = BodyMetricLog.objects.filter(user=request.user, date=selected_date)
-
-    log_map = {log.body_metric_id: log.amount for log in logs}
+    log_map = {
+        log.body_metric_id: log.amount
+        for log in logs
+    }
 
     context = {
         "selected_date": selected_date,
@@ -180,9 +209,13 @@ def diary_day(request, date=None):
         "yesterday": selected_date - timedelta(days=1),
         "tomorrow": selected_date + timedelta(days=1),
         "month_name": selected_date.strftime("%B %Y"),
-        "nutrients_total": Nutrient.objects.filter(show_in_diary_total=True).order_by("order"),
-        "nutrients_meal": Nutrient.objects.filter(show_in_diary_meal=True).order_by("order"),
-        "day_total": to_int_dict(day_total),
+        "nutrients_total": Nutrient.objects.filter(
+            show_in_diary_total=True
+        ).order_by("order"),
+        "nutrients_meal": Nutrient.objects.filter(
+            show_in_diary_meal=True
+        ).order_by("order"),
+        "day_total": day_total,
         "body_metrics": body_metrics,
         "log_map": log_map,
     }
@@ -311,9 +344,9 @@ def save_body_metric(request):
     )
 
 
-
 @require_POST
 def update_meal_food(request):
+
     data = json.loads(request.body)
 
     meal_food = get_object_or_404(
@@ -328,69 +361,33 @@ def update_meal_food(request):
 
     meal = meal_food.meal
 
-    # -----------------------------
-    # Calculation helper
-    # -----------------------------
-    def calc_value(fn, mf):
-        return (
-            float(fn.amount)
-            * float(mf.serving_size)
-            * float(mf.number_of_servings)
-            / 100
+    meal_food_totals = calculate_meal_food_totals(meal_food)
+
+    meal_totals = calculate_meal_totals(meal)
+
+    all_meals = (
+        Meal.objects.filter(
+            user=request.user,
+            date=meal.date,
         )
-
-    # -----------------------------
-    # RAW ACCUMULATORS
-    # -----------------------------
-    meal_food_totals = defaultdict(float)
-    meal_totals = defaultdict(float)
-    day_totals = defaultdict(float)
-
-    # =========================================================
-    # 1. ROW (meal_food only)
-    # =========================================================
-    for fn in meal_food.food.food_nutrients.all():
-        meal_food_totals[fn.nutrient_id] += calc_value(fn, meal_food)
-
-    # =========================================================
-    # 2. MEAL TOTALS
-    # =========================================================
-    for mf in meal.meal_foods.all():
-        for fn in mf.food.food_nutrients.all():
-            meal_totals[fn.nutrient_id] += calc_value(fn, mf)
-
-    # =========================================================
-    # 3. DAY TOTALS
-    # =========================================================
-    all_meals = Meal.objects.filter(
-        user=request.user,
-        date=meal.date
-    ).prefetch_related(
-        "meal_foods__food__food_nutrients"
+        .prefetch_related(
+            "meal_foods__food__food_nutrients"
+        )
     )
 
-    for m in all_meals:
-        for mf in m.meal_foods.all():
-            for fn in mf.food.food_nutrients.all():
-                day_totals[fn.nutrient_id] += calc_value(fn, mf)
+    day_totals = calculate_day_totals(all_meals)
 
-    # =========================================================
-    # FINAL RESPONSE (ALL INT SAFE)
-    # =========================================================
-    return JsonResponse({
-        "ok": True,
+    return JsonResponse(
+        {
+            "ok": True,
+            "meal_food": {
+                str(meal_food.id): to_int_dict(meal_food_totals)
+            },
+            "meal": to_int_dict(meal_totals),
+            "day": day_totals,
+        }
+    )
 
-        # per meal_food row
-        "meal_food": {
-            str(meal_food.id): to_int_dict(meal_food_totals)
-        },
-
-        # meal totals
-        "meal": to_int_dict(meal_totals),
-
-        # day totals
-        "day": to_int_dict(day_totals),
-    })
 
 @require_POST
 def update_note(request, meal_id):
