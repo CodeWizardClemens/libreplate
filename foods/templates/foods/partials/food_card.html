@@ -21,6 +21,12 @@
                     {{ food.name }}
                 </div>
 
+                {% if food.brand %}
+                <div class="food-brand">
+                    {{ food.brand }}
+                </div>
+                {% endif %}
+
                 <div class="serving">
                     Portion: {{ food.serving|floatformat:"-1" }} {{ food.unit }}
                 </div>
@@ -52,13 +58,29 @@
         </div>
 
         <div class="actions">
-            <a href="{% url 'edit_food' food.id %}" class="action-btn edit-btn">
-                Edit
-            </a>
 
-            <a href="{% url 'delete_food' food.id %}" class="action-btn delete-btn">
-                Delete
-            </a>
+            {% if food.source == "local" %}
+
+                <a href="{% url 'edit_food' food.id %}" class="action-btn edit-btn">
+                    Edit
+                </a>
+
+                <a href="{% url 'delete_food' food.id %}" class="action-btn delete-btn">
+                    Delete
+                </a>
+
+            {% else %}
+
+                <button
+                    type="submit"
+                    form="import-food-{{ food.fdc_id }}"
+                    class="action-btn edit-btn"
+                >
+                    Import
+                </button>
+
+            {% endif %}
+
         </div>
 
     </div>

@@ -1,134 +1,259 @@
-from django.shortcuts import render, get_object_or_404, redirect
+# foods/views.py
+from django.urls import reverse
+
 from django.contrib.auth.decorators import login_required
 from django.db.models import Prefetch
-
-from .models import Food, FoodNutrient
-from nutrients.models import Nutrient
-from .forms import FoodForm
-
-import requests
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+
 from diary.models import Meal, MealFood
-from foods.models import Food
+from foods.forms import FoodForm
+from foods.models import Food, FoodNutrient
+from foods.services.usda_client import USDAClient
+from foods.services.usda_import import import_usda_food
+from nutrients.models import Nutrient
 
-OPENFOODFACTS_URL = "https://world.openfoodfacts.org/cgi/search.pl"
+
+# =============================================================================
+# Helpers
+# =============================================================================
 
 
-@login_required
-def openfood_search(request):
-    query = request.GET.get("q", "")
-    products = []
-
-    if query:
-        headers = {"User-Agent": "LibrePlate/1.0 (contact: dev@example.com)"}
-
-        params = {
-            "search_terms": query,
-            "search_simple": 1,
-            "action": "process",
-            "json": 1,
-            "page_size": 20,
-        }
-
-        try:
-            response = requests.get(
-                OPENFOODFACTS_URL, params=params, headers=headers, timeout=10
+def get_food_queryset(user, sort):
+    foods = (
+        Food.objects.filter(user=user)
+        .prefetch_related(
+            Prefetch(
+                "food_nutrients",
+                queryset=FoodNutrient.objects.select_related("nutrient"),
             )
-
-            if response.status_code == 200:
-                data = response.json()
-                products = data.get("products", [])
-
-        except requests.RequestException:
-            products = []
-
-    return render(
-        request, "foods/openfood_search.html", {"query": query, "products": products}
-    )
-
-
-@login_required
-def import_openfood(request):
-    if request.method == "POST":
-        name = request.POST.get("name")
-        barcode = request.POST.get("barcode")
-        brand = request.POST.get("brand")
-
-        if barcode and Food.objects.filter(barcode=barcode, user=request.user).exists():
-            return redirect("foods")
-
-        Food.objects.create(
-            name=name or "Unknown product",
-            barcode=barcode,
-            brand=brand,
-            user=request.user,
-            serving=100,
-        )
-
-    return redirect("foods")
-
-
-@login_required
-def foods(request):
-    sort = request.GET.get("sort", "last_used")
-    meal_id = request.GET.get("meal")
-    select_step = request.GET.get("select_step")  # NEW
-
-    foods_qs = Food.objects.filter(user=request.user).prefetch_related(
-        Prefetch(
-            "food_nutrients", queryset=FoodNutrient.objects.select_related("nutrient")
         )
     )
 
     if sort == "name":
-        foods_qs = foods_qs.order_by("name")
+        return foods.order_by("name")
 
-    elif sort == "last_used":
-        foods_qs = foods_qs.order_by("-last_used_at", "-created_at")
+    if sort == "last_used":
+        return foods.order_by("-last_used_at", "-created_at")
 
-    else:
-        foods_qs = foods_qs.order_by("-created_at")
+    return foods.order_by("-created_at")
 
-    nutrients = list(Nutrient.objects.filter(show_in_foods=True).order_by("order"))
 
-    foods_data = []
+def get_visible_nutrients():
+    nutrients = list(
+        Nutrient.objects.filter(show_in_foods=True).order_by("order")
+    )
 
-    for food in foods_qs:
-        nutrient_map = {fn.nutrient_id: fn.amount for fn in food.food_nutrients.all()}
+    nutrient_lookup = {
+        nutrient.name.lower(): nutrient
+        for nutrient in nutrients
+    }
 
-        formatted_nutrients = []
+    return nutrients, nutrient_lookup
 
-        for nutrient in nutrients:
-            formatted_nutrients.append(
-                {
-                    "name": nutrient.name,
-                    "abbr": nutrient.abbreviation,
-                    "value": float(nutrient_map.get(nutrient.id, 0)),
-                }
-            )
 
-        foods_data.append(
+def build_local_food_data(foods, nutrients, query=""):
+    results = []
+
+    for food in foods:
+
+        if query and query.lower() not in food.name.lower():
+            continue
+
+        nutrient_map = {
+            fn.nutrient_id: float(fn.amount)
+            for fn in food.food_nutrients.all()
+        }
+
+        formatted = [
             {
-                "id": food.id,
+                "name": nutrient.name,
+                "abbr": nutrient.abbreviation,
+                "value": nutrient_map.get(nutrient.id, 0),
+            }
+            for nutrient in nutrients
+        ]
+
+        results.append(
+            {
+                "id": str(food.id),
                 "name": food.name,
                 "description": food.description or "",
                 "serving": float(food.serving),
                 "unit": food.unit.name if food.unit else "",
-                "nutrients": formatted_nutrients,
+                "nutrients": formatted,
+                "source": "local",
+                "brand": food.brand or "",
+                "barcode": food.barcode or "",
             }
         )
+
+    return results
+
+
+def build_usda_food_data(user, query, nutrients):
+    if not query:
+        return []
+
+    client = USDAClient(user)
+    results = []
+
+    for food in client.search(query):
+
+        # USDA nutrients are in food["nutrients"]
+        usda_values = {
+            n["number"]: n["value"]
+            for n in food.get("nutrients", [])
+        }
+
+        formatted = [
+            {
+                "name": nutrient.name,
+                "abbr": nutrient.abbreviation,
+                "value": usda_values.get(nutrient.usda_nutrient_number, 0),
+            }
+            for nutrient in nutrients
+        ]
+
+        results.append(
+            {
+                "id": f"usda_{food['fdc_id']}",
+                "fdc_id": food["fdc_id"],
+                "name": food["name"],
+                "description": food["description"],
+                "serving": float(food["serving"]),
+                "unit": food["unit"],
+                "nutrients": formatted,
+                "source": "usda",
+                "brand": food["brand"],
+                "barcode": food["barcode"],
+            }
+        )
+
+    return results
+
+
+def selected_foods(user, ids):
+    foods = []
+
+    for value in ids:
+
+        if value.startswith("usda_"):
+            fdc_id = int(value.split("_", 1)[1])
+            food = import_usda_food(user, fdc_id)
+        else:
+            food = get_object_or_404(
+                Food,
+                user=user,
+                id=int(value),
+            )
+
+        foods.append(food)
+
+    return foods
+
+
+def touch_food(food):
+    food.last_used_at = timezone.now()
+    food.save(update_fields=["last_used_at"])
+
+
+def add_foods_to_meal_instance(meal, foods):
+    for food in foods:
+        MealFood.objects.create(
+            meal=meal,
+            food=food,
+            serving_size=food.serving,
+            number_of_servings=1,
+        )
+
+        touch_food(food)
+
+
+def save_food_form(form, user=None):
+    food = form.save(commit=False)
+
+    if user:
+        food.user = user
+
+    food.last_used_at = timezone.now()
+    food.save()
+
+    form.save_nutrients(food)
+
+    return food
+
+
+# =============================================================================
+# Views
+# =============================================================================
+
+
+@login_required
+def foods(request):
+    sorting_method = request.GET.get("sort", "last_used")
+    meal_id = request.GET.get("meal")
+    meal_name = request.GET.get("meal_name")
+
+    print(meal_id)
+    user_food_search_query = request.GET.get("q", "").strip()
+
+    use_local_search = request.GET.get("use_local_search") == "1"
+    use_usda_search = request.GET.get("use_usda_search") == "1"
+
+    if user_food_search_query and "local" not in request.GET and "usda" not in request.GET:
+        use_local_search = True
+        use_usda_search = True
+
+    nutrients, _ = get_visible_nutrients()
+    
+    foods_data = []
+
+    if not user_food_search_query or use_local_search:
+        foods_data.extend(
+            build_local_food_data(
+                get_food_queryset(request.user, sorting_method),
+                nutrients,
+                user_food_search_query,
+            )
+        )
+
+    if user_food_search_query and use_usda_search:
+        try:
+            foods_data.extend(
+                build_usda_food_data(
+                    request.user,
+                    user_food_search_query,
+                    nutrients,
+                )
+            )
+        except Exception as exc:
+            print("USDA search failed:", exc)
 
     return render(
         request,
         "foods/foods.html",
         {
             "foods": foods_data,
-            "nutrients": nutrients,
-            "sort": sort,
+            "sort": sorting_method,
             "meal_id": meal_id,
-            "select_step": select_step,  # NEW
+            "user_food_search_query": user_food_search_query,
+            "use_local_search": use_local_search,
+            "use_usda_search": use_usda_search,
+            "meal_name": meal_name,
         },
     )
+
+
+@login_required
+def import_usda_food_view(request, fdc_id):
+    if request.method != "POST":
+        return redirect("foods")
+
+    food = import_usda_food(request.user, fdc_id)
+    touch_food(food)
+
+    return redirect("foods")
 
 
 @login_required
@@ -139,14 +264,9 @@ def create_food(request):
         form = FoodForm(request.POST, show_all=show_all)
 
         if form.is_valid():
-            food = form.save(commit=False)
-            food.user = request.user
-            food.last_used_at = timezone.now()
-            food.save()
-
-            form.save_nutrients(food)
-
+            save_food_form(form, request.user)
             return redirect("foods")
+
     else:
         form = FoodForm(show_all=show_all)
 
@@ -162,7 +282,11 @@ def create_food(request):
 
 @login_required
 def edit_food(request, pk):
-    food = get_object_or_404(Food, pk=pk, user=request.user)
+    food = get_object_or_404(
+        Food,
+        pk=pk,
+        user=request.user,
+    )
 
     show_all = request.GET.get("all") == "1"
 
@@ -174,11 +298,9 @@ def edit_food(request, pk):
         )
 
         if form.is_valid():
-            food = form.save(commit=False)
-            food.last_used_at = timezone.now()
-            food.save()
-            form.save()
+            save_food_form(form)
             return redirect("foods")
+
     else:
         form = FoodForm(
             instance=food,
@@ -197,25 +319,32 @@ def edit_food(request, pk):
 
 @login_required
 def delete_food(request, pk):
-    food = get_object_or_404(Food, pk=pk, user=request.user)
+    food = get_object_or_404(
+        Food,
+        pk=pk,
+        user=request.user,
+    )
 
     if request.method == "POST":
         food.delete()
         return redirect("foods")
 
-    return render(request, "foods/food_confirm_delete.html", {"food": food})
+    return render(
+        request,
+        "foods/food_confirm_delete.html",
+        {
+            "food": food,
+        },
+    )
 
 
+@login_required
 def select_meal(request):
     if request.method != "POST":
         return redirect("foods")
 
-    food_ids = request.POST.getlist("foods")
-
-    foods = Food.objects.filter(
-        user=request.user,
-        id__in=food_ids,
-    )
+    selected_ids = request.POST.getlist("foods")
+    foods = selected_foods(request.user, selected_ids)
 
     meals = Meal.objects.filter(
         user=request.user,
@@ -227,12 +356,13 @@ def select_meal(request):
         "foods/select_meal.html",
         {
             "foods": foods,
-            "food_ids": food_ids,
+            "food_ids": [food.id for food in foods],
             "meals": meals,
         },
     )
 
 
+@login_required
 def add_foods_to_meal(request, meal_id):
     if request.method != "POST":
         return redirect("foods")
@@ -243,22 +373,13 @@ def add_foods_to_meal(request, meal_id):
         user=request.user,
     )
 
-    food_ids = request.POST.getlist("foods")
-
-    foods = Food.objects.filter(
-        user=request.user,
-        id__in=food_ids,
+    foods = selected_foods(
+        request.user,
+        request.POST.getlist("foods"),
     )
 
-    for food in foods:
-        MealFood.objects.create(
-            meal=meal,
-            food=food,
-            serving_size=food.serving,
-            number_of_servings=1,
-        )
-        food.last_used_at = timezone.now()
-        food.save(update_fields=["last_used_at"])
+    add_foods_to_meal_instance(meal, foods)
+
     return redirect("diary_today")
 
 
@@ -275,22 +396,14 @@ def add_foods_to_meal_direct(request, meal_id):
         date=timezone.localdate(),
     )
 
-    food_ids = request.POST.getlist("foods")
-
-    foods = Food.objects.filter(
-        user=request.user,
-        id__in=food_ids,
+    foods = selected_foods(
+        request.user,
+        request.POST.getlist("foods"),
     )
 
-    for food in foods:
-        MealFood.objects.create(
-            meal=meal,
-            food=food,
-            serving_size=food.serving,
-            number_of_servings=1,
-        )
+    add_foods_to_meal_instance(meal, foods)
 
-        food.last_used_at = timezone.now()
-        food.save(update_fields=["last_used_at"])
-
-    return redirect("diary_day", date=meal.date.strftime("%Y-%m-%d"))
+    return redirect(
+        "diary_day",
+        date=meal.date.strftime("%Y-%m-%d"),
+    )

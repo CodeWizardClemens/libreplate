@@ -10,10 +10,6 @@
         <h1>Foods</h1>
 
         <div class="header-actions">
-            <a href="{% url 'openfood_search' %}" class="btn btn-secondary">
-                🔍 OpenFoodFacts
-            </a>
-
             <a href="{% url 'create_food' %}" class="btn btn-primary">
                 + New Food
             </a>
@@ -28,20 +24,49 @@
                 type="submit"
                 form="foodSelectionForm"
                 disabled>
+                {% if foods %}
+                {% if meal_id %}
+                Add to {{ meal_name }}
+                {% else %}
                 Add
+                {% endif %}
             </button>
         </div>
 
         <div class="food-search">
-            <input
-                type="text"
-                id="foodSearch"
-                placeholder="Search foods..."
-            >
+
+            <form method="get" id="foodSearchForm">
+            {% if meal_id %}
+                <input type="hidden" name="meal" value="{{ meal_id }}">
+                <input type="hidden" name="meal_name" value="{{ meal_name }}">
+            {% endif %}
+                <input
+                    type="text"
+                    id="foodSearch"
+                    name="q"
+                    value="{{ query }}"
+                    placeholder="Search foods..."
+                >
+
         </div>
 
+        </form>
+
+        {% for food in foods %}
+            {% if food.source != "local" %}
+                <form
+                    id="import-food-{{ food.fdc_id }}"
+                    method="post"
+                    action="{% url 'import_usda_food' food.fdc_id %}"
+                    style="display:none;"
+                >
+                    {% csrf_token %}
+                </form>
+            {% endif %}
+        {% endfor %}
+
         <div class="food-sort">
-            <select id="sortSelect">
+            <select id="sortSelect" name="sort">
                 <option value="last_used"
                     {% if sort == "last_used" %}selected{% endif %}>
                     Last used
@@ -59,9 +84,47 @@
             </select>
         </div>
 
+        <div class="food-search-submit">
+            <button type="submit" class="btn btn-secondary">
+                Search
+            </button>
+
+            </form>
+        </div>
+
     </div>
 
-    {% if foods %}
+    <div class="food-toolbar" style="margin-top:8px;">
+
+        <div class="search-sources">
+
+            Search options:
+    
+            <label style="margin-right:12px;">
+                <input
+                    type="checkbox"
+                    name="use_local_search"
+                    value="1"
+                    form="foodSearchForm"
+                    {% if use_local or not query %}checked{% endif %}
+                >
+                Local
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="use_usda_search"
+                    value="1"
+                    form="foodSearchForm"
+                    {% if use_usda or not query %}checked{% endif %}
+                >
+                USDA
+            </label>
+
+        </div>
+
+    </div>
 
     <form
         id="foodSelectionForm"
@@ -75,17 +138,19 @@
         "
     >
         {% csrf_token %}
-
+        
         <div id="foodsContainer">
             {% for food in foods %}
-                {% include "foods/partials/food_card.html" %}
+            {% include "foods/partials/food_card.html" %}
             {% endfor %}
         </div>
-
+        
     </form>
 
     {% else %}
-        <p>No foods available.</p>
+
+        <p>No foods found.</p>
+
     {% endif %}
 
 </div>

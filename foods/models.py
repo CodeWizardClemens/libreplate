@@ -23,6 +23,11 @@ class Food(models.Model):
 
     last_used_at = models.DateTimeField(null=True, blank=True, db_index=True)
 
+    usda_fdc_id = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        db_index=True,
+    )
     class Meta:
         ordering = ["-created_at"]
         verbose_name_plural = "Foods"

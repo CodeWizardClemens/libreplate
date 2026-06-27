@@ -23,4 +23,9 @@ urlpatterns = [
         views.reorder_default_meals,
         name="reorder_default_meals",
     ),
+    path(
+        "api_configuration",
+        views.api_configuration,
+        name="api_configuration",
+    )
 ]

@@ -14,7 +14,8 @@ class NutrientForm(forms.ModelForm):
             "show_in_food_edit",
             "show_in_recipe",
             "show_in_foods",
-            "show_in_goal_edit"
+            "show_in_goal_edit",
+            "usda_nutrient_number",
         ]
 
         widgets = {

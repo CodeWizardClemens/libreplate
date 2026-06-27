@@ -5,7 +5,9 @@
     <div class="meal-header">
         <div>
             <h>{{ meal.name }}</h>
-            <a href="{% url 'foods' %}?meal={{ meal.id }}">+ Add food</a>
+            <a href="{% url 'foods' %}?meal={{ meal.id }}&meal_name={{ meal.name|urlencode }}">
+                + Add food
+            </a>
         </div>
 
         {% if not meal.is_virtual %}

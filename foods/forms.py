@@ -12,6 +12,7 @@ class FoodForm(forms.ModelForm):
             "unit",
             "thumbnail_path",
             "barcode",
+            "usda_fdc_id",
             "brand",
             "description",
         ]

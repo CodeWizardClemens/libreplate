@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    console.log("food.js LOADED");
-
     const searchInput = document.getElementById("foodSearch");
     const addButton = document.getElementById("addSelectedBtn");
     const sortSelect = document.getElementById("sortSelect");
@@ -52,38 +50,5 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     updateAddButton();
-
-    //
-    // Nutrients toggle
-    //
-    const toggleBtn = document.getElementById("toggleNutrientsBtn");
-
-    if (toggleBtn) {
-
-        const hiddenRows = Array.from(
-            document.querySelectorAll('#nutrientList .nutrient-row[data-visible="false"]')
-        );
-
-        let expanded = false;
-
-        function updateNutrients() {
-            hiddenRows.forEach(row => {
-                row.style.display = expanded ? "" : "none";
-            });
-
-            toggleBtn.textContent = expanded ? "Hide" : "Show more";
-        }
-
-        if (hiddenRows.length === 0) {
-            toggleBtn.style.display = "none";
-        } else {
-            updateNutrients();
-
-            toggleBtn.addEventListener("click", () => {
-                expanded = !expanded;
-                updateNutrients();
-            });
-        }
-    }
 
 });

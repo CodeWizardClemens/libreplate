@@ -4,8 +4,8 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from .models import DefaultMeal
-from .forms import DefaultMealForm
+from .models import DefaultMeal, USDAAPISettings
+from .forms import DefaultMealForm, APIConfigurationForm
 from django.shortcuts import render, get_object_or_404, redirect
 
 
@@ -37,6 +37,31 @@ def default_meals(request):
     default_meals = DefaultMeal.objects.all()
     context = {"default_meals": default_meals}
     return render(request, "settings/default_meals/default_meals.html", context)
+
+
+@login_required
+def api_configuration(request):
+    # Get the user's settings or create them the first time
+    configuration, created = USDAAPISettings.objects.get_or_create(
+        user=request.user
+    )
+
+    if request.method == "POST":
+        form = APIConfigurationForm(
+            request.POST,
+            instance=configuration,
+        )
+        if form.is_valid():
+            form.save()
+            return redirect("api_configuration")
+    else:
+        form = APIConfigurationForm(instance=configuration)
+
+    return render(
+        request,
+        "settings/api_configuration/api_configuration.html",
+        {"form": form},
+    )
 
 
 @login_required

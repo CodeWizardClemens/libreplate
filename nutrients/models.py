@@ -1,3 +1,4 @@
+# nutrients/models
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -40,6 +41,13 @@ class Nutrient(models.Model):
     show_in_goal_edit = models.BooleanField(
         null=True,
         blank=True,
+    )
+    usda_nutrient_number = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        unique=True,
+        help_text="USDA nutrient number (e.g. 1003 for Protein).",
     )
 
     order = models.PositiveIntegerField(default=0)

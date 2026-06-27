@@ -154,15 +154,12 @@
     <title>{% block title %}My App{% endblock %}</title>
 
     <style>
-        html, body {
-            margin: 0;
-            height: 100%;
-            font-family: Arial, sans-serif;
-        }
-
+        html,
         body {
             margin: 0;
-            height: 100vh;
+            height: 100%;
+            overflow: hidden;   /* prevent body scrollbar */
+            font-family: Arial, sans-serif;
         }
 
         #globalTopbar {
@@ -284,9 +281,13 @@
         #content {
             margin-left: 150px;
             margin-top: 48px;
+
             height: calc(100vh - 48px);
+            overflow-y: auto;
+            overflow-x: hidden;
+
             padding: 20px;
-            overflow: auto;
+            box-sizing: border-box;
         }
 
         #sidebar.collapsed ~ #content {
