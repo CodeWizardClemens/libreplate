@@ -4,14 +4,14 @@ from django.db import models
 
 class GoalGroup(models.Model):
     name = models.CharField(max_length=255)
-    note = models.TextField(blank=True)
+    description = models.TextField(blank=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="goal_groups",
     )
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return self.name

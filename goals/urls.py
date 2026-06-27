@@ -3,13 +3,7 @@ from . import views
 
 urlpatterns = [
     path("", views.goals_page, name="goals"),
-    path("group/add/", views.add_group, name="add_goal_group"),
-    path("group/<int:pk>/delete/", views.delete_group, name="delete_goal_group"),
-    path("group/<int:pk>/rename/", views.rename_group, name="rename_goal_group"),
-    path("group/<int:pk>/add-item/", views.add_goal_item, name="add_goal_item"),
-    path(
-        "group/<int:pk>/add-item/post/",
-        views.add_goal_item_post,
-        name="add_goal_item_post",
-    ),
+    path("create/", views.goal_group_create, name="goal_group_create"),
+    path("<int:pk>/delete/", views.goal_group_delete, name="goal_group_delete"),
+    path("<int:pk>/edit/", views.goal_group_edit, name="goal_group_edit"),
 ]

@@ -11,6 +11,10 @@ class BodyMetric(models.Model):
     show_in_diary_total = models.BooleanField(
         default=True, help_text="If True, this nutrient will be visible to users"
     )
+    show_in_goal_edit = models.BooleanField(
+        null=True,
+        blank=True,
+    )
 
     order = models.PositiveIntegerField(default=0)
 

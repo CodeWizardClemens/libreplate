@@ -3,24 +3,45 @@
 <h3>Day total</h3>
 
 <table class="day-table">
+
+    <!-- HEADER ROW -->
     <tr>
+        <th></th>
         {% for nutrient in nutrients_total %}
-        <th>
-            {% if nutrient.abbreviation %}
-                {{ nutrient.abbreviation }}
-            {% else %}
-                {{ nutrient.name }}
-            {% endif %}
-        </th>
+            <th>
+                {% if nutrient.abbreviation %}
+                    {{ nutrient.abbreviation }}
+                {% else %}
+                    {{ nutrient.name }}
+                {% endif %}
+            </th>
         {% endfor %}
     </tr>
 
+    <!-- DAY TOTAL ROW -->
     <tr>
+        <td class="row-label">Total</td>
+
         {% for nutrient in nutrients_total %}
-        <td class="day-total" data-nutrient="{{ nutrient.id }}">
-            {{ day_total|get_item:nutrient.id|default:"0" }}
-            {{ nutrient.unit }}
-        </td>
+            <td class="day-total" data-nutrient="{{ nutrient.id }}">
+                {{ day_total|get_item:nutrient.id|default:"0" }}
+                {{ nutrient.unit }}
+            </td>
         {% endfor %}
     </tr>
+
+    <!-- GOAL ROW -->
+    {% if goal_nutrients %}
+    <tr class="day-goals">
+        <td class="row-label">Goal</td>
+
+        {% for nutrient in nutrients_total %}
+            <td class="day-goal" data-nutrient="{{ nutrient.id }}">
+                {{ goal_nutrients|get_item:nutrient.id|default:"-" }}
+                {{ nutrient.unit }}
+            </td>
+        {% endfor %}
+    </tr>
+    {% endif %}
+
 </table>

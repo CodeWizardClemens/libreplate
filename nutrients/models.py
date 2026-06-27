@@ -37,6 +37,11 @@ class Nutrient(models.Model):
         help_text="Show this nutrient in food detail/list pages.",
     )
 
+    show_in_goal_edit = models.BooleanField(
+        null=True,
+        blank=True,
+    )
+
     order = models.PositiveIntegerField(default=0)
 
     user = models.ForeignKey(

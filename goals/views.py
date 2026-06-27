@@ -4,53 +4,79 @@ from django.contrib.auth.decorators import login_required
 from .models import GoalGroup, GoalNutrient, GoalBodyMetric
 from nutrients.models import Nutrient
 from body_metrics.models import BodyMetric
-from .forms import GoalGroupForm
-
+from .forms import GoalForm
 
 @login_required
 def goals_page(request):
-    groups = GoalGroup.objects.filter(user=request.user).order_by("-id")
-    form = GoalGroupForm()
+    goal_groups = GoalGroup.objects.filter(user=request.user).order_by("-id")
 
-    return render(request, "goals/goals.html", {"groups": groups, "form": form})
+    return render(
+        request, "goals/goals.html",
+        {"goal_groups": goal_groups}
+    )
 
 
 @login_required
-def add_group(request):
+def goal_group_create(request):
     if request.method == "POST":
-        form = GoalGroupForm(request.POST)
-        if form.is_valid():
-            group = form.save(commit=False)
-            group.user = request.user
-            group.save()
+        form = GoalForm(request.POST)
 
-    return redirect("goals")
+        if form.is_valid():
+            goal = form.save(commit=False)
+            goal.user = request.user
+            goal.save()
+
+            form.save_nutrients_and_metrics(goal)
+
+            return redirect("goals")
+    else:
+        form = GoalForm()
+
+    nutrients = Nutrient.objects.filter(show_in_goal_edit=True)
+    body_metrics = BodyMetric.objects.filter(show_in_goal_edit=True)
+
+    return render(request, "goals/goal_edit.html", {
+        "form": form,
+        "nutrients": nutrients,
+        "body_metrics": body_metrics,
+        "nutrient_values": {},
+        "body_metric_values": {},
+    })
 
 
 @login_required
-def delete_group(request, pk):
+def goal_group_delete(request, pk):
     group = get_object_or_404(GoalGroup, pk=pk, user=request.user)
     group.delete()
     return redirect("goals")
 
 
 @login_required
-def rename_group(request, pk):
-    group = get_object_or_404(GoalGroup, pk=pk, user=request.user)
+def goal_group_edit(request, pk):
+    goal_group = get_object_or_404(GoalGroup, pk=pk, user=request.user)
 
     if request.method == "POST":
-        name = request.POST.get("name")
-        note = request.POST.get("note")
+        form = GoalForm(request.POST, instance=goal_group, goal_group=goal_group)
 
-        if name is not None:
-            group.name = name
+        if form.is_valid():
+            goal_group = form.save()
+            form.save_nutrients_and_metrics(goal_group)
+            return redirect("goals")
 
-        if note is not None:
-            group.note = note
+    else:
+        form = GoalForm(instance=goal_group, goal_group=goal_group)
 
-        group.save()
+    nutrient_values = form.get_nutrient_values()
+    body_metric_values = form.get_body_metric_values()
 
-    return redirect("goals")
+    return render(request, "goals/goal_edit.html", {
+        "form": form,
+        "goal_group": goal_group,
+        "nutrients": Nutrient.objects.filter(show_in_goal_edit=True),
+        "body_metrics": BodyMetric.objects.filter(show_in_goal_edit=True),
+        "nutrient_values": nutrient_values,
+        "body_metric_values": body_metric_values,
+    })
 
 
 @login_required

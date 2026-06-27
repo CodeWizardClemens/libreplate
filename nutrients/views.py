@@ -32,11 +32,6 @@ def create_nutrient(request):
 def edit_nutrient(request, pk):
     nutrient = get_object_or_404(Nutrient, pk=pk)
 
-    # Security check: Only allow editing if it belongs to this user OR it's a global nutrient
-    # (Decide policy: Can users edit global nutrients? Usually no. Let's restrict to user-owned or admin)
-    if nutrient.user and nutrient.user != request.user:
-        return redirect("nutrients")  # Or raise PermissionDenied
-
     if request.method == "POST":
         form = NutrientForm(request.POST, instance=nutrient)
         if form.is_valid():

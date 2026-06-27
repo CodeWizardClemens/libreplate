@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load dict_extras %}
+
+
+{% block content %}
+
+<div style="border:1px solid #ccc; padding:20px; max-width:700px;">
+
+    <h3>Edit Goal</h3>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <h4>General</h4>
+
+        {{ form.name }}
+        <br><br>
+
+        {{ form.description }}
+        <br><br>
+
+        {{ form.start_date }}
+        {{ form.end_date }}
+
+        <br><br>
+
+        <hr>
+
+        <h4>Nutrient Goals</h4>
+
+        {% for nutrient in nutrients %}
+            <div style="margin-bottom:10px;">
+                <label>
+                    {{ nutrient.name }}
+                    {% if nutrient.abbreviation %}
+                        ({{ nutrient.abbreviation }})
+                    {% endif %}
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="nutrient_{{ nutrient.id }}"
+                    class="form-control"
+                    value="{{ nutrient_values|get_item:nutrient.id }}"
+                >
+            </div>
+        {% empty %}
+            <p>No nutrients available.</p>
+        {% endfor %}
+
+        <hr>
+
+        <h4>Body Metric Goals</h4>
+
+        {% for metric in body_metrics %}
+            <div style="margin-bottom:10px;">
+                <label>{{ metric.name }}</label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    name="metric_{{ metric.id }}"
+                    class="form-control"
+                    value="{{ body_metric_values|get_item:metric.id }}"
+                >
+            </div>
+        {% empty %}
+            <p>No body metrics available.</p>
+        {% endfor %}
+
+        <br>
+
+        <button type="submit" class="btn btn-primary">
+            Save Goal
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

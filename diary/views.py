@@ -20,11 +20,31 @@ from common.food_selection import get_user_foods
 from collections import defaultdict
 
 import json
+from goals.models import GoalGroup, GoalNutrient
 
 class VirtualMealFoodManager:
     def all(self):
         return []
 
+def get_active_goal_group(user, selected_date):
+    """
+    Returns the single GoalGroup active for the selected_date.
+    Rules:
+    - start_date is optional (None = -infinity)
+    - end_date is optional (None = +infinity)
+    - date must be within inclusive range
+    """
+
+    groups = GoalGroup.objects.filter(user=user)
+
+    for g in groups:
+        start_ok = g.start_date is None or g.start_date <= selected_date
+        end_ok = g.end_date is None or g.end_date >= selected_date
+
+        if start_ok and end_ok:
+            return g
+
+    return None
 
 def to_int_dict(d):
     return {k: int(v) for k, v in d.items()}
@@ -187,6 +207,21 @@ def diary_day(request, date=None):
 
     day_total = calculate_day_totals(meals)
 
+    # ----------------------------
+    # GOALS
+    # ----------------------------
+    goal_group = get_active_goal_group(request.user, selected_date)
+
+    goal_nutrients = {}
+
+    if goal_group:
+        goal_qs = GoalNutrient.objects.filter(goal_group=goal_group)
+
+        goal_nutrients = {
+            g.nutrient_id: float(g.amount)
+            for g in goal_qs
+        }
+
     body_metrics = BodyMetric.objects.filter(
         show_in_diary_total=True
     ).order_by("order")
@@ -196,10 +231,7 @@ def diary_day(request, date=None):
         date=selected_date,
     )
 
-    log_map = {
-        log.body_metric_id: log.amount
-        for log in logs
-    }
+    log_map = {log.body_metric_id: log.amount for log in logs}
 
     context = {
         "selected_date": selected_date,
@@ -216,12 +248,12 @@ def diary_day(request, date=None):
             show_in_diary_meal=True
         ).order_by("order"),
         "day_total": day_total,
+        "goal_nutrients": to_int_dict(goal_nutrients),
         "body_metrics": body_metrics,
         "log_map": log_map,
     }
 
     return render(request, "diary/day.html", context)
-
 
 # =========================================================
 # MEALS
