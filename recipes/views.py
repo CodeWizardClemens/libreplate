@@ -169,6 +169,11 @@ def recipe_edit(request, recipe_id):
                         "default_servings",
                     ]
                 )
+            
+            if "add_food" in request.POST:
+                return redirect(
+                    f"/foods/?recipe_id={recipe.id}&recipe_name={recipe.name}"
+                )
 
             return redirect("recipes")
 

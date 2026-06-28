@@ -32,19 +32,13 @@
         <div class="meal-card">
 
             <div class="meal-header">
-                {% if recipe %}
-                    <a href="{% url 'foods' %}?recipe_id={{ recipe.id }}&recipe_name={{ recipe.name|urlencode }}">
-                        + Add food
-                    </a>
-                {% else %}
-                    <button
-                        type="submit"
-                        name="add_food"
-                        value="1"
-                        class="btn btn-primary">
-                        + Add food
-                    </button>
-                {% endif %}
+                <button
+                    type="submit"
+                    name="add_food"
+                    value="1"
+                    class="btn btn-primary">
+                    + Add food
+                </button>
             </div>
 
             {% if ingredients %}
