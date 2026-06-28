@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+{% load diary_filters %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="page-header">
+        <h1>Edit recipe</h1>
+
+        <div class="header-actions">
+            <a href="{% url 'recipes' %}" class="btn btn-secondary">
+                Back
+            </a>
+
+            <button type="submit"
+                    form="recipeForm"
+                    class="btn btn-primary">
+                Save recipe
+            </button>
+        </div>
+    </div>
+
+    <form method="post"
+          id="recipeForm"
+          class="recipe-form">
+
+        {% csrf_token %}
+        {{ form.as_p }}
+
+    </form>
+
+    <hr>
+
+    <div class="meal-card">
+
+        <div class="meal-header">
+
+            {% if recipe %}
+
+                <a href="{% url 'foods' %}?recipe_id={{ recipe.id }}&recipe_name={{ recipe.name|urlencode }}">
+                    + Add food
+                </a>
+
+            {% else %}
+
+                <button
+                    type="submit"
+                    form="recipeForm"
+                    name="add_food"
+                    value="1"
+                    class="btn btn-primary">
+
+                    + Add food
+
+                </button>
+
+            {% endif %}
+
+        </div>
+
+        {% if ingredients %}
+
+        <table class="meal-table">
+
+            <tr>
+
+                <th>Food</th>
+                <th>Servings</th>
+
+                {% for nutrient in visible_nutrients %}
+                    <th class="nutrient-header">
+
+                        {% if nutrient.abbreviation %}
+                            {{ nutrient.abbreviation }}
+                        {% else %}
+                            {{ nutrient.name }}
+                        {% endif %}
+
+                    </th>
+                {% endfor %}
+
+                <th></th>
+
+            </tr>
+
+            {% for ingredient in ingredients %}
+
+            <tr>
+
+                <td>
+                    {{ ingredient.food.name }}
+                </td>
+
+                <td>
+                    {{ ingredient.default_servings }}
+                </td>
+
+                {% for nutrient in visible_nutrients %}
+
+                    <td>
+
+                        {% with value=ingredient.food.food_nutrients.all %}
+
+                            {% for fn in ingredient.food.food_nutrients.all %}
+
+                                {% if fn.nutrient_id == nutrient.id %}
+                                    {{ fn.amount|floatformat:0|add:"0"|floatformat:0 }}
+                                {% endif %}
+
+                            {% endfor %}
+
+                        {% endwith %}
+
+                    </td>
+
+                {% endfor %}
+
+                <td>
+
+                    <form method="post"
+                          action="{% url 'delete_recipe_ingredient' ingredient.id %}">
+
+                        {% csrf_token %}
+
+                        <button class="action-btn delete-btn">
+                            ×
+                        </button>
+
+                    </form>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            <tr>
+
+                <th colspan="2">
+                    Recipe total
+                </th>
+
+                {% for nutrient in visible_nutrients %}
+
+                    <th id="recipe-total-{{ nutrient.id }}">
+                        0
+                    </th>
+
+                {% endfor %}
+
+                <th></th>
+
+            </tr>
+
+        </table>
+
+        {% else %}
+
+            <p class="empty-meal">
+                No ingredients yet.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<script>
+
+{% if recipe %}
+
+function loadTotals() {
+
+    fetch("{% url 'recipe_nutrition_ajax' recipe.id %}")
+        .then(r => r.json())
+        .then(data => {
+
+            for (const nutrient in data) {
+
+                const cell = document.getElementById(
+                    "recipe-total-" + nutrient
+                );
+
+                if (cell) {
+                    cell.textContent = Math.round(data[nutrient]);
+                }
+            }
+
+        });
+
+}
+
+loadTotals();
+
+{% endif %}
+
+</script>
+
+{% endblock %}

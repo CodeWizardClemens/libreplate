@@ -27,4 +27,9 @@ urlpatterns = [
         views.add_foods_to_meal_direct,
         name="add_foods_to_meal_direct",
     ),
+    path(
+        "add-to-recipe/<int:recipe_id>/",
+        views.add_foods_to_recipe_direct,
+        name="add_foods_to_recipe_direct",
+    ),
 ]

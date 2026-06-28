@@ -27,6 +27,8 @@
                 {% if foods %}
                 {% if meal_id %}
                 Add to {{ meal_name }}
+                {% elif recipe_name %}
+                Add to {{ recipe_name }}
                 {% else %}
                 Add
                 {% endif %}
@@ -39,6 +41,9 @@
             {% if meal_id %}
                 <input type="hidden" name="meal" value="{{ meal_id }}">
                 <input type="hidden" name="meal_name" value="{{ meal_name }}">
+            {% elif recipe_id %}
+                <input type="hidden" name="recipe_id" value="{{ recipe_id }}">
+                <input type="hidden" name="recipe_name" value="{{ recipe_name }}">            
             {% endif %}
                 <input
                     type="text"
@@ -132,6 +137,8 @@
         action="
         {% if meal_id %}
             {% url 'add_foods_to_meal_direct' meal_id %}
+        {% elif recipe_id %}
+            {% url 'add_foods_to_recipe_direct' recipe_id %}
         {% else %}
             {% url 'select_meal' %}
         {% endif %}

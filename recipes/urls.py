@@ -1,14 +1,14 @@
 from django.urls import path
-
 from . import views
 
 urlpatterns = [
-    path("", views.recipe_list, name="recipes"),
-    path("new/", views.recipe_create, name="recipe_create"),
+    path("", views.recipes, name="recipes"),
+    path("create/", views.recipe_create, name="recipe_create"),
     path("<int:recipe_id>/", views.recipe_edit, name="recipe_edit"),
     path("<int:recipe_id>/delete/", views.recipe_delete, name="recipe_delete"),
+
     path(
-        "<int:recipe_id>/ingredient/add/",
+        "<int:recipe_id>/add-ingredient/",
         views.add_recipe_ingredient,
         name="add_recipe_ingredient",
     ),

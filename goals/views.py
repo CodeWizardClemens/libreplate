@@ -20,12 +20,10 @@ def goals_page(request):
 def goal_group_create(request):
     if request.method == "POST":
         form = GoalForm(request.POST)
-
         if form.is_valid():
             goal = form.save(commit=False)
             goal.user = request.user
             goal.save()
-
             form.save_nutrients_and_metrics(goal)
 
             return redirect("goals")

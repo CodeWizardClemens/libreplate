@@ -12,6 +12,7 @@ from foods.models import Food, FoodNutrient
 from foods.services.usda_client import USDAClient
 from foods.services.usda_import import import_usda_food
 from nutrients.models import Nutrient
+from recipes.models import Recipe, RecipeIngredient
 
 
 # =============================================================================
@@ -194,8 +195,12 @@ def foods(request):
     sorting_method = request.GET.get("sort", "last_used")
     meal_id = request.GET.get("meal")
     meal_name = request.GET.get("meal_name")
+    recipe_id = request.GET.get("recipe_id")
+    recipe_name = request.GET.get("recipe_name")
 
-    print(meal_id)
+    print(recipe_id)
+    print(recipe_name)
+
     user_food_search_query = request.GET.get("q", "").strip()
 
     use_local_search = request.GET.get("use_local_search") == "1"
@@ -241,6 +246,8 @@ def foods(request):
             "use_local_search": use_local_search,
             "use_usda_search": use_usda_search,
             "meal_name": meal_name,
+            "recipe_id": recipe_id,
+            "recipe_name": recipe_name,
         },
     )
 
@@ -406,4 +413,36 @@ def add_foods_to_meal_direct(request, meal_id):
     return redirect(
         "diary_day",
         date=meal.date.strftime("%Y-%m-%d"),
+    )
+
+@login_required
+def add_foods_to_recipe_direct(request, recipe_id):
+    if request.method != "POST":
+        return redirect("foods")
+
+    recipe = get_object_or_404(
+        Recipe,
+        id=recipe_id,
+        user=request.user,
+    )
+
+    foods = selected_foods(
+        request.user,
+        request.POST.getlist("foods"),
+    )
+
+    order = recipe.ingredients.count()
+
+    for food in foods:
+        RecipeIngredient.objects.create(
+            recipe=recipe,
+            food=food,
+            default_servings=1,
+            order=order,
+        )
+        order += 1
+
+    return redirect(
+        "recipe_edit",
+        recipe_id=recipe.id,
     )
