@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 
@@ -10,44 +11,48 @@
     </a>
 </div>
 
-<div>
+<div class="search-toolbar">
 
-    {% for recipe in recipes %}
+    <div class="add-button">
+        <button
+            id="addSelectedBtn"
+            type="submit"
+            form="recipeSelectionForm"
+            disabled>
 
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
-            <span>
-                {{ recipe.name }}
-                {% if recipe.summary %}
-                 - {{ recipe.summary }}
-                {% endif %}
-            </span>
-
-            <a href="{% url 'recipe_edit' recipe.id %}">
-                Edit
-            </a>
-
-            <form
-                method="post"
-                action="{% url 'recipe_delete' recipe.id %}"
-                style="display:inline; margin:0;"
-                onsubmit="return confirm('Are you sure you want to delete this recipe? This action can not be undone.');"
-            >
-                {% csrf_token %}
-                <button
-                    type="submit"
-                    style="background:none;border:none;color:#0d6efd;text-decoration:underline;cursor:pointer;padding:0;"
-                >
-                    Delete
-                </button>
-            </form>
-        </div>
-
-    {% empty %}
-
-        <p>No recipes yet.</p>
-
-    {% endfor %}
-
+            {% if meal_id %}
+                Add to {{ meal_name }}
+            {% else %}
+                Add
+            {% endif %}
+        </button>
+    </div>
 </div>
+
+<!-- TODO replace recipes url later when other funcitonality works first. -->
+<form
+    id="recipeSelectionForm"
+    method="post"
+    action="
+    {% if meal_id %}
+        {% url 'add_recipes_to_meal_direct' meal_id %}
+    {% else %}
+        {% url 'recipes' %} 
+    {% endif %}
+    "
+>
+
+    {% csrf_token %}
+
+    <div id="recipesContainer">
+
+        {% for recipe in recipes %}
+            {% include "recipes/partials/recipe_card.html" %}
+        {% endfor %}
+
+    </div>
+
+<script src="{% static 'recipes/js/recipes.js' %}"></script>
+
 
 {% endblock %}

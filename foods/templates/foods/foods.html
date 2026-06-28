@@ -1,12 +1,15 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load static %}
 
 {% block content %}
+
 <link rel="stylesheet" href="{% static 'foods/css/food.css' %}">
+<link rel="stylesheet" href="{% static 'shared/css/search_bar.css' %}">
 
 <div class="container">
 
     <div class="page-header">
+
         <h1>Foods</h1>
 
         <div class="header-actions">
@@ -14,122 +17,49 @@
                 + New Food
             </a>
         </div>
+
     </div>
+
+    {% if foods %}
 
     <div class="food-toolbar">
 
         <div class="add-button">
+
             <button
                 id="addSelectedBtn"
                 type="submit"
                 form="foodSelectionForm"
                 disabled>
-                {% if foods %}
+
                 {% if meal_id %}
-                Add to {{ meal_name }}
+                    Add to {{ meal_name }}
                 {% elif recipe_name %}
-                Add to {{ recipe_name }}
+                    Add to {{ recipe_name }}
                 {% else %}
-                Add
+                    Add
                 {% endif %}
-            </button>
-        </div>
 
-        <div class="food-search">
-
-            <form method="get" id="foodSearchForm">
-            {% if meal_id %}
-                <input type="hidden" name="meal" value="{{ meal_id }}">
-                <input type="hidden" name="meal_name" value="{{ meal_name }}">
-            {% elif recipe_id %}
-                <input type="hidden" name="recipe_id" value="{{ recipe_id }}">
-                <input type="hidden" name="recipe_name" value="{{ recipe_name }}">            
-            {% endif %}
-                <input
-                    type="text"
-                    id="foodSearch"
-                    name="q"
-                    value="{{ query }}"
-                    placeholder="Search foods..."
-                >
-
-        </div>
-
-        </form>
-
-        {% for food in foods %}
-            {% if food.source != "local" %}
-                <form
-                    id="import-food-{{ food.fdc_id }}"
-                    method="post"
-                    action="{% url 'import_usda_food' food.fdc_id %}"
-                    style="display:none;"
-                >
-                    {% csrf_token %}
-                </form>
-            {% endif %}
-        {% endfor %}
-
-        <div class="food-sort">
-            <select id="sortSelect" name="sort">
-                <option value="last_used"
-                    {% if sort == "last_used" %}selected{% endif %}>
-                    Last used
-                </option>
-
-                <option value="last_added"
-                    {% if sort == "last_added" %}selected{% endif %}>
-                    Last added
-                </option>
-
-                <option value="name"
-                    {% if sort == "name" %}selected{% endif %}>
-                    Name
-                </option>
-            </select>
-        </div>
-
-        <div class="food-search-submit">
-            <button type="submit" class="btn btn-secondary">
-                Search
             </button>
 
+        </div>
+
+        {% include "components/search_bar.html" with form_id="foodSearchForm" input_id="foodSearch" placeholder="Search foods..." query=user_food_search_query filters_template="foods/partials/food_search_filters.html" selected_sort=sort sort_options=food_sort_options hidden_fields=search_hidden_fields %}
+
+    </div>
+
+    {% for food in foods %}
+        {% if food.source != "local" %}
+            <form
+                id="import-food-{{ food.fdc_id }}"
+                method="post"
+                action="{% url 'import_usda_food' food.fdc_id %}"
+                style="display:none;"
+            >
+                {% csrf_token %}
             </form>
-        </div>
-
-    </div>
-
-    <div class="food-toolbar" style="margin-top:8px;">
-
-        <div class="search-sources">
-
-            Search options:
-    
-            <label style="margin-right:12px;">
-                <input
-                    type="checkbox"
-                    name="use_local_search"
-                    value="1"
-                    form="foodSearchForm"
-                    {% if use_local or not query %}checked{% endif %}
-                >
-                Local
-            </label>
-
-            <label>
-                <input
-                    type="checkbox"
-                    name="use_usda_search"
-                    value="1"
-                    form="foodSearchForm"
-                    {% if use_usda or not query %}checked{% endif %}
-                >
-                USDA
-            </label>
-
-        </div>
-
-    </div>
+        {% endif %}
+    {% endfor %}
 
     <form
         id="foodSelectionForm"
@@ -144,14 +74,17 @@
         {% endif %}
         "
     >
+
         {% csrf_token %}
-        
-        <div id="foodsContainer">
-            {% for food in foods %}
+
+    <div id="foodsContainer">
+
+        {% for food in foods %}
             {% include "foods/partials/food_card.html" %}
-            {% endfor %}
-        </div>
-        
+        {% endfor %}
+
+    </div>
+
     </form>
 
     {% else %}
@@ -163,5 +96,6 @@
 </div>
 
 <script src="{% static 'foods/js/food.js' %}"></script>
+<script src="{% static 'shared/js/search_bar.js' %}"></script>
 
 {% endblock %}

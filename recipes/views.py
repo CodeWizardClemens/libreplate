@@ -13,10 +13,21 @@ from .forms import (
 )
 from collections import defaultdict
 from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
+def selected_recipes(user, ids):
+    return Recipe.objects.filter(
+        user=user,
+        id__in=ids,
+    ).prefetch_related("ingredients__food")
 
-
+@login_required
 def recipes(request):
+
+    meal_id = request.GET.get("meal")
+    meal_name = request.GET.get("meal_name")
+
     recipes = Recipe.objects.filter(user=request.user).order_by("name")
 
     return render(
@@ -24,17 +35,78 @@ def recipes(request):
         "recipes/recipes.html",
         {
             "recipes": recipes,
+            "meal_id": meal_id,
+            "meal_name": meal_name,
         },
     )
 
+@login_required
+def add_recipes_to_meal_direct(request, meal_id):
+    if request.method != "POST":
+        return redirect("recipes")
+
+    from diary.views import get_or_create_real_meal
+
+    meal = get_or_create_real_meal(
+        meal_id,
+        request.user,
+        date=timezone.localdate(),
+    )
+
+    recipes = (
+        Recipe.objects.filter(
+            user=request.user,
+            id__in=request.POST.getlist("recipes"),
+        )
+        .prefetch_related("ingredients__food")
+    )
+
+    notes = []
+
+    for recipe in recipes:
+
+        # Add all ingredients
+        for ingredient in recipe.ingredients.all():
+            MealFood.objects.create(
+                meal=meal,
+                food=ingredient.food,
+                serving_size=ingredient.serving_amount,
+                number_of_servings=ingredient.default_servings,
+            )
+
+        # Collect recipe instructions
+
+        notes.append(f"Recipe: {recipe.name}")
+        if recipe.summary:
+            notes.append(
+                f"Description: {recipe.summary}"
+            )            
+        if recipe.instructions:
+            notes.append(
+                f"\n{recipe.instructions.strip()}"
+            )
+
+    # Append instructions to the meal note
+    if notes:
+        if meal.note:
+            meal.note += "\n\n"
+        meal.note += "\n\n".join(notes)
+        meal.save(update_fields=["note"])
+
+    return redirect(
+        "diary_day",
+        date=meal.date.strftime("%Y-%m-%d"),
+    )
 
 def recipe_create(request):
+
     if request.method == "POST":
         form = RecipeForm(request.POST)
 
         if form.is_valid():
             recipe = form.save(commit=False)
             recipe.user = request.user
+            recipe.last_used_at = timezone.localdate()
             recipe.save()
 
             if "add_food" in request.POST:
@@ -60,6 +132,7 @@ def recipe_create(request):
     )
 
 
+@login_required
 def recipe_edit(request, recipe_id):
     recipe = get_object_or_404(
         Recipe,
@@ -72,7 +145,33 @@ def recipe_edit(request, recipe_id):
 
         if form.is_valid():
             form.save()
+
+            # Save ingredient values
+            for ingredient in recipe.ingredients.all():
+
+                serving_amount = request.POST.get(
+                    f"serving_amount_{ingredient.id}"
+                )
+
+                default_servings = request.POST.get(
+                    f"default_servings_{ingredient.id}"
+                )
+
+                if serving_amount is not None:
+                    ingredient.serving_amount = float(serving_amount)
+
+                if default_servings is not None:
+                    ingredient.default_servings = float(default_servings)
+
+                ingredient.save(
+                    update_fields=[
+                        "serving_amount",
+                        "default_servings",
+                    ]
+                )
+
             return redirect("recipes")
+
     else:
         form = RecipeForm(instance=recipe)
 
@@ -97,11 +196,13 @@ def recipe_edit(request, recipe_id):
             recipe_totals[fn.nutrient_id] += amount
 
         ingredient.nutrient_values = {
-            k: int(v) for k, v in nutrient_values.items()
+            k: int(v)
+            for k, v in nutrient_values.items()
         }
 
     recipe.total_nutrients = {
-        k: int(v) for k, v in recipe_totals.items()
+        k: int(v)
+        for k, v in recipe_totals.items()
     }
 
     return render(
@@ -117,6 +218,7 @@ def recipe_edit(request, recipe_id):
     )
 
 
+@login_required
 @require_POST
 def recipe_delete(request, recipe_id):
     recipe = get_object_or_404(
@@ -129,7 +231,7 @@ def recipe_delete(request, recipe_id):
 
     return redirect("recipes")
 
-
+@login_required
 def add_recipe_ingredient(request, recipe_id):
     recipe = get_object_or_404(
         Recipe,
@@ -151,13 +253,14 @@ def add_recipe_ingredient(request, recipe_id):
     return redirect("recipe_edit", recipe.id)
 
 
-def delete_recipe_ingredient(request, ingredient_id):
+@login_required
+def ingredient_delete(request, ingredient_id):
+
     ingredient = get_object_or_404(
         RecipeIngredient,
         id=ingredient_id,
         recipe__user=request.user,
     )
-
     recipe_id = ingredient.recipe.id
 
     if request.method == "POST":
@@ -165,7 +268,7 @@ def delete_recipe_ingredient(request, ingredient_id):
 
     return redirect("recipe_edit", recipe_id)
 
-
+@login_required
 def recipe_nutrition_ajax(request, recipe_id):
     recipe = get_object_or_404(
         Recipe,
@@ -198,7 +301,7 @@ def recipe_nutrition_ajax(request, recipe_id):
 
     return JsonResponse(totals)
 
-
+@login_required
 def add_recipe_to_diary(request, recipe_id):
     recipe = get_object_or_404(
         Recipe,

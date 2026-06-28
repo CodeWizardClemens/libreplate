@@ -1,0 +1,40 @@
+<div class="card">
+
+    <label style="display:flex; align-items:center; gap:10px;">
+
+        <input
+            type="checkbox"
+            name="recipes"
+            value="{{ recipe.id }}"
+            class="recipe-checkbox"
+        />
+
+        <span>
+            {{ recipe.name }}
+            {% if recipe.summary %}
+                - {{ recipe.summary }}
+            {% endif %}
+        </span>
+
+    </label>
+
+    <a href="{% url 'recipe_edit' recipe.id %}">
+        Edit
+    </a>
+
+    <form
+        method="post"
+        action="{% url 'recipe_delete' recipe.id %}"
+        style="display:inline; margin:0;"
+        onsubmit="return confirm('Are you sure you want to delete this recipe? This action can not be undone.');"
+    >
+        {% csrf_token %}
+        <button
+            type="submit"
+            style="background:none;border:none;color:#0d6efd;text-decoration:underline;cursor:pointer;padding:0;"
+        >
+            Delete
+        </button>
+    </form>
+
+</div>

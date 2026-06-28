@@ -32,6 +32,7 @@ class RecipeIngredient(models.Model):
     # Current default amount used by recipe
     default_servings = models.FloatField(default=1)
 
+    serving_amount = models.FloatField(default=1)
     # Slider limits
     min_servings = models.FloatField(default=0)
 

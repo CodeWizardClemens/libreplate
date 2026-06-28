@@ -1,0 +1,76 @@
+<form
+    method="{{ method|default:'get' }}"
+    id="{{ form_id }}"
+    action="{{ action|default:'' }}"
+    class="search-bar-form"
+>
+
+    {% csrf_token %}
+
+    {% for hidden in hidden_fields %}
+        <input
+            type="hidden"
+            name="{{ hidden.name }}"
+            value="{{ hidden.value }}"
+        >
+    {% endfor %}
+
+    <div class="search-bar">
+
+        <div class="search-bar-input">
+
+            <input
+                id="{{ input_id }}"
+                type="text"
+                name="{{ query_name|default:'q' }}"
+                value="{{ query }}"
+                placeholder="{{ placeholder|default:'Search...' }}"
+                autocomplete="off"
+            >
+
+        </div>
+
+        {% if sort_options %}
+        <div class="search-bar-sort">
+
+            <select
+                name="{{ sort_name|default:'sort' }}"
+                id="{{ sort_id|default:'sortSelect' }}"
+            >
+
+                {% for option in sort_options %}
+
+                    <option
+                        value="{{ option.value }}"
+                        {% if option.value == selected_sort %}selected{% endif %}
+                    >
+                        {{ option.label }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+        {% endif %}
+
+        <div class="search-bar-button">
+
+            <button
+                type="submit"
+                class="btn btn-secondary"
+            >
+                Search
+            </button>
+
+        </div>
+
+    </div>
+
+    {% if filters_template %}
+    <div class="search-bar-filters">
+        {% include filters_template %}
+    </div>
+    {% endif %}
+
+</form>

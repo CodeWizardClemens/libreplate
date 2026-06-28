@@ -248,13 +248,17 @@ h3 {
 
 .meal-card textarea {
     width: 100%;
-    margin-top: 6px;
     resize: none;
+    overflow: hidden;
+    min-height: 34px;
     line-height: 1.4;
     border-radius: 8px;
     border: 1px solid #d6deea;
     padding: 6px 8px;
     font-size: 13px;
+
+    /* ADD THIS */
+    box-sizing: border-box;
 }
 
 /* =========================

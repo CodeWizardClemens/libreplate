@@ -13,11 +13,6 @@ urlpatterns = [
         name="add_recipe_ingredient",
     ),
     path(
-        "ingredient/<int:ingredient_id>/delete/",
-        views.delete_recipe_ingredient,
-        name="delete_recipe_ingredient",
-    ),
-    path(
         "<int:recipe_id>/nutrition/",
         views.recipe_nutrition_ajax,
         name="recipe_nutrition_ajax",
@@ -26,5 +21,15 @@ urlpatterns = [
         "<int:recipe_id>/add-to-diary/",
         views.add_recipe_to_diary,
         name="add_recipe_to_diary",
+    ),
+    path(
+        "recipes/add-to-meal/<int:meal_id>/",
+        views.add_recipes_to_meal_direct,
+        name="add_recipes_to_meal_direct",
+    ),
+    path(
+        "ingredient/<int:ingredient_id>/delete/",
+        views.ingredient_delete,
+        name="ingredient_delete",
     ),
 ]

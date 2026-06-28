@@ -394,7 +394,6 @@ def update_meal_food(request):
     meal = meal_food.meal
 
     meal_food_totals = calculate_meal_food_totals(meal_food)
-
     meal_totals = calculate_meal_totals(meal)
 
     all_meals = (

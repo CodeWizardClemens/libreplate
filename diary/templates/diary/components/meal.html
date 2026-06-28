@@ -7,7 +7,10 @@
         <div>
             <h>{{ meal.name }}</h>
             <a href="{% url 'foods' %}?meal={{ meal.id }}&meal_name={{ meal.name|urlencode }}">
-                + Add food
+                Add food
+            </a>
+            <a href="{% url 'recipes' %}?meal={{ meal.id }}&meal_name={{ meal.name|urlencode }}">
+                Add recipe
             </a>
         </div>
 
@@ -99,10 +102,13 @@
 
     <form method="post" action="{% url 'update_note' meal.id %}">
         {% csrf_token %}
+
         <label>Note:</label>
-        <textarea rows="1"
-                  data-meal="{{ meal.id }}"
-                  oninput="saveNote(this)">{{ meal.note }}</textarea>
+
+        <textarea
+            rows="1"
+            data-meal="{{ meal.id }}"
+        >{{ meal.note }}</textarea>
     </form>
 
 </div>

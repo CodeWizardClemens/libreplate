@@ -1,0 +1,31 @@
+<div class="search-sources">
+
+    Search options:
+
+    <label style="margin-right:12px;">
+
+        <input
+            type="checkbox"
+            name="use_local_search"
+            value="1"
+            {% if use_local_search %}checked{% endif %}
+        >
+
+        Local
+
+    </label>
+
+    <label>
+
+        <input
+            type="checkbox"
+            name="use_usda_search"
+            value="1"
+            {% if use_usda_search %}checked{% endif %}
+        >
+
+        USDA
+
+    </label>
+
+</div>

@@ -198,9 +198,6 @@ def foods(request):
     recipe_id = request.GET.get("recipe_id")
     recipe_name = request.GET.get("recipe_name")
 
-    print(recipe_id)
-    print(recipe_name)
-
     user_food_search_query = request.GET.get("q", "").strip()
 
     use_local_search = request.GET.get("use_local_search") == "1"
@@ -235,6 +232,51 @@ def foods(request):
         except Exception as exc:
             print("USDA search failed:", exc)
 
+    hidden_fields = []
+
+    if meal_id:
+        hidden_fields.extend(
+            [
+                {
+                    "name": "meal",
+                    "value": meal_id,
+                },
+                {
+                    "name": "meal_name",
+                    "value": meal_name,
+                },
+            ]
+        )
+
+    if recipe_id:
+        hidden_fields.extend(
+            [
+                {
+                    "name": "recipe_id",
+                    "value": recipe_id,
+                },
+                {
+                    "name": "recipe_name",
+                    "value": recipe_name,
+                },
+            ]
+        )
+
+    food_sort_options = [
+        {
+            "value": "last_used",
+            "label": "Last used",
+        },
+        {
+            "value": "last_added",
+            "label": "Last added",
+        },
+        {
+            "value": "name",
+            "label": "Name",
+        },
+    ]
+
     return render(
         request,
         "foods/foods.html",
@@ -242,12 +284,14 @@ def foods(request):
             "foods": foods_data,
             "sort": sorting_method,
             "meal_id": meal_id,
-            "user_food_search_query": user_food_search_query,
-            "use_local_search": use_local_search,
-            "use_usda_search": use_usda_search,
             "meal_name": meal_name,
             "recipe_id": recipe_id,
             "recipe_name": recipe_name,
+            "user_food_search_query": user_food_search_query,
+            "use_local_search": use_local_search,
+            "use_usda_search": use_usda_search,
+            "food_sort_options": food_sort_options,
+            "search_hidden_fields": hidden_fields,
         },
     )
 
@@ -438,6 +482,7 @@ def add_foods_to_recipe_direct(request, recipe_id):
             recipe=recipe,
             food=food,
             default_servings=1,
+            serving_amount=food.serving,
             order=order,
         )
         order += 1
