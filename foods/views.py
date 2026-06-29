@@ -180,11 +180,17 @@ def save_food_form(form, user=None):
 
 @login_required
 def foods(request):
+
     sorting_method = request.GET.get("sort", "last_used")
+
     meal_id = request.GET.get("meal")
-    meal_name = request.GET.get("meal_name")
     recipe_id = request.GET.get("recipe_id")
-    recipe_name = request.GET.get("recipe_name")
+
+
+    meal_name = get_object_or_404(
+        Meal, id=meal_id, user=request.user).name if meal_id else None
+    recipe_name = get_object_or_404(
+        Recipe, id=recipe_id, user=request.user).name if recipe_id else None
 
     user_food_search_query = request.GET.get("q", "").strip()
 
@@ -428,6 +434,7 @@ def add_foods_to_meal(request, meal_id):
 
 @login_required
 def add_foods_to_meal_direct(request, meal_id):
+
     if request.method != "POST":
         return redirect("foods")
 
