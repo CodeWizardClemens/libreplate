@@ -106,3 +106,10 @@ next_7_days
 
 delete_grocery_list
 before_today
+
+Add a function that makes a grocery list based on all the foods the user fils in in the diary.
+
+create_grocery_list_from_diary_entries(
+    starting=now|30-06-2026|next_monday|in_7_days,
+    ending=now|30-06-2026|next_monday|in_7_days,
+)

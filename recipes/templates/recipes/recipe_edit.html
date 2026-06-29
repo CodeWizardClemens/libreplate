@@ -87,10 +87,8 @@
                             class="Servings">
                     </td>
 
-                    {% for nutrient in visible_nutrients %}
-                        <td>
-                            {{ ingredient.nutrient_values|get_item:nutrient.id|default:"0" }}
-                        </td>
+                    {% for amount in ingredient.nutrients %}
+                        <td>{{ amount }}</td>
                     {% endfor %}
 
                     <td>

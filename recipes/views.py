@@ -137,81 +137,118 @@ def recipe_create(request):
     )
 
 
-@login_required
-def recipe_edit(request, recipe_id):
-    recipe = get_object_or_404(
+def get_recipe(user, recipe_id):
+    return get_object_or_404(
         Recipe,
         id=recipe_id,
-        user=request.user,
+        user=user,
     )
 
-    if request.method == "POST":
-        form = RecipeForm(request.POST, instance=recipe)
 
-        if form.is_valid():
-            form.save()
-
-            # Save ingredient values
-            for ingredient in recipe.ingredients.all():
-
-                serving_amount = request.POST.get(f"serving_amount_{ingredient.id}")
-
-                default_servings = request.POST.get(f"default_servings_{ingredient.id}")
-
-                if serving_amount is not None:
-                    ingredient.serving_amount = float(serving_amount)
-
-                if default_servings is not None:
-                    ingredient.default_servings = float(default_servings)
-
-                ingredient.save(
-                    update_fields=[
-                        "serving_amount",
-                        "default_servings",
-                    ]
-                )
-
-            if "add_food" in request.POST:
-                return redirect(
-                    f"/foods/?recipe_id={recipe.id}&recipe_name={recipe.name}"
-                )
-
-            return redirect("recipes")
-
-    else:
-        form = RecipeForm(instance=recipe)
-
-    ingredient_form = RecipeIngredientForm(user=request.user)
-
-    visible_nutrients = Nutrient.objects.filter(show_in_recipe=True).order_by("order")
-
-    recipe_totals = defaultdict(float)
-
+def update_recipe_ingredients(recipe, post_data):
     for ingredient in recipe.ingredients.all():
 
-        nutrient_values = defaultdict(float)
+        serving_amount = post_data.get(f"serving_amount_{ingredient.id}")
+        default_servings = post_data.get(f"default_servings_{ingredient.id}")
 
-        for fn in ingredient.food.food_nutrients.all():
+        if serving_amount is not None:
+            ingredient.serving_amount = float(serving_amount)
 
-            amount = float(fn.amount) * ingredient.default_servings
+        if default_servings is not None:
+            ingredient.default_servings = float(default_servings)
 
-            nutrient_values[fn.nutrient_id] = amount
-            recipe_totals[fn.nutrient_id] += amount
+        ingredient.save(
+            update_fields=[
+                "serving_amount",
+                "default_servings",
+            ]
+        )
 
-        ingredient.nutrient_values = {k: int(v) for k, v in nutrient_values.items()}
 
-    recipe.total_nutrients = {k: int(v) for k, v in recipe_totals.items()}
+def handle_recipe_edit_post(request, recipe):
+    form = RecipeForm(request.POST, instance=recipe)
+
+    if not form.is_valid():
+        return form, None
+
+    form.save()
+    update_recipe_ingredients(recipe, request.POST)
+
+    if "add_food" in request.POST:
+        return (
+            form,
+            redirect(
+                f"/foods/?recipe_id={recipe.id}&recipe_name={recipe.name}"
+            ),
+        )
+
+    return form, redirect("recipes")
+
+
+def get_recipe_context(recipe, form, user):
+    visible_nutrients = list(
+        Nutrient.objects.filter(show_in_recipe=True).order_by("order")
+    )
+
+    visible_ids = {n.id for n in visible_nutrients}
+
+    ingredients = list(
+        recipe.ingredients.select_related("food")
+    )
+
+    # Fetch all nutrient values for all foods in one query
+    food_ids = [i.food_id for i in ingredients]
+
+    nutrients_by_food = defaultdict(dict)
+
+    for fn in (
+        FoodNutrient.objects
+        .filter(food_id__in=food_ids, nutrient_id__in=visible_ids)
+        .select_related("nutrient")
+    ):
+        nutrients_by_food[fn.food_id][fn.nutrient_id] = float(fn.amount)
+
+    for ingredient in ingredients:
+        ingredient.nutrients = []
+
+        food_values = nutrients_by_food.get(ingredient.food_id, {})
+
+        for nutrient in visible_nutrients:
+            amount = (
+                food_values.get(nutrient.id, 0)
+                * ingredient.default_servings
+            )
+            ingredient.nutrients.append(int(amount))
+
+    return {
+        "recipe": recipe,
+        "form": form,
+        "ingredients": ingredients,
+        "ingredient_form": RecipeIngredientForm(user=user),
+        "visible_nutrients": visible_nutrients,
+    }
+
+
+@login_required
+def recipe_edit(request, recipe_id):
+    recipe = get_recipe(request.user, recipe_id)
+
+    if request.method == "POST":
+        form, response = handle_recipe_edit_post(request, recipe)
+
+        if response:
+            return response
+    else:
+        form = RecipeForm(instance=recipe)
 
     return render(
         request,
         "recipes/recipe_edit.html",
-        {
-            "recipe": recipe,
-            "form": form,
-            "ingredients": recipe.ingredients.all(),
-            "ingredient_form": ingredient_form,
-            "visible_nutrients": visible_nutrients,
-        },
+        get_recipe_context(
+            recipe,
+            form,
+            request.user,
+        ),
     )
 
 

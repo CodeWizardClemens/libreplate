@@ -11,18 +11,9 @@ class Script(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    lua_version = models.CharField(max_length=32, blank=True)
+    lua_code = models.TextField(blank=True, default="") 
+    last_run_at = models.DateTimeField(null=True, blank=True)
+
     def __str__(self):
         return self.name
-
-
-class ScriptStep(models.Model):
-    script = models.ForeignKey(Script, on_delete=models.CASCADE, related_name="steps")
-
-    order = models.PositiveIntegerField(default=0)
-
-    function_key = models.CharField(max_length=100)
-
-    config = models.JSONField(default=dict)
-
-    class Meta:
-        ordering = ["order"]
