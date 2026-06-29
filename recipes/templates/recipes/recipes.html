@@ -20,7 +20,7 @@
             form="recipeSelectionForm"
             disabled>
 
-            {% if meal_id %}
+            {% if meal_name %}
                 Add to {{ meal_name }}
             {% else %}
                 Add
@@ -35,7 +35,7 @@
     method="post"
     action="
     {% if meal_id %}
-        {% url 'add_recipes_to_meal_direct' meal_id %}
+        {% url 'add_recipes_to_meal_direct' meal_id meal_name meal_date %}
     {% else %}
         {% url 'recipes' %} 
     {% endif %}

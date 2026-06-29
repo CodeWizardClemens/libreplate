@@ -23,7 +23,7 @@ urlpatterns = [
         name="add_recipe_to_diary",
     ),
     path(
-        "recipes/add-to-meal/<int:meal_id>/",
+        "meal/<str:meal_id>/<str:meal_name>/<str:meal_date>/add/",
         views.add_recipes_to_meal_direct,
         name="add_recipes_to_meal_direct",
     ),

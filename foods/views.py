@@ -509,7 +509,6 @@ def add_foods_to_recipe_direct(request, recipe_id):
     )
 
     order = recipe.ingredients.count()
-
     for food in foods:
         RecipeIngredient.objects.create(
             recipe=recipe,

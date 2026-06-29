@@ -12,6 +12,8 @@ from nutrients.models import Nutrient
 
 from .forms import AddRecipeToDiaryForm, RecipeForm, RecipeIngredientForm
 from .models import Recipe, RecipeIngredient
+from diary.models import Meal
+from datetime import datetime
 
 
 def selected_recipes(user, ids):
@@ -24,10 +26,10 @@ def selected_recipes(user, ids):
 @login_required
 def recipes(request):
 
-    meal_id = request.GET.get("meal")
+    meal_id = request.GET.get("meal_id")
     meal_name = request.GET.get("meal_name")
-
-    recipes = Recipe.objects.filter(user=request.user).order_by("name")
+    meal_date = request.GET.get("meal_date")
+    recipes = Recipe.objects.filter(user=request.user)
 
     return render(
         request,
@@ -36,32 +38,42 @@ def recipes(request):
             "recipes": recipes,
             "meal_id": meal_id,
             "meal_name": meal_name,
+            "meal_date": meal_date,
         },
     )
 
 
 @login_required
-def add_recipes_to_meal_direct(request, meal_id):
+def add_recipes_to_meal_direct(request, meal_id, meal_name, meal_date):
     if request.method != "POST":
         return redirect("recipes")
 
-    from diary.views import get_or_create_real_meal
+    if meal_id == "dm-1":
+        meal, _ = Meal.objects.get_or_create(
+            user=request.user,
+            date=datetime.strptime(meal_date, "%B %d, %Y").date(),
+            name=meal_name,
+        )
+    else:
+        from diary.views import get_or_create_real_meal
 
-    meal = get_or_create_real_meal(
-        meal_id,
-        request.user,
-        date=timezone.localdate(),
+        meal = get_or_create_real_meal(
+            meal_id,
+            request.user,
+            date=timezone.localdate(),
+        )
+
+    recipes = (
+        Recipe.objects.filter(
+            user=request.user,
+            id__in=request.POST.getlist("recipes"),
+        )
+        .prefetch_related("ingredients__food")
     )
-
-    recipes = Recipe.objects.filter(
-        user=request.user,
-        id__in=request.POST.getlist("recipes"),
-    ).prefetch_related("ingredients__food")
 
     notes = []
 
     for recipe in recipes:
-
         # Add all ingredients
         for ingredient in recipe.ingredients.all():
             MealFood.objects.create(
@@ -72,7 +84,6 @@ def add_recipes_to_meal_direct(request, meal_id):
             )
 
         # Collect recipe instructions
-
         notes.append(f"Recipe: {recipe.name}")
         if recipe.summary:
             notes.append(f"Description: {recipe.summary}")
