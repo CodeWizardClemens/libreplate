@@ -21,7 +21,7 @@ urlpatterns = [
         name="add_foods_to_meal",
     ),
     path(
-        "meal/<str:meal_id>/add/",
+        "meal/<str:meal_id>/<str:meal_name>/<str:meal_date>/add/",
         views.add_foods_to_meal_direct,
         name="add_foods_to_meal_direct",
     ),

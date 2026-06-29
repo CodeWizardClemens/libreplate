@@ -14,6 +14,7 @@ from foods.services.usda_client import USDAClient
 from foods.services.usda_import import import_usda_food
 from nutrients.models import Nutrient
 from recipes.models import Recipe, RecipeIngredient
+from datetime import datetime
 
 # =============================================================================
 # Helpers
@@ -181,6 +182,7 @@ class FoodView(LoginRequiredMixin, View):
 
     def get(self, request):
         context = self.get_page_context(request)
+        print(context)
 
         foods_data = self.build_foods_data(
             request.user,
@@ -205,6 +207,7 @@ class FoodView(LoginRequiredMixin, View):
                 "sort": context["sorting_method"],
                 "meal_id": context["meal_id"],
                 "meal_name": context["meal_name"],
+                "meal_date": context["meal_date"],
                 "recipe_id": context["recipe_id"],
                 "recipe_name": context["recipe_name"],
                 "user_food_search_query": context["user_food_search_query"],
@@ -218,7 +221,7 @@ class FoodView(LoginRequiredMixin, View):
     def get_page_context(self, request):
         return {
             "sorting_method": request.GET.get("sort", "last_used"),
-            "meal_id": request.GET.get("meal"),
+            "meal_id": request.GET.get("meal_id"),
             "recipe_id": request.GET.get("recipe_id"),
             "user_food_search_query": request.GET.get("q", "").strip(),
             "use_local_search": request.GET.get("use_local_search") == "1",
@@ -458,23 +461,28 @@ def add_foods_to_meal(request, meal_id):
 
 
 @login_required
-def add_foods_to_meal_direct(request, meal_id):
+def add_foods_to_meal_direct(request, meal_id, meal_name, meal_date):
 
     if request.method != "POST":
         return redirect("foods")
-
-    from diary.views import get_or_create_real_meal
-
-    meal = get_or_create_real_meal(
-        meal_id,
-        request.user,
-        date=timezone.localdate(),
-    )
 
     foods = selected_foods(
         request.user,
         request.POST.getlist("foods"),
     )
+    if meal_id == "dm-1":
+        meal, _ = Meal.objects.get_or_create(
+            user=request.user,
+            date=datetime.strptime(meal_date, "%B %d, %Y").date(),
+            name=meal_name,
+        )
+    else:
+        from diary.views import get_or_create_real_meal
+        meal = get_or_create_real_meal(
+            meal_id,
+            request.user,
+            date=timezone.localdate(),
+        )
 
     add_foods_to_meal_instance(meal, foods)
 

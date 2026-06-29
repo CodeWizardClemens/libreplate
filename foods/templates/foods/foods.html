@@ -66,7 +66,7 @@
         method="post"
         action="
         {% if meal_id %}
-            {% url 'add_foods_to_meal_direct' meal_id %}
+            {% url 'add_foods_to_meal_direct' meal_id meal_name meal_date %}
         {% elif recipe_id %}
             {% url 'add_foods_to_recipe_direct' recipe_id %}
         {% else %}
@@ -74,8 +74,7 @@
         {% endif %}
         "
     >
-
-        {% csrf_token %}
+    {% csrf_token %}
 
     <div id="foodsContainer">
 
