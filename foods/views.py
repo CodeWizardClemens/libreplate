@@ -179,50 +179,18 @@ def save_food_form(form, user=None):
 
 
 def get_food_page_context(request):
-    """Read all request parameters."""
-    sorting_method = request.GET.get("sort", "last_used")
-
-    meal_id = request.GET.get("meal")
-    recipe_id = request.GET.get("recipe_id")
-
-    user_food_search_query = request.GET.get("q", "").strip()
-
-    use_local_search = request.GET.get("use_local_search") == "1"
-    use_usda_search = request.GET.get("use_usda_search") == "1"
-
-    if (
-        user_food_search_query
-        and "local" not in request.GET
-        and "usda" not in request.GET
-    ):
-        use_local_search = True
-        use_usda_search = True
-
     return {
-        "sorting_method": sorting_method,
-        "meal_id": meal_id,
-        "recipe_id": recipe_id,
-        "user_food_search_query": user_food_search_query,
-        "use_local_search": use_local_search,
-        "use_usda_search": use_usda_search,
+        "sorting_method": request.GET.get("sort", "last_used"),
+        "meal_id": request.GET.get("meal"),
+        "recipe_id": request.GET.get("recipe_id"),
+        "user_food_search_query": request.GET.get("q", "").strip(),
+        "use_local_search": request.GET.get("use_local_search") == "1",
+        "use_usda_search": request.GET.get("use_usda_search") == "1",
+        "meal_name": request.GET.get("meal_name"),
+        "recipe_name": request.GET.get("recipe_name"),
+        "meal_date": request.GET.get("meal_date"),
+        "recipe_date": request.GET.get("recipe_date"),
     }
-
-
-def get_selected_names(user, meal_id, recipe_id):
-    """Resolve selected meal/recipe names."""
-    meal_name = (
-        get_object_or_404(Meal, id=meal_id, user=user).name
-        if meal_id
-        else None
-    )
-
-    recipe_name = (
-        get_object_or_404(Recipe, id=recipe_id, user=user).name
-        if recipe_id
-        else None
-    )
-
-    return meal_name, recipe_name
 
 
 def build_foods_data(
@@ -315,12 +283,6 @@ def get_food_sort_options():
 def foods(request):
     context = get_food_page_context(request)
 
-    meal_name, recipe_name = get_selected_names(
-        request.user,
-        context["meal_id"],
-        context["recipe_id"],
-    )
-
     foods_data = build_foods_data(
         request.user,
         context["sorting_method"],
@@ -331,9 +293,9 @@ def foods(request):
 
     hidden_fields = build_hidden_fields(
         context["meal_id"],
-        meal_name,
+        context["meal_name"],
         context["recipe_id"],
-        recipe_name,
+        context["recipe_name"],
     )
 
     return render(
@@ -343,9 +305,9 @@ def foods(request):
             "foods": foods_data,
             "sort": context["sorting_method"],
             "meal_id": context["meal_id"],
-            "meal_name": meal_name,
+            "meal_name": context["meal_name"],
             "recipe_id": context["recipe_id"],
-            "recipe_name": recipe_name,
+            "recipe_name": context["recipe_name"],
             "user_food_search_query": context["user_food_search_query"],
             "use_local_search": context["use_local_search"],
             "use_usda_search": context["use_usda_search"],

@@ -6,10 +6,10 @@
     <div class="meal-header">
         <div>
             <h>{{ meal.name }}</h>
-            <a href="{% url 'foods' %}?meal={{ meal.id }}">
+            <a href="{% url 'foods' %}?meal_id={{ meal.id }}&meal_name={{ meal.name }}&meal_date={{ meal.date }}">
                 Add food
             </a>
-            <a href="{% url 'recipes' %}?meal={{ meal.id }}">
+            <a href="{% url 'recipes' %}?meal_id={{ meal.id }}&meal_name={{ meal.name }}&meal_date={{ meal.date }}">
                 Add recipe
             </a>
         </div>
