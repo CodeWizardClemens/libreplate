@@ -178,19 +178,12 @@ def save_food_form(form, user=None):
 # =============================================================================
 
 
-@login_required
-def foods(request):
-
+def get_food_page_context(request):
+    """Read all request parameters."""
     sorting_method = request.GET.get("sort", "last_used")
 
     meal_id = request.GET.get("meal")
     recipe_id = request.GET.get("recipe_id")
-
-
-    meal_name = get_object_or_404(
-        Meal, id=meal_id, user=request.user).name if meal_id else None
-    recipe_name = get_object_or_404(
-        Recipe, id=recipe_id, user=request.user).name if recipe_id else None
 
     user_food_search_query = request.GET.get("q", "").strip()
 
@@ -205,31 +198,69 @@ def foods(request):
         use_local_search = True
         use_usda_search = True
 
-    nutrients, _ = get_visible_nutrients()
+    return {
+        "sorting_method": sorting_method,
+        "meal_id": meal_id,
+        "recipe_id": recipe_id,
+        "user_food_search_query": user_food_search_query,
+        "use_local_search": use_local_search,
+        "use_usda_search": use_usda_search,
+    }
 
+
+def get_selected_names(user, meal_id, recipe_id):
+    """Resolve selected meal/recipe names."""
+    meal_name = (
+        get_object_or_404(Meal, id=meal_id, user=user).name
+        if meal_id
+        else None
+    )
+
+    recipe_name = (
+        get_object_or_404(Recipe, id=recipe_id, user=user).name
+        if recipe_id
+        else None
+    )
+
+    return meal_name, recipe_name
+
+
+def build_foods_data(
+    user,
+    sorting_method,
+    search_query,
+    use_local_search,
+    use_usda_search,
+):
+    """Collect local and USDA foods."""
+    nutrients, _ = get_visible_nutrients()
     foods_data = []
 
-    if not user_food_search_query or use_local_search:
+    if not search_query or use_local_search:
         foods_data.extend(
             build_local_food_data(
-                get_food_queryset(request.user, sorting_method),
+                get_food_queryset(user, sorting_method),
                 nutrients,
-                user_food_search_query,
+                search_query,
             )
         )
 
-    if user_food_search_query and use_usda_search:
+    if search_query and use_usda_search:
         try:
             foods_data.extend(
                 build_usda_food_data(
-                    request.user,
-                    user_food_search_query,
+                    user,
+                    search_query,
                     nutrients,
                 )
             )
         except Exception as exc:
             print("USDA search failed:", exc)
 
+    return foods_data
+
+
+def build_hidden_fields(meal_id, meal_name, recipe_id, recipe_name):
     hidden_fields = []
 
     if meal_id:
@@ -260,7 +291,11 @@ def foods(request):
             ]
         )
 
-    food_sort_options = [
+    return hidden_fields
+
+
+def get_food_sort_options():
+    return [
         {
             "value": "last_used",
             "label": "Last used",
@@ -275,20 +310,46 @@ def foods(request):
         },
     ]
 
+
+@login_required
+def foods(request):
+    context = get_food_page_context(request)
+
+    meal_name, recipe_name = get_selected_names(
+        request.user,
+        context["meal_id"],
+        context["recipe_id"],
+    )
+
+    foods_data = build_foods_data(
+        request.user,
+        context["sorting_method"],
+        context["user_food_search_query"],
+        context["use_local_search"],
+        context["use_usda_search"],
+    )
+
+    hidden_fields = build_hidden_fields(
+        context["meal_id"],
+        meal_name,
+        context["recipe_id"],
+        recipe_name,
+    )
+
     return render(
         request,
         "foods/foods.html",
         {
             "foods": foods_data,
-            "sort": sorting_method,
-            "meal_id": meal_id,
+            "sort": context["sorting_method"],
+            "meal_id": context["meal_id"],
             "meal_name": meal_name,
-            "recipe_id": recipe_id,
+            "recipe_id": context["recipe_id"],
             "recipe_name": recipe_name,
-            "user_food_search_query": user_food_search_query,
-            "use_local_search": use_local_search,
-            "use_usda_search": use_usda_search,
-            "food_sort_options": food_sort_options,
+            "user_food_search_query": context["user_food_search_query"],
+            "use_local_search": context["use_local_search"],
+            "use_usda_search": context["use_usda_search"],
+            "food_sort_options": get_food_sort_options(),
             "search_hidden_fields": hidden_fields,
         },
     )
