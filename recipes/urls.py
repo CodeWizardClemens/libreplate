@@ -6,7 +6,6 @@ urlpatterns = [
     path("create/", views.recipe_create, name="recipe_create"),
     path("<int:recipe_id>/", views.recipe_edit, name="recipe_edit"),
     path("<int:recipe_id>/delete/", views.recipe_delete, name="recipe_delete"),
-
     path(
         "<int:recipe_id>/add-ingredient/",
         views.add_recipe_ingredient,

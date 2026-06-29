@@ -37,7 +37,7 @@ class DefaultMeal(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 
 class USDAAPISettings(models.Model):
     user = models.OneToOneField(

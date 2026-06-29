@@ -21,13 +21,10 @@ from recipes.models import Recipe, RecipeIngredient
 
 
 def get_food_queryset(user, sort):
-    foods = (
-        Food.objects.filter(user=user)
-        .prefetch_related(
-            Prefetch(
-                "food_nutrients",
-                queryset=FoodNutrient.objects.select_related("nutrient"),
-            )
+    foods = Food.objects.filter(user=user).prefetch_related(
+        Prefetch(
+            "food_nutrients",
+            queryset=FoodNutrient.objects.select_related("nutrient"),
         )
     )
 
@@ -41,14 +38,9 @@ def get_food_queryset(user, sort):
 
 
 def get_visible_nutrients():
-    nutrients = list(
-        Nutrient.objects.filter(show_in_foods=True).order_by("order")
-    )
+    nutrients = list(Nutrient.objects.filter(show_in_foods=True).order_by("order"))
 
-    nutrient_lookup = {
-        nutrient.name.lower(): nutrient
-        for nutrient in nutrients
-    }
+    nutrient_lookup = {nutrient.name.lower(): nutrient for nutrient in nutrients}
 
     return nutrients, nutrient_lookup
 
@@ -62,8 +54,7 @@ def build_local_food_data(foods, nutrients, query=""):
             continue
 
         nutrient_map = {
-            fn.nutrient_id: float(fn.amount)
-            for fn in food.food_nutrients.all()
+            fn.nutrient_id: float(fn.amount) for fn in food.food_nutrients.all()
         }
 
         formatted = [
@@ -102,10 +93,7 @@ def build_usda_food_data(user, query, nutrients):
     for food in client.search(query):
 
         # USDA nutrients are in food["nutrients"]
-        usda_values = {
-            n["number"]: n["value"]
-            for n in food.get("nutrients", [])
-        }
+        usda_values = {n["number"]: n["value"] for n in food.get("nutrients", [])}
 
         formatted = [
             {
@@ -203,12 +191,16 @@ def foods(request):
     use_local_search = request.GET.get("use_local_search") == "1"
     use_usda_search = request.GET.get("use_usda_search") == "1"
 
-    if user_food_search_query and "local" not in request.GET and "usda" not in request.GET:
+    if (
+        user_food_search_query
+        and "local" not in request.GET
+        and "usda" not in request.GET
+    ):
         use_local_search = True
         use_usda_search = True
 
     nutrients, _ = get_visible_nutrients()
-    
+
     foods_data = []
 
     if not user_food_search_query or use_local_search:
@@ -458,6 +450,7 @@ def add_foods_to_meal_direct(request, meal_id):
         "diary_day",
         date=meal.date.strftime("%Y-%m-%d"),
     )
+
 
 @login_required
 def add_foods_to_recipe_direct(request, recipe_id):

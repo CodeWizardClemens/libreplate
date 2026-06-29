@@ -40,12 +40,15 @@ class USDAClient:
                 nutrients.append(
                     {
                         "name": nutrient.get("nutrientName"),
-                        "number": str(nutrient.get("nutrientNumber") or nutrient.get("nutrientId") or ""),
+                        "number": str(
+                            nutrient.get("nutrientNumber")
+                            or nutrient.get("nutrientId")
+                            or ""
+                        ),
                         "unit": nutrient.get("unitName"),
                         "value": value,
                     }
                 )
-
 
             foods.append(
                 {

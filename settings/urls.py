@@ -27,5 +27,5 @@ urlpatterns = [
         "api_configuration",
         views.api_configuration,
         name="api_configuration",
-    )
+    ),
 ]

@@ -6,14 +6,12 @@ from nutrients.models import Nutrient
 from body_metrics.models import BodyMetric
 from .forms import GoalForm
 
+
 @login_required
 def goals_page(request):
     goal_groups = GoalGroup.objects.filter(user=request.user).order_by("-id")
 
-    return render(
-        request, "goals/goals.html",
-        {"goal_groups": goal_groups}
-    )
+    return render(request, "goals/goals.html", {"goal_groups": goal_groups})
 
 
 @login_required
@@ -33,13 +31,17 @@ def goal_group_create(request):
     nutrients = Nutrient.objects.filter(show_in_goal_edit=True)
     body_metrics = BodyMetric.objects.filter(show_in_goal_edit=True)
 
-    return render(request, "goals/goal_edit.html", {
-        "form": form,
-        "nutrients": nutrients,
-        "body_metrics": body_metrics,
-        "nutrient_values": {},
-        "body_metric_values": {},
-    })
+    return render(
+        request,
+        "goals/goal_edit.html",
+        {
+            "form": form,
+            "nutrients": nutrients,
+            "body_metrics": body_metrics,
+            "nutrient_values": {},
+            "body_metric_values": {},
+        },
+    )
 
 
 @login_required
@@ -67,14 +69,18 @@ def goal_group_edit(request, pk):
     nutrient_values = form.get_nutrient_values()
     body_metric_values = form.get_body_metric_values()
 
-    return render(request, "goals/goal_edit.html", {
-        "form": form,
-        "goal_group": goal_group,
-        "nutrients": Nutrient.objects.filter(show_in_goal_edit=True),
-        "body_metrics": BodyMetric.objects.filter(show_in_goal_edit=True),
-        "nutrient_values": nutrient_values,
-        "body_metric_values": body_metric_values,
-    })
+    return render(
+        request,
+        "goals/goal_edit.html",
+        {
+            "form": form,
+            "goal_group": goal_group,
+            "nutrients": Nutrient.objects.filter(show_in_goal_edit=True),
+            "body_metrics": BodyMetric.objects.filter(show_in_goal_edit=True),
+            "nutrient_values": nutrient_values,
+            "body_metric_values": body_metric_values,
+        },
+    )
 
 
 @login_required

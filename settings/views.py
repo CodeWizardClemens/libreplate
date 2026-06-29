@@ -42,9 +42,7 @@ def default_meals(request):
 @login_required
 def api_configuration(request):
     # Get the user's settings or create them the first time
-    configuration, created = USDAAPISettings.objects.get_or_create(
-        user=request.user
-    )
+    configuration, created = USDAAPISettings.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
         form = APIConfigurationForm(

@@ -28,6 +28,7 @@ class Food(models.Model):
         blank=True,
         db_index=True,
     )
+
     class Meta:
         ordering = ["-created_at"]
         verbose_name_plural = "Foods"

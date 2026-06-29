@@ -22,9 +22,11 @@ from collections import defaultdict
 import json
 from goals.models import GoalGroup, GoalNutrient
 
+
 class VirtualMealFoodManager:
     def all(self):
         return []
+
 
 def get_active_goal_group(user, selected_date):
     """
@@ -62,7 +64,10 @@ def calculate_meal_food_nutrients(meal_food):
     return defaultdict(
         float,
         {
-            nutrient.nutrient_id: float(nutrient.amount) * serving_size * number_of_servings / food_serving
+            nutrient.nutrient_id: float(nutrient.amount)
+            * serving_size
+            * number_of_servings
+            / food_serving
             for nutrient in meal_food.food.food_nutrients.all()
         },
     )
@@ -214,14 +219,9 @@ def diary_day(request, date=None):
     if goal_group:
         goal_qs = GoalNutrient.objects.filter(goal_group=goal_group)
 
-        goal_nutrients = {
-            g.nutrient_id: float(g.amount)
-            for g in goal_qs
-        }
+        goal_nutrients = {g.nutrient_id: float(g.amount) for g in goal_qs}
 
-    body_metrics = BodyMetric.objects.filter(
-        show_in_diary_total=True
-    ).order_by("order")
+    body_metrics = BodyMetric.objects.filter(show_in_diary_total=True).order_by("order")
 
     logs = BodyMetricLog.objects.filter(
         user=request.user,
@@ -238,12 +238,12 @@ def diary_day(request, date=None):
         "yesterday": selected_date - timedelta(days=1),
         "tomorrow": selected_date + timedelta(days=1),
         "month_name": selected_date.strftime("%B %Y"),
-        "nutrients_total": Nutrient.objects.filter(
-            show_in_diary_total=True
-        ).order_by("order"),
-        "nutrients_meal": Nutrient.objects.filter(
-            show_in_diary_meal=True
-        ).order_by("order"),
+        "nutrients_total": Nutrient.objects.filter(show_in_diary_total=True).order_by(
+            "order"
+        ),
+        "nutrients_meal": Nutrient.objects.filter(show_in_diary_meal=True).order_by(
+            "order"
+        ),
         "day_total": day_total,
         "goal_nutrients": to_int_dict(goal_nutrients),
         "body_metrics": body_metrics,
@@ -251,6 +251,7 @@ def diary_day(request, date=None):
     }
 
     return render(request, "diary/day.html", context)
+
 
 # =========================================================
 # MEALS
@@ -393,24 +394,17 @@ def update_meal_food(request):
     meal_food_totals = calculate_meal_food_nutrients(meal_food)
     meal_totals = calculate_meal_totals(meal)
 
-    all_meals = (
-        Meal.objects.filter(
-            user=request.user,
-            date=meal.date,
-        )
-        .prefetch_related(
-            "meal_foods__food__food_nutrients"
-        )
-    )
+    all_meals = Meal.objects.filter(
+        user=request.user,
+        date=meal.date,
+    ).prefetch_related("meal_foods__food__food_nutrients")
 
     day_totals = calculate_day_totals(all_meals)
 
     return JsonResponse(
         {
             "ok": True,
-            "meal_food": {
-                str(meal_food.id): to_int_dict(meal_food_totals)
-            },
+            "meal_food": {str(meal_food.id): to_int_dict(meal_food_totals)},
             "meal": to_int_dict(meal_totals),
             "day": day_totals,
         }
