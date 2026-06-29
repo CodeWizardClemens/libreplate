@@ -16,6 +16,7 @@ class RecipeForm(forms.ModelForm):
             "summary",
             "description",
             "instructions",
+            "cooking_time",
             "thumbnail_path",
             "portions",
         ]
