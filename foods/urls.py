@@ -1,9 +1,10 @@
 # foods/urls.py
 from django.urls import path
 from . import views
+from .views import FoodView
 
 urlpatterns = [
-    path("", views.foods, name="foods"),
+    path("", FoodView.as_view(), name="foods"),
     path("create/", views.create_food, name="create_food"),
     path("<int:pk>/edit/", views.edit_food, name="edit_food"),
     path("<int:pk>/delete/", views.delete_food, name="delete_food"),

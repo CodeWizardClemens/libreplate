@@ -13,6 +13,8 @@ from foods.services.usda_client import USDAClient
 from foods.services.usda_import import import_usda_food
 from nutrients.models import Nutrient
 from recipes.models import Recipe, RecipeIngredient
+from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 # =============================================================================
@@ -177,144 +179,146 @@ def save_food_form(form, user=None):
 # Views
 # =============================================================================
 
+class FoodView(LoginRequiredMixin, View):
 
-def get_food_page_context(request):
-    return {
-        "sorting_method": request.GET.get("sort", "last_used"),
-        "meal_id": request.GET.get("meal"),
-        "recipe_id": request.GET.get("recipe_id"),
-        "user_food_search_query": request.GET.get("q", "").strip(),
-        "use_local_search": request.GET.get("use_local_search") == "1",
-        "use_usda_search": request.GET.get("use_usda_search") == "1",
-        "meal_name": request.GET.get("meal_name"),
-        "recipe_name": request.GET.get("recipe_name"),
-        "meal_date": request.GET.get("meal_date"),
-        "recipe_date": request.GET.get("recipe_date"),
-    }
+    def get(self, request):
+        context = self.get_page_context(request)
 
-
-def build_foods_data(
-    user,
-    sorting_method,
-    search_query,
-    use_local_search,
-    use_usda_search,
-):
-    """Collect local and USDA foods."""
-    nutrients, _ = get_visible_nutrients()
-    foods_data = []
-
-    if not search_query or use_local_search:
-        foods_data.extend(
-            build_local_food_data(
-                get_food_queryset(user, sorting_method),
-                nutrients,
-                search_query,
-            )
+        foods_data = self.build_foods_data(
+            request.user,
+            context["sorting_method"],
+            context["user_food_search_query"],
+            context["use_local_search"],
+            context["use_usda_search"],
         )
 
-    if search_query and use_usda_search:
-        try:
+        hidden_fields = self.build_hidden_fields(
+            context["meal_id"],
+            context["meal_name"],
+            context["recipe_id"],
+            context["recipe_name"],
+        )
+
+        return render(
+            request,
+            "foods/foods.html",
+            {
+                "foods": foods_data,
+                "sort": context["sorting_method"],
+                "meal_id": context["meal_id"],
+                "meal_name": context["meal_name"],
+                "recipe_id": context["recipe_id"],
+                "recipe_name": context["recipe_name"],
+                "user_food_search_query": context["user_food_search_query"],
+                "use_local_search": context["use_local_search"],
+                "use_usda_search": context["use_usda_search"],
+                "food_sort_options": self.get_sort_options(),
+                "search_hidden_fields": hidden_fields,
+            },
+        )
+
+    def get_page_context(self, request):
+        return {
+            "sorting_method": request.GET.get("sort", "last_used"),
+            "meal_id": request.GET.get("meal"),
+            "recipe_id": request.GET.get("recipe_id"),
+            "user_food_search_query": request.GET.get("q", "").strip(),
+            "use_local_search": request.GET.get("use_local_search") == "1",
+            "use_usda_search": request.GET.get("use_usda_search") == "1",
+            "meal_name": request.GET.get("meal_name"),
+            "recipe_name": request.GET.get("recipe_name"),
+            "meal_date": request.GET.get("meal_date"),
+            "recipe_date": request.GET.get("recipe_date"),
+        }
+
+    def build_foods_data(
+        self,
+        user,
+        sorting_method,
+        search_query,
+        use_local_search,
+        use_usda_search,
+    ):
+        nutrients, _ = get_visible_nutrients()
+        foods_data = []
+
+        if not search_query or use_local_search:
             foods_data.extend(
-                build_usda_food_data(
-                    user,
-                    search_query,
+                build_local_food_data(
+                    get_food_queryset(user, sorting_method),
                     nutrients,
+                    search_query,
                 )
             )
-        except Exception as exc:
-            print("USDA search failed:", exc)
 
-    return foods_data
+        if search_query and use_usda_search:
+            try:
+                foods_data.extend(
+                    build_usda_food_data(
+                        user,
+                        search_query,
+                        nutrients,
+                    )
+                )
+            except Exception as exc:
+                print("USDA search failed:", exc)
 
+        return foods_data
 
-def build_hidden_fields(meal_id, meal_name, recipe_id, recipe_name):
-    hidden_fields = []
+    def build_hidden_fields(
+        self,
+        meal_id,
+        meal_name,
+        recipe_id,
+        recipe_name,
+    ):
+        hidden_fields = []
 
-    if meal_id:
-        hidden_fields.extend(
-            [
-                {
-                    "name": "meal",
-                    "value": meal_id,
-                },
-                {
-                    "name": "meal_name",
-                    "value": meal_name,
-                },
-            ]
-        )
+        if meal_id:
+            hidden_fields.extend(
+                [
+                    {
+                        "name": "meal",
+                        "value": meal_id,
+                    },
+                    {
+                        "name": "meal_name",
+                        "value": meal_name,
+                    },
+                ]
+            )
 
-    if recipe_id:
-        hidden_fields.extend(
-            [
-                {
-                    "name": "recipe_id",
-                    "value": recipe_id,
-                },
-                {
-                    "name": "recipe_name",
-                    "value": recipe_name,
-                },
-            ]
-        )
+        if recipe_id:
+            hidden_fields.extend(
+                [
+                    {
+                        "name": "recipe_id",
+                        "value": recipe_id,
+                    },
+                    {
+                        "name": "recipe_name",
+                        "value": recipe_name,
+                    },
+                ]
+            )
 
-    return hidden_fields
+        return hidden_fields
 
-
-def get_food_sort_options():
-    return [
-        {
-            "value": "last_used",
-            "label": "Last used",
-        },
-        {
-            "value": "last_added",
-            "label": "Last added",
-        },
-        {
-            "value": "name",
-            "label": "Name",
-        },
-    ]
-
-
-@login_required
-def foods(request):
-    context = get_food_page_context(request)
-
-    foods_data = build_foods_data(
-        request.user,
-        context["sorting_method"],
-        context["user_food_search_query"],
-        context["use_local_search"],
-        context["use_usda_search"],
-    )
-
-    hidden_fields = build_hidden_fields(
-        context["meal_id"],
-        context["meal_name"],
-        context["recipe_id"],
-        context["recipe_name"],
-    )
-
-    return render(
-        request,
-        "foods/foods.html",
-        {
-            "foods": foods_data,
-            "sort": context["sorting_method"],
-            "meal_id": context["meal_id"],
-            "meal_name": context["meal_name"],
-            "recipe_id": context["recipe_id"],
-            "recipe_name": context["recipe_name"],
-            "user_food_search_query": context["user_food_search_query"],
-            "use_local_search": context["use_local_search"],
-            "use_usda_search": context["use_usda_search"],
-            "food_sort_options": get_food_sort_options(),
-            "search_hidden_fields": hidden_fields,
-        },
-    )
+    def get_sort_options(self):
+        return [
+            {
+                "value": "last_used",
+                "label": "Last used",
+            },
+            {
+                "value": "last_added",
+                "label": "Last added",
+            },
+            {
+                "value": "name",
+                "label": "Name",
+            },
+        ]
 
 
 @login_required
