@@ -1,10 +1,11 @@
-from django.shortcuts import render, get_object_or_404, redirect
+import json
+
 from django.contrib.auth.decorators import login_required
-from .models import Nutrient
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
+
 from .forms import NutrientForm
 from .models import Nutrient
-import json
-from django.views.decorators.http import require_POST
 
 
 @login_required

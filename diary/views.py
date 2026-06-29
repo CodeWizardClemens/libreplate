@@ -1,26 +1,21 @@
-from datetime import datetime, timedelta
-from collections import defaultdict
 import json
+from collections import defaultdict
+from datetime import datetime, timedelta
 
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-
-from .models import Meal, MealFood
-from settings.models import DefaultMeal
-from .forms import MealForm, MealFoodForm, AddMealFoodForm
-
-from nutrients.models import Nutrient
-from foods.models import Food
 
 from body_metrics.models import BodyMetric, BodyMetricLog
 from common.food_selection import get_user_foods
-
-from collections import defaultdict
-
-import json
+from foods.models import Food
 from goals.models import GoalGroup, GoalNutrient
+from nutrients.models import Nutrient
+from settings.models import DefaultMeal
+
+from .forms import AddMealFoodForm, MealFoodForm, MealForm
+from .models import Meal, MealFood
 
 
 class VirtualMealFoodManager:

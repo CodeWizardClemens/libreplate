@@ -1,11 +1,12 @@
-from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
 
-from .models import Script, ScriptStep
+from foods.models import Food
+
+from .executors import EXECUTORS
 from .forms import ScriptForm
 from .functions import SCRIPT_FUNCTIONS
-from .executors import EXECUTORS
-from foods.models import Food
+from .models import Script, ScriptStep
 
 
 @login_required

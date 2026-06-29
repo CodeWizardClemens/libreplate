@@ -1,6 +1,8 @@
 from django import forms
-from .models import Food, FoodNutrient
+
 from nutrients.models import Nutrient
+
+from .models import Food, FoodNutrient
 
 
 class FoodForm(forms.ModelForm):

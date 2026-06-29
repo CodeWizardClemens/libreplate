@@ -1,10 +1,12 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from .models import BodyMetric
-from .forms import BodyMetricForm
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
 import json
+
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
+
+from .forms import BodyMetricForm
+from .models import BodyMetric
 
 
 @login_required

@@ -1,7 +1,9 @@
 from django import forms
-from .models import GoalGroup, GoalNutrient, GoalBodyMetric
-from nutrients.models import Nutrient
+
 from body_metrics.models import BodyMetric
+from nutrients.models import Nutrient
+
+from .models import GoalBodyMetric, GoalGroup, GoalNutrient
 
 
 class GoalForm(forms.ModelForm):

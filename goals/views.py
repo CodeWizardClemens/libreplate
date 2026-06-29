@@ -1,10 +1,11 @@
-from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
 
-from .models import GoalGroup, GoalNutrient, GoalBodyMetric
-from nutrients.models import Nutrient
 from body_metrics.models import BodyMetric
+from nutrients.models import Nutrient
+
 from .forms import GoalForm
+from .models import GoalBodyMetric, GoalGroup, GoalNutrient
 
 
 @login_required

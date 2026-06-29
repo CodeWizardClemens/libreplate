@@ -1,13 +1,13 @@
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
+from django.shortcuts import get_object_or_404, redirect, render
 
-from .models import GroceryList, GroceryListFood
-from .forms import GroceryListCreateForm
-
-from diary.models import MealFood, Meal
-from .services import generate_grocery_items
 from common.food_selection import get_user_foods
+from diary.models import Meal, MealFood
+
+from .forms import GroceryListCreateForm
+from .models import GroceryList, GroceryListFood
+from .services import generate_grocery_items
 
 
 @login_required

@@ -1,9 +1,8 @@
-from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from .models import Unit
+from django.shortcuts import get_object_or_404, redirect, render
+
 from .forms import UnitForm
 from .models import Unit
-from .forms import UnitForm
 
 
 @login_required
