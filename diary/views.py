@@ -46,36 +46,33 @@ def get_active_goal_group(user, selected_date):
 
     return None
 
+
 def to_int_dict(d):
     return {k: int(v) for k, v in d.items()}
 
-def calculate_meal_food_totals(meal_food):
-    """
-    Calculate nutrients for a single MealFood.
-    Formula:
-        nutrient_per_100g * serving_size * servings / 100
-    """
-    totals = defaultdict(float)
+
+def calculate_meal_food_nutrients(meal_food):
+    food_serving = float(meal_food.food.serving or 0)
+    if food_serving == 0:
+        return defaultdict(float)
 
     serving_size = float(meal_food.serving_size or 0)
-    servings = float(meal_food.number_of_servings or 0)
+    number_of_servings = float(meal_food.number_of_servings or 0)
 
-    for fn in meal_food.food.food_nutrients.all():
-        totals[fn.nutrient_id] += (
-            float(fn.amount)
-            * serving_size
-            * servings
-            / 100
-        )
-
-    return totals
+    return defaultdict(
+        float,
+        {
+            nutrient.nutrient_id: float(nutrient.amount) * serving_size * number_of_servings / food_serving
+            for nutrient in meal_food.food.food_nutrients.all()
+        },
+    )
 
 
 def calculate_meal_totals(meal):
     totals = defaultdict(float)
 
     for meal_food in meal.meal_foods.all():
-        food_totals = calculate_meal_food_totals(meal_food)
+        food_totals = calculate_meal_food_nutrients(meal_food)
 
         meal_food.nutrient_values = to_int_dict(food_totals)
 
@@ -393,7 +390,7 @@ def update_meal_food(request):
 
     meal = meal_food.meal
 
-    meal_food_totals = calculate_meal_food_totals(meal_food)
+    meal_food_totals = calculate_meal_food_nutrients(meal_food)
     meal_totals = calculate_meal_totals(meal)
 
     all_meals = (
