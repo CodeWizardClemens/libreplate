@@ -7,14 +7,7 @@ class GroceryListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GroceryList
-        fields = (
-            "id",
-            "date_start",
-            "date_end",
-            "created_at",
-            "updated_at",
-            "name"
-        )
+        fields = ("id", "date_start", "date_end", "created_at", "updated_at", "name")
 
 
 class GroceryListFoodSerializer(serializers.ModelSerializer):

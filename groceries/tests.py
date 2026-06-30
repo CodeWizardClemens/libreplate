@@ -21,7 +21,7 @@ class GroceryViewsTests(TestCase):
         )
 
         self.client.login(username="Alice", password="password123")
-    
+
         self.food = Food.objects.create(name="Chicken", serving=1, user_id=self.user.id)
         self.grocery = GroceryList.objects.create(
             user=self.user,

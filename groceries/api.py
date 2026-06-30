@@ -1,9 +1,9 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.authentication import SessionAuthentication
 
 from .models import GroceryList, GroceryListFood
 from .serializers import GroceryListFoodSerializer, GroceryListSerializer
@@ -19,6 +19,7 @@ class GroceryListViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
 
 class GroceryListFoodViewSet(viewsets.ModelViewSet):
     authentication_classes = [SessionAuthentication]

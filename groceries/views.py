@@ -59,6 +59,7 @@ def grocery_delete(request, pk):
 
     return render(request, "groceries/delete.html", {"grocery": grocery})
 
+
 @login_required
 def add_item(request, pk):
 
