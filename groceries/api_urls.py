@@ -1,30 +1,40 @@
 from django.urls import path
 
-from .api import GroceryListViewSet, GroceryListFoodViewSet
+from .api import GroceryListFoodViewSet, GroceryListViewSet
 
-grocery_list = GroceryListViewSet.as_view({
-    "get": "list",
-    "post": "create",
-})
+grocery_list = GroceryListViewSet.as_view(
+    {
+        "get": "list",
+        "post": "create",
+    }
+)
 
-grocery_detail = GroceryListViewSet.as_view({
-    "get": "retrieve",
-    "delete": "destroy",
-})
+grocery_detail = GroceryListViewSet.as_view(
+    {
+        "get": "retrieve",
+        "delete": "destroy",
+    }
+)
 
-item_list = GroceryListFoodViewSet.as_view({
-    "get": "list",
-    "post": "create",
-})
+item_list = GroceryListFoodViewSet.as_view(
+    {
+        "get": "list",
+        "post": "create",
+    }
+)
 
-item_detail = GroceryListFoodViewSet.as_view({
-    "patch": "partial_update",
-    "delete": "destroy",
-})
+item_detail = GroceryListFoodViewSet.as_view(
+    {
+        "patch": "partial_update",
+        "delete": "destroy",
+    }
+)
 
-item_toggle = GroceryListFoodViewSet.as_view({
-    "post": "toggle",
-})
+item_toggle = GroceryListFoodViewSet.as_view(
+    {
+        "post": "toggle",
+    }
+)
 
 urlpatterns = [
     path("groceries/", grocery_list),

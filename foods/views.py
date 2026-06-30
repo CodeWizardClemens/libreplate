@@ -1,4 +1,6 @@
 # foods/views.py
+from datetime import datetime
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Prefetch
@@ -14,7 +16,6 @@ from foods.services.usda_client import USDAClient
 from foods.services.usda_import import import_usda_food
 from nutrients.models import Nutrient
 from recipes.models import Recipe, RecipeIngredient
-from datetime import datetime
 
 # =============================================================================
 # Helpers
@@ -177,6 +178,7 @@ def save_food_form(form, user=None):
 # =============================================================================
 # Views
 # =============================================================================
+
 
 class FoodView(LoginRequiredMixin, View):
 
@@ -478,6 +480,7 @@ def add_foods_to_meal_direct(request, meal_id, meal_name, meal_date):
         )
     else:
         from diary.views import get_or_create_real_meal
+
         meal = get_or_create_real_meal(
             meal_id,
             request.user,

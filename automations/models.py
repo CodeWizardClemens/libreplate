@@ -12,7 +12,7 @@ class Automation(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     lua_version = models.CharField(max_length=32, blank=True)
-    lua_code = models.TextField(blank=True, default="") 
+    lua_code = models.TextField(blank=True, default="")
     last_run_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):

@@ -10,9 +10,17 @@
             New Automation
         {% endif %}
     </h1>
+    <div class="header-actions">
+        <a href="{% url 'automations' %}" class="btn btn-secondary">
+            Back to Automations
+        </a>
+        <button class="btn btn-primary" type="submit" form="script-form">
+            Save Automation
+        </button>
+    </div>
 </div>
 
-<form method="post">
+<form method="post" id="script-form">
 
     {% csrf_token %}
 
@@ -30,11 +38,6 @@
         {{ form.lua_code.label_tag }}
         {{ form.lua_code }}
     </p>
-
-    <button class="btn btn-primary" type="submit">
-        Save Automation
-    </button>
-
 </form>
 
 {% endblock %}

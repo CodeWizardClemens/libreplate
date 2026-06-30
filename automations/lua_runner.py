@@ -8,7 +8,6 @@ from diary.models import Meal, MealFood
 from foods.models import Food
 from groceries.models import GroceryList, GroceryListFood
 
-
 WEEKDAYS = {
     "monday": 0,
     "tuesday": 1,
@@ -106,13 +105,10 @@ def execute_automation(automation):
 
         totals = defaultdict(float)
 
-        meal_foods = (
-            MealFood.objects.select_related("meal", "food")
-            .filter(
-                meal__user=user,
-                meal__date__gte=start,
-                meal__date__lte=end,
-            )
+        meal_foods = MealFood.objects.select_related("meal", "food").filter(
+            meal__user=user,
+            meal__date__gte=start,
+            meal__date__lte=end,
         )
 
         for meal_food in meal_foods:

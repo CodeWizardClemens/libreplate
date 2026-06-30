@@ -1,4 +1,5 @@
 from collections import defaultdict
+from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -6,14 +7,12 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
-from diary.models import MealFood
+from diary.models import Meal, MealFood
 from foods.models import FoodNutrient
 from nutrients.models import Nutrient
 
 from .forms import AddRecipeToDiaryForm, RecipeForm, RecipeIngredientForm
 from .models import Recipe, RecipeIngredient
-from diary.models import Meal
-from datetime import datetime
 
 
 def selected_recipes(user, ids):
@@ -63,13 +62,10 @@ def add_recipes_to_meal_direct(request, meal_id, meal_name, meal_date):
             date=timezone.localdate(),
         )
 
-    recipes = (
-        Recipe.objects.filter(
-            user=request.user,
-            id__in=request.POST.getlist("recipes"),
-        )
-        .prefetch_related("ingredients__food")
-    )
+    recipes = Recipe.objects.filter(
+        user=request.user,
+        id__in=request.POST.getlist("recipes"),
+    ).prefetch_related("ingredients__food")
 
     notes = []
 
@@ -177,9 +173,7 @@ def handle_recipe_edit_post(request, recipe):
     if "add_food" in request.POST:
         return (
             form,
-            redirect(
-                f"/foods/?recipe_id={recipe.id}&recipe_name={recipe.name}"
-            ),
+            redirect(f"/foods/?recipe_id={recipe.id}&recipe_name={recipe.name}"),
         )
 
     return form, redirect("recipes")
@@ -192,20 +186,16 @@ def get_recipe_context(recipe, form, user):
 
     visible_ids = {n.id for n in visible_nutrients}
 
-    ingredients = list(
-        recipe.ingredients.select_related("food")
-    )
+    ingredients = list(recipe.ingredients.select_related("food"))
 
     # Fetch all nutrient values for all foods in one query
     food_ids = [i.food_id for i in ingredients]
 
     nutrients_by_food = defaultdict(dict)
 
-    for fn in (
-        FoodNutrient.objects
-        .filter(food_id__in=food_ids, nutrient_id__in=visible_ids)
-        .select_related("nutrient")
-    ):
+    for fn in FoodNutrient.objects.filter(
+        food_id__in=food_ids, nutrient_id__in=visible_ids
+    ).select_related("nutrient"):
         nutrients_by_food[fn.food_id][fn.nutrient_id] = float(fn.amount)
 
     for ingredient in ingredients:
@@ -214,10 +204,7 @@ def get_recipe_context(recipe, form, user):
         food_values = nutrients_by_food.get(ingredient.food_id, {})
 
         for nutrient in visible_nutrients:
-            amount = (
-                food_values.get(nutrient.id, 0)
-                * ingredient.default_servings
-            )
+            amount = food_values.get(nutrient.id, 0) * ingredient.default_servings
             ingredient.nutrients.append(int(amount))
 
     return {

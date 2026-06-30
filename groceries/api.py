@@ -1,15 +1,11 @@
 from django.shortcuts import get_object_or_404
-
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .models import GroceryList, GroceryListFood
-from .serializers import (
-    GroceryListSerializer,
-    GroceryListFoodSerializer,
-)
+from .serializers import GroceryListFoodSerializer, GroceryListSerializer
 from .services import generate_grocery_items
 
 
