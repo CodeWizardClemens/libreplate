@@ -5,9 +5,9 @@ window.noteTimers = window.noteTimers || {};
 /* -----------------------
    METRICS
 ----------------------- */
+
 function saveMetric(input) {
     clearTimeout(metricSaveTimer);
-
     metricSaveTimer = setTimeout(() => {
         fetch("/diary/body-metrics/save/", {
             method: "POST",
