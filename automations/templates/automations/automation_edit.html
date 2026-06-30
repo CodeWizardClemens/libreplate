@@ -4,10 +4,10 @@
 
 <div class="page-header">
     <h1>
-        {% if script %}
-            Edit Script
+        {% if automation %}
+            Edit Automation
         {% else %}
-            New Script
+            New Automation
         {% endif %}
     </h1>
 </div>
@@ -22,8 +22,8 @@
     </p>
 
     <p>
-        {{ form.description.label_tag }}
-        {{ form.description }}
+        {{ form.deautomationion.label_tag }}
+        {{ form.deautomationion }}
     </p>
 
     <p>
@@ -32,7 +32,7 @@
     </p>
 
     <button class="btn btn-primary" type="submit">
-        Save Script
+        Save Automation
     </button>
 
 </form>

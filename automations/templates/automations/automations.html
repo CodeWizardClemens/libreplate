@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>Automations</h1>
+    <a href="{% url 'automation_create' %}" class="btn btn-primary">+ new automation</a>
+</div>
+
+{% for automation in automations %}
+
+<div>
+    <a href="{% url 'run_automation' automation.id %}">[run]</a>
+    {{ automation.name }} -
+    {{ automation.description }}
+    <a href="{% url 'edit_automation' automation.id %}">[edit]</a>
+
+    <form method="post"
+          action="{% url 'delete_automation' automation.id %}"
+          style="display:inline;">
+        {% csrf_token %}
+        <button type="submit">delete</button>
+    </form>
+</div>
+
+{% endfor %}
+
+{% endblock %}

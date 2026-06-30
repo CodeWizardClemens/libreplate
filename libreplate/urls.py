@@ -16,6 +16,6 @@ urlpatterns = [
     path("body-metrics/", include("body_metrics.urls")),
     path("goals/", include("goals.urls")),
     path("settings/", include("settings.urls")),
-    path("scripts/", include("scripts.urls")),
+    path("automations/", include("automations.urls")),
     path("user_statistics/", include("user_statistics.urls")),
 ]

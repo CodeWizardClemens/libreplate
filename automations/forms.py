@@ -1,11 +1,11 @@
 from django import forms
 
-from .models import Script
+from .models import Automation
 
 
-class ScriptForm(forms.ModelForm):
+class AutomationForm(forms.ModelForm):
     class Meta:
-        model = Script
+        model = Automation
         fields = [
             "name",
             "description",

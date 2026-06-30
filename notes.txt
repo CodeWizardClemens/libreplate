@@ -37,7 +37,7 @@ python manage.py migrate
 What I'll do today:
 * I want to generate a mealplan
   * goals need to be implemented
-  * scripts need to be implemented
+  * automations need to be implemented
   * recipes may need to be edited.
 * I want a graph of my macros and weight
   * goals need to be implemented

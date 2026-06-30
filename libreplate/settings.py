@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     "body_metrics.apps.BodyMetricsConfig",
     "goals.apps.GoalsConfig",
     "settings.apps.SettingsConfig",
-    "scripts.apps.ScriptsConfig",
+    "automations.apps.AutomationsConfig",
     "user_statistics.apps.UserStatisticsConfig",
     "django.contrib.admin",
     "django.contrib.auth",

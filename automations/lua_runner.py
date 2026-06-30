@@ -20,12 +20,12 @@ WEEKDAYS = {
 }
 
 
-def execute_script(script):
+def execute_automation(automation):
     runtime = LuaRuntime(
         unpack_returned_tuples=True,
     )
     globals = runtime.globals()
-    user = script.user
+    user = automation.user
 
     result = {
         "redirect": None,
@@ -204,9 +204,9 @@ def execute_script(script):
 
     globals.dates = dates
 
-    runtime.execute(script.lua_code)
+    runtime.execute(automation.lua_code)
 
-    script.last_run_at = timezone.now()
-    script.save(update_fields=["last_run_at"])
+    automation.last_run_at = timezone.now()
+    automation.save(update_fields=["last_run_at"])
 
     return result
