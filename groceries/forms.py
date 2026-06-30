@@ -13,13 +13,12 @@ class GroceryListCreateForm(forms.ModelForm):
         model = GroceryList
 
         fields = [
-            "generate_from_diary",
             "date_start",
             "date_end",
+            "name",
         ]
 
         widgets = {
-            "generate_from_diary": forms.CheckboxInput(),
             "date_start": forms.DateInput(attrs={"type": "date"}),
             "date_end": forms.DateInput(attrs={"type": "date"}),
         }

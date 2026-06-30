@@ -9,12 +9,11 @@ class GroceryList(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="grocery_lists"
     )
+    name = models.TextField()
+    date_start = models.DateField(null=True, blank=True)
+    date_end = models.DateField(null=True, blank=True)
 
-    date_start = models.DateField()
-    date_end = models.DateField()
-
-    generate_from_diary = models.BooleanField(default=False)
-
+    # TODO what do auto now and auto add do?
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -22,13 +21,7 @@ class GroceryList(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-
-        name = f"Grocery list #{self.id}"
-
-        if self.generate_from_diary:
-            name += f" " f"({self.date_start} - {self.date_end})"
-
-        return name
+        return self.name
 
 
 class GroceryListFood(models.Model):
@@ -41,7 +34,7 @@ class GroceryListFood(models.Model):
 
     amount = models.DecimalField(max_digits=8, decimal_places=2)
 
-    has_item = models.BooleanField(default=False)
+    on_hand = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     last_modified_at = models.DateTimeField(auto_now_add=True)

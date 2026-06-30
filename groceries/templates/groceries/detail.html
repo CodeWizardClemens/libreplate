@@ -24,7 +24,7 @@
 
 <li>
 
-{% if item.has_item %}
+{% if item.on_hand %}
 
 <s>
 {{ item.food.name }}
@@ -41,7 +41,7 @@
 
 
 <a href="{% url 'toggle_item' item.id %}">
-    {% if item.has_item %}
+    {% if item.on_hand %}
         Undo
     {% else %}
         Bought

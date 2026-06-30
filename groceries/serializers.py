@@ -11,14 +11,18 @@ class GroceryListSerializer(serializers.ModelSerializer):
             "id",
             "date_start",
             "date_end",
-            "generate_from_diary",
             "created_at",
             "updated_at",
+            "name"
         )
 
 
 class GroceryListFoodSerializer(serializers.ModelSerializer):
+
+    # Include the food name so clients can render the grocery list without
+    # making an additional request to look up each food by its ID.
     food_name = serializers.CharField(source="food.name", read_only=True)
+    on_hand = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = GroceryListFood
@@ -27,5 +31,5 @@ class GroceryListFoodSerializer(serializers.ModelSerializer):
             "food",
             "food_name",
             "amount",
-            "has_item",
+            "on_hand",
         )

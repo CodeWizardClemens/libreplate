@@ -100,7 +100,6 @@ def execute_automation(automation):
             user=user,
             date_start=start,
             date_end=end,
-            generate_from_diary=True,
         )
 
         totals = defaultdict(float)

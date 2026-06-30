@@ -3,29 +3,27 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication
 
 from .models import GroceryList, GroceryListFood
 from .serializers import GroceryListFoodSerializer, GroceryListSerializer
-from .services import generate_grocery_items
 
 
 class GroceryListViewSet(viewsets.ModelViewSet):
-    serializer_class = GroceryListSerializer
+    authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
+    serializer_class = GroceryListSerializer
 
     def get_queryset(self):
         return GroceryList.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        grocery = serializer.save(user=self.request.user)
-
-        if grocery.generate_from_diary:
-            generate_grocery_items(grocery)
-
+        serializer.save(user=self.request.user)
 
 class GroceryListFoodViewSet(viewsets.ModelViewSet):
-    serializer_class = GroceryListFoodSerializer
+    authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
+    serializer_class = GroceryListFoodSerializer
 
     def get_queryset(self):
         return GroceryListFood.objects.filter(
@@ -39,17 +37,14 @@ class GroceryListFoodViewSet(viewsets.ModelViewSet):
             pk=self.kwargs["grocery_pk"],
             user=self.request.user,
         )
-
         serializer.save(grocery_list=grocery)
 
     @action(detail=True, methods=["post"])
     def toggle(self, request, grocery_pk=None, pk=None):
-        item = self.get_object()
-
-        item.has_item = not item.has_item
-        item.save(update_fields=["has_item"])
+        grocery_item.on_hand = not self.get_object().on_hand
+        grocery_item.save(update_fields=["on_hand"])
 
         return Response(
-            GroceryListFoodSerializer(item).data,
+            GroceryListFoodSerializer(grocery_item).data,
             status=status.HTTP_200_OK,
         )
