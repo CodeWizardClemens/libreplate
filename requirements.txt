@@ -2,8 +2,10 @@ asgiref==3.11.1
 certifi==2026.6.17
 charset-normalizer==3.4.7
 Django==5.2.15
+djangorestframework==3.17.1
 idna==3.18
-packaging==26.2
+lupa==2.8
+Pygments==2.20.0
 requests==2.34.2
 sqlparse==0.5.5
 urllib3==2.7.0
