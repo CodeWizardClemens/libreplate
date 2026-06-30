@@ -30,6 +30,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "rest_framework",
     "foods.apps.FoodsConfig",
     "units.apps.UnitsConfig",
     "nutrients.apps.NutrientsConfig",

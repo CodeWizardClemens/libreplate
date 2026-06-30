@@ -18,4 +18,5 @@ urlpatterns = [
     path("settings/", include("settings.urls")),
     path("automations/", include("automations.urls")),
     path("user_statistics/", include("user_statistics.urls")),
+    path("api/", include("groceries.api_urls")),
 ]

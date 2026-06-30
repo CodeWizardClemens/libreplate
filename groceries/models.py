@@ -44,6 +44,7 @@ class GroceryListFood(models.Model):
     has_item = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
+    last_modified_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.food.name
