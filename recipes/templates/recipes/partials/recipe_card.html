@@ -1,44 +1,40 @@
 <div class="card">
-
-    <label style="display:flex; align-items:center; gap:10px;">
-
-        <input
-            type="checkbox"
-            name="recipes"
-            value="{{ recipe.id }}"
-            class="recipe-checkbox"
-        />
-
-        <span>
-            {{ recipe.name }}
-            {% if recipe.summary %}
-                - {{ recipe.summary }}
-            {% endif %}
-        </span>
-
-    </label>
-
-    <a href="{% url 'recipe_edit' recipe.id %}">
-        Edit
-    </a>
-
-    <form method="post" action="{% url 'recipe_copy' recipe.id %}" style="display:inline;">
-        {% csrf_token %}
-        <button type="submit">
-            Copy
-        </button>
-    </form>
-
-    <form
-        method="post"
-        action="{% url 'recipe_delete' recipe.id %}"
-        style="display:inline;"
-        onsubmit="return confirm('Are you sure you want to delete this recipe? This action can not be undone.');"
-    >
-        {% csrf_token %}
-        <button type="submit">
-            Delete
-        </button>
-    </form>
-
+    <div style="display:flex; align-items:center; width:100%;">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <input
+                type="checkbox"
+                name="recipes"
+                value="{{ recipe.id }}"
+                class="recipe-checkbox"
+            />
+            <span>
+                {{ recipe.name }}
+                {% if recipe.summary %}
+                    - {{ recipe.summary }}
+                {% endif %}
+            </span>
+        </div>
+        <div style="margin-left:auto; display:flex; gap:10px; align-items:center;">
+            <a href="{% url 'recipe_edit' recipe.id %}" class="action-btn">
+                Edit
+            </a>
+            <form method="post" action="{% url 'recipe_copy' recipe.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="action-btn">
+                    Copy
+                </button>
+            </form>
+            <form
+                method="post"
+                action="{% url 'recipe_delete' recipe.id %}"
+                style="display:inline;"
+                onsubmit="return confirm('Are you sure you want to delete this recipe? This action can not be undone.');"
+            >
+                {% csrf_token %}
+                <button type="submit" class="action-btn">
+                    Delete
+                </button>
+            </form>
+        </div>
+    </div>
 </div>
