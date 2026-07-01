@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 
 
 class Recipe(models.Model):
@@ -14,7 +15,7 @@ class Recipe(models.Model):
     portions = models.FloatField(
         default=1, help_text="Number of portions this recipe creates"
     )
-    # last_used_at = models.DateTimeField(auto_now_add=True)
+    last_used_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

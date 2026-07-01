@@ -28,7 +28,7 @@ def recipes(request):
     meal_id = request.GET.get("meal_id")
     meal_name = request.GET.get("meal_name")
     meal_date = request.GET.get("meal_date")
-    recipes = Recipe.objects.filter(user=request.user)
+    recipes = Recipe.objects.filter(user=request.user).order_by("-last_used_at")
 
     return render(
         request,
@@ -40,6 +40,38 @@ def recipes(request):
             "meal_date": meal_date,
         },
     )
+
+@login_required
+def recipe_copy(request, recipe_id):
+
+    recipe = get_recipe(request.user, recipe_id)
+
+    if request.method != "POST":
+        return redirect("recipe_edit", recipe.id)
+
+    data = {
+        field: getattr(recipe, field)
+        for field in RecipeForm.Meta.fields
+    }
+    data["user"] = request.user
+    data["name"] = f"{recipe.name} Copy"
+
+    new_recipe = Recipe.objects.create(**data)
+    new_recipe.last_used_at = timezone.now()
+    new_recipe.save()
+
+    for ingredient in recipe.ingredients.all():
+        ingredient_data = {
+            field: getattr(ingredient, field)
+            for field in RecipeIngredientForm.Meta.fields
+        }
+
+        RecipeIngredient.objects.create(
+            recipe=new_recipe,
+            **ingredient_data,
+        )
+    
+    return redirect("recipe_edit", recipe_id=new_recipe.id)
 
 
 @login_required
@@ -78,6 +110,9 @@ def add_recipes_to_meal_direct(request, meal_id, meal_name, meal_date):
                 serving_size=ingredient.serving_amount,
                 number_of_servings=ingredient.default_servings,
             )
+        recipe.last_used_at = timezone.now()
+        recipe.save()
+
 
         # Collect recipe instructions
         notes.append(f"Recipe: {recipe.name}")
@@ -107,7 +142,7 @@ def recipe_create(request):
         if form.is_valid():
             recipe = form.save(commit=False)
             recipe.user = request.user
-            recipe.last_used_at = timezone.localdate()
+            recipe.last_used_at = timezone.now()
             recipe.save()
 
             if "add_food" in request.POST:
@@ -169,6 +204,9 @@ def handle_recipe_edit_post(request, recipe):
 
     form.save()
     update_recipe_ingredients(recipe, request.POST)
+    recipe.last_used_at = timezone.now()
+    recipe.save()
+
 
     if "add_food" in request.POST:
         return (
