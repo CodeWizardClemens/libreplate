@@ -31,7 +31,8 @@ def edit_unit(request, pk):
     unit = get_object_or_404(Unit, pk=pk)
 
     # Security check: Only allow editing if it belongs to this user OR it's a global unit
-    # (Decide policy: Can users edit global units? Usually no. Let's restrict to user-owned or admin)
+    # (Decide policy: Can users edit global units? Usually no. Let's restrict to user-owned
+    # or admin)
     if unit.user and unit.user != request.user:
         return redirect("units")  # Or raise PermissionDenied
 
