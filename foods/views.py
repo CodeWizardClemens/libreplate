@@ -144,7 +144,7 @@ def selected_foods(user, ids):
     return foods
 
 
-def touch_food(food):
+def touch_food(food: Food):
     food.last_used_at = timezone.now()
     food.save(update_fields=["last_used_at"])
 
@@ -157,7 +157,6 @@ def add_foods_to_meal_instance(meal, foods):
             serving_size=food.serving,
             number_of_servings=1,
         )
-
         touch_food(food)
 
 
@@ -520,6 +519,7 @@ def add_foods_to_recipe_direct(request, recipe_id):
             serving_amount=food.serving,
             order=order,
         )
+        touch_food(food)
         order += 1
 
     return redirect(
