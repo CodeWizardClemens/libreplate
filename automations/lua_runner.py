@@ -140,47 +140,48 @@ def execute_automation(automation):
     def redirect_to(url):
         result["redirect"] = str(url)
 
-    def get_food(name):
-        food = Food.objects.filter(
-            user=user,
-            name=name,
-        ).first()
+    # New refactored functions
 
-        return food.id if food else None
+    def parse_time(time: str):
+        pass
 
-    def add_food_to_today(food_id, servings=1):
-        meal, _ = Meal.objects.get_or_create(
-            user=user,
-            date=date.today(),
-            name="Breakfast",
-            defaults={"order": 0},
-        )
 
-        food = Food.objects.get(
-            id=food_id,
-            user=user,
-        )
+    def add_food_to_meal(
+        food_name,
+        meal_date,
+        meal_name,
+        serving=None,
+        number_of_servings=None,
+    ):
+        """
+        Add a food with a specific name to a specific meal. When two foods have
+        the same name, the last used food is added.
+        """
+        food = Food.objects.all().filter(
+            name=food_name, user=user).order_by("-last_used").first()
+        
 
-        MealFood.objects.create(
-            meal=meal,
-            food=food,
-            serving_size=float(food.serving),
-            number_of_servings=float(servings),
-        )
 
-    def create_food(name, serving=100):
-        food = Food.objects.create(
-            user=user,
-            name=name,
-            serving=serving,
-        )
+    def add_recipe_to_meal(
+        name,
+        meal_date,
+        meal_name,
+        servings=1,
+    ):
+        pass
 
-        return food.id
+    def create_grocery_list_from_diary_entries(starting_date, ending_date):
+        pass
+
+    def delete_meals_by_date(starting_date, ending_date):
+        pass
+
 
     # ------------------------------------------------------------------
     # Register globals
     # ------------------------------------------------------------------
 
+    globals.add_food_to_meal = add_food_to_meal
     globals.print = print_message
     globals.redirect = redirect_to
     globals.get_food = get_food
