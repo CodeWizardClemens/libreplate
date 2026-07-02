@@ -326,7 +326,6 @@
 
     <div class="nav-links">
         <a href="{% url 'diary_today' %}"><span>📔</span><span class="label">Diary</span></a>
-        <a href="{% url 'automations' %}"><span>🧾</span><span class="label">Automations</span></a>
         <a href="{% url 'groceries' %}"><span>🛒</span><span class="label">Groceries</span></a>
         <a href="{% url 'recipes' %}"><span>🍲</span><span class="label">Recipes</span></a>
         <a href="{% url 'foods' %}"><span>🍎</span><span class="label">Foods</span></a>
@@ -335,6 +334,9 @@
     </div>
 
     <div class="bottom-links">
+        <a href="{% url 'profile' %}">
+            <span>👤</span><span class="label">Account</span>
+        </a>
         <a href="{% url 'settings' %}">
             <span>⚙️</span><span class="label">Settings</span>
         </a>
