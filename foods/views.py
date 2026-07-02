@@ -23,20 +23,23 @@ from recipes.models import Recipe, RecipeIngredient
 
 
 def get_food_queryset(user, sort):
-    foods = Food.objects.filter(user=user).prefetch_related(
-        Prefetch(
-            "food_nutrients",
-            queryset=FoodNutrient.objects.select_related("nutrient"),
+    foods = (
+        Food.objects.filter(user=user)
+        .prefetch_related(
+            Prefetch(
+                "food_nutrients",
+                queryset=FoodNutrient.objects.select_related("nutrient"),
+            )
         )
     )
 
     if sort == "name":
-        return foods.order_by("name")
+        return foods.order_by("-is_favorite", "name")
 
     if sort == "last_used":
-        return foods.order_by("-last_used_at", "-created_at")
+        return foods.order_by("-is_favorite", "-last_used_at", "-created_at")
 
-    return foods.order_by("-created_at")
+    return foods.order_by("-is_favorite", "-created_at")
 
 
 def get_visible_nutrients():
@@ -79,6 +82,7 @@ def build_local_food_data(foods, nutrients, query=""):
                 "source": "local",
                 "brand": food.brand or "",
                 "barcode": food.barcode or "",
+                "is_favorite": food.is_favorite,
             }
         )
 
@@ -356,6 +360,23 @@ def create_food(request):
             "show_all": show_all,
         },
     )
+
+@login_required
+def food_toggle_favorite(request, pk):
+    food = get_object_or_404(
+        Food,
+        pk=pk,
+        user=request.user,
+    )
+    print(pk)
+    print(food.is_favorite)
+
+    food.is_favorite = not food.is_favorite
+
+    food.save()
+    print(food.is_favorite)
+
+    return redirect("foods")
 
 
 @login_required

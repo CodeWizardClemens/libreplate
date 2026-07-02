@@ -30,4 +30,9 @@ urlpatterns = [
         views.add_foods_to_recipe_direct,
         name="add_foods_to_recipe_direct",
     ),
+    path(
+        "<int:pk>/food-toggle-favorite/",
+        views.food_toggle_favorite,
+        name="food_toggle_favorite",
+    ),
 ]

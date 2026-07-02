@@ -20,8 +20,8 @@ class Food(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
     last_used_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    is_favorite = models.BooleanField(default=False)
 
     usda_fdc_id = models.PositiveIntegerField(
         null=True,

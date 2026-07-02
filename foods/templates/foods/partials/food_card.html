@@ -61,6 +61,13 @@
 
             {% if food.source == "local" %}
 
+                <a href="{% url 'food_toggle_favorite' food.id %}" class="action-btn edit-btn">
+                    {% if food.is_favorite %}
+                    ★
+                    {% else %}
+                    ☆
+                    {% endif %}
+                </a>
                 <a href="{% url 'edit_food' food.id %}" class="action-btn edit-btn">
                     Edit
                 </a>
