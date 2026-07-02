@@ -1,61 +1,37 @@
 {% extends "base.html" %}
+{% load static %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'groceries/css/detail.css' %}">
+{% endblock %}
 
 {% block content %}
-
-<h1>
-
-<h1>
-{{ grocery }}
-</h1>
-
-{% if grocery.is_complete %}
-✓
-{% endif %}
-
-</h1>
-
+<h1>{{ grocery }}</h1>
 
 <ul>
-
-
 {% for item in grocery.items.all %}
+    <li>
+        <span class="item-name {% if item.on_hand %}bought{% endif %}">
+            {{ item.food.name }} ({{ item.amount }} {{ item.food.unit }})
+        </span>
 
-
-<li>
-
-{% if item.on_hand %}
-
-<s>
-{{ item.food.name }}
-({{ item.amount }})
-</s>
-
-{% else %}
-
-{{ item.food.name }}
-({{ item.amount }})
-
-{% endif %}
-
-
-
-<a href="{% url 'toggle_item' item.id %}">
-    {% if item.on_hand %}
-        Undo
-    {% else %}
-        Bought
-    {% endif %}
-</a>
-
-
-</li>
-
-
+        <button
+            class="toggle-item"
+            data-grocery="{{ grocery.id }}"
+            data-item="{{ item.id }}"
+        >
+            {% if item.on_hand %}Undo{% else %}Bought{% endif %}
+        </button>
+    </li>
 {% endfor %}
-
-
 </ul>
 
+{% endblock %}
 
+{% block scripts %}
+
+<!-- TODO Switch to proper front end, stop using NPM -->
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+
+<script src="{% static 'groceries/js/detail.js' %}"></script>
 {% endblock %}
