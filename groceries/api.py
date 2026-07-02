@@ -42,9 +42,9 @@ class GroceryListFoodViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def toggle(self, request, grocery_pk=None, pk=None):
-        grocery_item.on_hand = not self.get_object().on_hand
+        grocery_item = self.get_object()
+        grocery_item.on_hand = not grocery_item.on_hand
         grocery_item.save(update_fields=["on_hand"])
-
         return Response(
             GroceryListFoodSerializer(grocery_item).data,
             status=status.HTTP_200_OK,
