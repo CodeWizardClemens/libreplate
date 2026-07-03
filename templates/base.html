@@ -1,303 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<style>
-    /* ---------- Base Buttons ---------- */
-
-    .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-
-        padding: 10px 18px;
-        border-radius: 10px;
-
-        font-size: 14px;
-        font-weight: 600;
-        line-height: 1;
-
-        text-decoration: none;
-        cursor: pointer;
-
-        border: 1px solid transparent;
-        transition: all .2s ease;
-
-        font-family: inherit;
-        box-sizing: border-box;
-    }
-
-    .btn:hover {
-        transform: translateY(-1px);
-    }
-
-    .btn:active {
-        transform: translateY(0);
-    }
-
-    /* Primary */
-
-    .btn-primary {
-        background: #0b356d;
-        color: #fff;
-        border-color: #0b356d;
-    }
-
-    .btn-primary:hover {
-        background: #0f468f;
-        border-color: #0f468f;
-        box-shadow: 0 6px 16px rgba(11,53,109,.25);
-        color: #fff;
-    }
-
-    /* Secondary */
-
-    .btn-secondary {
-        background: #f4f6f9;
-        color: #0b356d;
-        border: 1px solid #d9e2ef;
-    }
-
-    .btn-secondary:hover {
-        background: #eaf1fb;
-        border-color: #bfd3f3;
-        color: #0b356d;
-    }
-
-    /* ---------- Header ---------- */
-
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        gap: 20px;
-    }
-
-    .header-actions {
-        display: flex;
-        gap: 12px;
-    }
-
-    @media (max-width: 700px) {
-        .page-header {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .header-actions {
-            width: 100%;
-            flex-direction: column;
-        }
-
-        .btn {
-            justify-content: center;
-        }
-
-        .actions {
-            margin-top: 10px;
-        }
-
-        .food-header {
-            flex-direction: column;
-        }
-    }
-
-    /* ---------- Actions ---------- */
-
-    .actions {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex-shrink: 0;
-    }
-
-    .action-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-
-        padding: 5px 8px;
-
-        background: #f4f6f9;
-        color: #0b356d;
-
-        border: 1px solid #d9e2ef;
-        border-radius: 10px;
-
-        text-decoration: none;
-        font-size: 13px;
-        font-weight: 600;
-
-        transition: all .2s ease;
-    }
-
-    .action-btn:hover {
-        background: #eaf1fb;
-        border-color: #bfd3f3;
-        transform: translateY(-1px);
-    }
-
-    .action-btn:active {
-        transform: translateY(0);
-    }
-
-    .delete-btn:hover {
-        background: #fff5f5;
-        border-color: #efcaca;
-        color: #c0392b;
-    }
-</style>
-
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}LibrePlate{% endblock %}</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'shared/css/base.css' %}">
+    <script src="https://unpkg.com/htmx.org@2.0.7"></script>
     {% block extra_head %}{% endblock %}
-
-    <style>
-        html,
-        body {
-            margin: 0;
-            height: 100%;
-            overflow: hidden;   /* prevent body scrollbar */
-            font-family: Arial, sans-serif;
-        }
-
-        #globalTopbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 48px;
-            background: #071428;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 14px;
-            z-index: 1000;
-            color: white;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.25);
-        }
-
-        .topbar-left,
-        .topbar-center,
-        .topbar-right {
-            flex: 1;
-            display: flex;
-            align-items: center;
-        }
-
-        .topbar-left { justify-content: flex-start; }
-        .topbar-center { justify-content: center; }
-        .topbar-right { justify-content: flex-end; }
-
-        .icon-btn {
-            width: 36px;
-            height: 36px;
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .icon-btn:hover {
-            background: rgba(255,255,255,0.2);
-        }
-
-        .logout-btn-wide {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            width: auto;
-            padding: 0 12px;
-            font-size: 14px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        .logo-emoji { margin-right: 8px; }
-        .logo-libre { color: #7dd3fc; }
-        .logo-plate { color: #ffffff; }
-
-        /* SIDEBAR (NO ANIMATION) */
-        #sidebar {
-            position: fixed;
-            top: 48px;
-            left: 0;
-            width: 160px;
-            height: calc(100vh - 48px);
-            background: #123052;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        #sidebar.collapsed {
-            width: 60px;
-        }
-
-        .nav-links {
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
-            gap: 6px;
-            flex: 1;
-        }
-
-        .bottom-links {
-            padding: 10px;
-        }
-
-        .nav-links a,
-        .bottom-links a {
-            color: white;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            border-radius: 8px;
-        }
-
-        #sidebar.collapsed .label {
-            display: none;
-        }
-
-        #sidebar.collapsed a {
-            justify-content: center;
-        }
-
-        /* CONTENT */
-        #content {
-            margin-left: 160px;
-            margin-top: 48px;
-
-            height: calc(100vh - 48px);
-            overflow-y: auto;
-            overflow-x: hidden;
-
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        #sidebar.collapsed ~ #content {
-            margin-left: 60px;
-        }
-    </style>
 </head>
 
-<body>
+<body
+    hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+    hx-ext="json-enc"
+>
 
 <div id="globalTopbar">
 
@@ -353,26 +69,27 @@
 const sidebar = document.getElementById("sidebar");
 const toggleBtn = document.getElementById("toggleSidebar");
 
-toggleBtn.onclick = async function () {
-    const isCollapsed = sidebar.classList.toggle("collapsed");
+toggleBtn.addEventListener("click", function () {
+    const collapsed = sidebar.classList.toggle("collapsed");
 
-    try {
-        await fetch("{% url 'toggle_sidebar' %}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token }}"
-            },
-            body: JSON.stringify({
-                collapsed: isCollapsed
-            })
-        });
-    } catch (e) {
-        console.error("Failed to save sidebar state", e);
-    }
-};
+    htmx.ajax("POST", "{% url 'toggle_sidebar' %}", {
+        values: {
+            collapsed: collapsed
+        },
+        swap: "none"
+    });
+});
+
+document.body.addEventListener("htmx:responseError", function(evt) {
+    console.error("HTMX request failed", evt.detail);
+});
+
+document.body.addEventListener("htmx:sendError", function(evt) {
+    console.error("Network error", evt.detail);
+});
 </script>
 
 {% block scripts %}{% endblock %}
+
 </body>
 </html>

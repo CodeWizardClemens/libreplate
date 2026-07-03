@@ -40,11 +40,24 @@ def grocery_detail(request, pk):
 
 @login_required
 def toggle_item(request, pk):
+    item = get_object_or_404(
+        GroceryListFood,
+        pk=pk,
+        grocery_list__user=request.user
+    )
 
-    item = get_object_or_404(GroceryListFood, pk=pk, grocery_list__user=request.user)
     item.on_hand = not item.on_hand
     item.save()
 
+    # If HTMX request → return partial
+    if request.headers.get("HX-Request"):
+        return render(
+            request,
+            "groceries/partials/item.html",
+            {"item": item},
+        )
+
+    # fallback (non-HTMX)
     return redirect("grocery_detail", pk=item.grocery_list.pk)
 
 

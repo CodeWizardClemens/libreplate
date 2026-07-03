@@ -1,0 +1,14 @@
+<li id="item-{{ item.id }}">
+    <span class="item-name {% if item.on_hand %}bought{% endif %}">
+        {{ item.food.name }} ({{ item.amount }} {{ item.food.unit }})
+    </span>
+
+    <button
+        hx-post="{% url 'toggle_item' item.id %}"
+        hx-target="#item-{{ item.id }}"
+        hx-swap="outerHTML"
+        class="toggle-item"
+    >
+        {% if item.on_hand %}Undo{% else %}Bought{% endif %}
+    </button>
+</li>

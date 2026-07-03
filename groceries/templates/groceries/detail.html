@@ -9,29 +9,8 @@
 <h1>{{ grocery }}</h1>
 
 <ul>
-{% for item in grocery.items.all %}
-    <li>
-        <span class="item-name {% if item.on_hand %}bought{% endif %}">
-            {{ item.food.name }} ({{ item.amount }} {{ item.food.unit }})
-        </span>
-
-        <button
-            class="toggle-item"
-            data-grocery="{{ grocery.id }}"
-            data-item="{{ item.id }}"
-        >
-            {% if item.on_hand %}Undo{% else %}Bought{% endif %}
-        </button>
-    </li>
-{% endfor %}
+    {% for item in grocery.items.all %}
+        {% include "groceries/partials/item.html" %}
+    {% endfor %}
 </ul>
-
-{% endblock %}
-
-{% block scripts %}
-
-<!-- TODO Switch to proper front end, stop using NPM -->
-<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
-
-<script src="{% static 'groceries/js/detail.js' %}"></script>
 {% endblock %}
