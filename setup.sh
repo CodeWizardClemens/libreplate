@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# LibrePlate alwaysdata production installer
+# LibrePlate installer
 #
 # Run:
 # DB_HOST=db.example.com
