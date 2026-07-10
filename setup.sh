@@ -223,14 +223,14 @@ check_environment_variables() {
 main() {
     log "Starting LibrePlate installer"
     check_environment_variables
-    # check_python
-    # check_postgresql
-    # create_directories
-    # create_virtualenv
-    # install_dependencies
-    # create_env_file
-    # run_django_setup
-    # print_next_steps
+    check_python
+    check_postgresql
+    create_directories
+    create_virtualenv
+    install_dependencies
+    create_env_file
+    run_django_setup
+    print_next_steps
 }
 
 main "$@"
