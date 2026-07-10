@@ -9,6 +9,7 @@
 # DB_NAME=libreplate_db \
 # DB_USER=libreplate \
 # DB_PASSWORD='secret' \
+# ALLOWED_HOSTS=libreplate.example.com \
 # bash setup.sh
 
 # Enable strict Bash error handling:
@@ -156,7 +157,7 @@ create_env_file() {
         printf 'APP_ENV=production\n'
         printf 'DEBUG=False\n'
         printf 'SECRET_KEY=%s\n' "$SECRET_KEY"
-        printf '\n'
+        printf 'ALLOWED_HOSTS=%s\n' "$ALLOWED_HOSTS"
         printf 'DATABASE_URL=postgres://%s:%s@%s:5432/%s\n' \
             "$DB_USER" \
             "$DB_PASSWORD" \
@@ -184,7 +185,6 @@ run_django_setup() {
 
 print_next_steps() {
 cat <<EOF
-Instalation Complete!
 
 Next steps:
 
@@ -206,7 +206,7 @@ check_environment_variables() {
     local missing=()
     local value
 
-    for name in DB_HOST DB_NAME DB_USER DB_PASSWORD; do
+    for name in DB_HOST DB_NAME DB_USER DB_PASSWORD ALLOWED_HOSTS; do
         value="$(printenv "$name" || true)"
 
         if [[ -z "$value" ]]; then
@@ -233,6 +233,7 @@ main() {
     install_dependencies
     create_env_file
     run_django_setup
+    log "Instalation complete!"
     print_next_steps
 }
 
