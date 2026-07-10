@@ -139,14 +139,6 @@ print(secrets.token_hex(32))
 PY
 }
 
-require_env() {
-    local name="$1"
-
-    if [[ -z "${!name:-}" ]]; then
-        fail "Missing required environment variable: ${name}"
-    fi
-}
-
 create_env_file() {
     log "Creating environment file"
 
@@ -206,12 +198,26 @@ EOF
 check_environment_variables() {
     log "Checking environment variables"
 
-    require_env DB_HOST
-    require_env DB_NAME
-    require_env DB_USER
-    require_env DB_PASSWORD
+    local missing=()
 
-    echo "Environment variables okey"
+    for name in DB_HOST DB_NAME DB_USER DB_PASSWORD; do
+        if [[ -z "${!name:-}" ]]; then
+            echo "${name}=<missing>"
+            missing+=("$name")
+        else
+            echo "${name}=${!name}"
+        fi
+    done
+
+    echo
+
+    if (( ${#missing[@]} > 0 )); then
+        echo "Missing required environment variables:"
+        printf '  - %s\n' "${missing[@]}"
+        exit 1
+    fi
+
+    echo "Environment variables OK"
 }
 
 main() {
