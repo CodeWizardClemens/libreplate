@@ -2,6 +2,8 @@
 #
 # LibrePlate installer
 #
+# Generate an environment file, if the user has not already made one.
+#
 # Run:
 # DB_HOST=db.example.com
 # DB_NAME=libreplate
