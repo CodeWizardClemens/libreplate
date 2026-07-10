@@ -104,12 +104,16 @@ create_directories() {
         "${BASE_DIR}/uploads" \
         "${BASE_DIR}/static" \
         "${BASE_DIR}/logs"
+    echo "Creating directories OK"
+
 }
 
 create_virtualenv() {
     log "Creating virtual environment"
     if [[ ! -d "$VENV_DIR" ]]; then
         "$PYTHON_BIN" -m venv "$VENV_DIR"
+        echo "Virtual environment OK"
+
     else
         echo "Virtualenv already exists"
     fi
@@ -153,10 +157,11 @@ create_env_file() {
         printf 'DEBUG=False\n'
         printf 'SECRET_KEY=%s\n' "$SECRET_KEY"
         printf '\n'
-        printf 'DATABASE_HOST=%s\n' "$DB_HOST"
-        printf 'DATABASE_NAME=%s\n' "$DB_NAME"
-        printf 'DATABASE_USER=%s\n' "$DB_USER"
-        printf 'DATABASE_PASSWORD=%s\n' "$DB_PASSWORD"
+        printf 'DATABASE_URL=postgres://%s:%s@%s:5432/%s\n' \
+            "$DB_USER" \
+            "$DB_PASSWORD" \
+            "$DB_HOST" \
+            "$DB_NAME"
     } > "$ENV_FILE"
 
     chmod 600 "$ENV_FILE"
