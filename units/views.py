@@ -15,14 +15,14 @@ def units(request):
 @login_required
 def create_unit(request):
     if request.method == "POST":
-        form = UnitForm(request.POST)
+        form = UnitForm(request.POST, scope=request.user.unit_scope)
         if form.is_valid():
             unit = form.save(commit=False)
             unit.user = request.user  # Assign the current user
             unit.save()
             return redirect("units")
     else:
-        form = UnitForm()
+        form = UnitForm(None, scope=request.user.unit_scope)
     return render(request, "units/unit_form.html", {"form": form})
 
 
@@ -37,12 +37,12 @@ def edit_unit(request, pk):
         return redirect("units")  # Or raise PermissionDenied
 
     if request.method == "POST":
-        form = UnitForm(request.POST, instance=unit)
+        form = UnitForm(request.POST, instance=unit, scope=request.user.unit_scope)
         if form.is_valid():
             form.save()
             return redirect("units")
     else:
-        form = UnitForm(instance=unit)
+        form = UnitForm(instance=unit, scope=request.user.unit_scope)
 
     return render(request, "units/unit_form.html", {"form": form})
 
