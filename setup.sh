@@ -24,7 +24,7 @@ set -euo pipefail
 umask 077
 
 APP_NAME="libreplate"
-BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="$(pwd)"
 VENV_DIR="${BASE_DIR}/venv"
 ENV_FILE="${BASE_DIR}/.env"
 LOG_FILE="${BASE_DIR}/install.log"
