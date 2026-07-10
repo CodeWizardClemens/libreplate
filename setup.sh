@@ -199,13 +199,13 @@ check_environment_variables() {
     log "Checking environment variables"
 
     local missing=()
+    local value
 
     for name in DB_HOST DB_NAME DB_USER DB_PASSWORD; do
-        if [[ -z "${!name:-}" ]]; then
-            echo "${name}=<missing>"
+        value="$(printenv "$name" || true)"
+
+        if [[ -z "$value" ]]; then
             missing+=("$name")
-        else
-            echo "${name}=${!name}"
         fi
     done
 
@@ -223,14 +223,14 @@ check_environment_variables() {
 main() {
     log "Starting LibrePlate installer"
     check_environment_variables
-    check_python
-    check_postgresql
-    create_directories
-    create_virtualenv
-    install_dependencies
-    create_env_file
-    run_django_setup
-    print_next_steps
+    # check_python
+    # check_postgresql
+    # create_directories
+    # create_virtualenv
+    # install_dependencies
+    # create_env_file
+    # run_django_setup
+    # print_next_steps
 }
 
 main "$@"
