@@ -25,7 +25,7 @@ umask 077
 
 APP_NAME="libreplate"
 BASE_DIR="$(pwd)"
-VENV_DIR="${BASE_DIR}/venv"
+VENV_DIR="${BASE_DIR}/.venv"
 ENV_FILE="${BASE_DIR}/.env"
 LOG_FILE="${BASE_DIR}/install.log"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
