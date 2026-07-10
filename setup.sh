@@ -209,8 +209,6 @@ check_environment_variables() {
         fi
     done
 
-    echo
-
     if (( ${#missing[@]} > 0 )); then
         echo "Missing required environment variables:"
         printf '  - %s\n' "${missing[@]}"
