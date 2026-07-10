@@ -9,7 +9,7 @@
 # DB_NAME=libreplate_db \
 # DB_USER=libreplate \
 # DB_PASSWORD='secret' \
-# bash install.sh
+# bash setup.sh
 
 # Enable strict Bash error handling:
 # -e  Exit immediately if any command fails.
