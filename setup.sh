@@ -31,6 +31,7 @@ BASE_DIR="$(pwd)"
 VENV_DIR="${BASE_DIR}/.venv"
 ENV_FILE="${BASE_DIR}/.env"
 LOG_FILE="${BASE_DIR}/install.log"
+STATIC_ROOT_DIR="${STATIC_ROOT_DIR:-${BASE_DIR}/staticfiles}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 PYTHON_REQUIRED_MAJOR=3
 PYTHON_REQUIRED_MINOR=10
@@ -179,10 +180,9 @@ run_django_setup() {
     source "${VENV_DIR}/bin/activate"
     python manage.py migrate --noinput
     log "Collecting static files"
-    python manage.py collectstatic --noinput
+    STATIC_ROOT="$STATIC_ROOT_DIR" python manage.py collectstatic --noinput
     deactivate
 }
-
 print_next_steps() {
 cat <<EOF
 
