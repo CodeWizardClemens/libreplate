@@ -155,11 +155,6 @@ create_env_file() {
         return
     fi
 
-    require_env DB_HOST
-    require_env DB_NAME
-    require_env DB_USER
-    require_env DB_PASSWORD
-
     SECRET_KEY="$(generate_secret)"
     {
         printf 'APP_ENV=production\n'
@@ -208,8 +203,20 @@ Next steps:
 EOF
 }
 
+check_environment_variables() {
+    log "Checking environment variables"
+
+    require_env DB_HOST
+    require_env DB_NAME
+    require_env DB_USER
+    require_env DB_PASSWORD
+
+    echo "Environment variables okey"
+}
+
 main() {
     log "Starting LibrePlate installer"
+    check_environment_variables
     check_python
     check_postgresql
     create_directories
