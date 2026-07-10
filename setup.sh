@@ -5,10 +5,10 @@
 # Generate an environment file, if the user has not already made one.
 #
 # Run:
-# DB_HOST=db.example.com
-# DB_NAME=libreplate
-# DB_USER=libreplate
-# DB_PASSWORD='secret'
+# DB_HOST=localhost \
+# DB_NAME=libreplate_db \
+# DB_USER=libreplate \
+# DB_PASSWORD='secret' \
 # bash install.sh
 
 # Enable strict Bash error handling:
