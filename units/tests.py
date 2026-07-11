@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.test import TestCase
 
-from units.models import Unit, UnitScope
+from units.models import Unit, UnitScope, HiddenUnit
 
 User = get_user_model()
 
@@ -60,8 +60,46 @@ class UnitModelTests(TestCase):
                 name="Gram", # Already exists in the global scope.
             )
 
-    # TODO There should be some logic for when a global unit is created, and a user
-    # has already defined one.
+class HiddenUnitModelTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="Fred",
+            password="password",
+        )
+        self.scope = UnitScope.objects.get(user=None)
+        self.gram = Unit.objects.get(
+            scope=self.scope,
+            name="Gram",
+        )
 
-    # TODO Units should be hidden from a selecting menu for the user. So the user
-    # doesn't get floated with a large amount of global units.
+    def test_user_can_hide_unit_only_once(self):
+        HiddenUnit.objects.create(
+            user=self.user,
+            unit=self.gram,
+        )
+
+        with self.assertRaises(IntegrityError):
+            HiddenUnit.objects.create(
+                user=self.user,
+                unit=self.gram,
+            )
+
+    def test_hidden_units_are_excluded_from_visible_units_queryset(self):
+        # Create another global unit that is not hidden.
+        liter = Unit.objects.create(
+            scope=self.scope,
+            name="Liter",
+        )
+
+        # Hide only Gram.
+        HiddenUnit.objects.create(
+            user=self.user,
+            unit=self.gram,
+        )
+
+        visible_units = Unit.objects.exclude(
+            hidden_by_users__user=self.user,
+        )
+
+        self.assertNotIn(self.gram, visible_units)
+        self.assertIn(liter, visible_units)

@@ -7,7 +7,7 @@ from .models import Unit
 
 @login_required
 def units(request):
-    units = Unit.objects.order_by("name")
+    units = Unit.objects
     context = {"units": units}
     return render(request, "units/units.html", context)
 

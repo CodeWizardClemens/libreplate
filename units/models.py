@@ -14,6 +14,10 @@ class UnitScope(models.Model):
     User units use their user's scope.
     """
 
+    # TODO There should be some logic for when a global unit is created, and a user
+    # has already defined one. This will have to be handled properly whenupdating
+    # the server via proper migrations.
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid4,
@@ -117,3 +121,31 @@ class Unit(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class HiddenUnit(models.Model):
+    """
+    Stores which units a user has chosen to hide from unit selection interface.
+
+    Each record represents a single (user, unit) combination. If no
+    HiddenUnit exists for a pair, the unit is considered visible.
+    """
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="hidden_units",
+    )
+
+    unit = models.ForeignKey(
+        Unit,
+        on_delete=models.CASCADE,
+        related_name="hidden_by_users",
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "unit"],
+                name="unique_hidden_unit_per_user",
+            ),
+        ]
