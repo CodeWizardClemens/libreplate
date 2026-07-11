@@ -27,8 +27,11 @@ def fail(message: str):
 
 
 def run(command, env=None):
-    subprocess.run(command, check=True, env=env)
-
+    try:
+        subprocess.run(command, check=True, env=env)
+    except subprocess.CalledProcessError as e:
+        cmd = " ".join(map(str, e.cmd))
+        fail(f"Command failed (exit code {e.returncode}):\n\n    {cmd}")
 
 def venv_python():
     if os.name == "nt":
@@ -239,6 +242,35 @@ def serve(c, host="127.0.0.1", port=8000):
             f"{host}:{port}",
         ]
     )
+
+@task
+def test(c, app=None):
+    """
+    Run all tests, or tests for a specific app.
+
+    Examples:
+        inv test
+        inv test --app units
+    """
+
+    load_env()
+    log("Running tests")
+
+    if not (BASE_DIR / "manage.py").exists():
+        fail("No Django project detected")
+
+    command = [
+        str(venv_python()),
+        "manage.py",
+        "test",
+    ]
+
+    if app:
+        command.append(app)
+
+    run(command)
+
+    print("Tests passed")
 
 
 @task
