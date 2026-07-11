@@ -225,6 +225,23 @@ else:
 
 
 @task
+def serve(c, host="127.0.0.1", port=8000):
+    """
+    Run the application server.
+    """
+    load_env()
+    gunicorn = VENV_DIR / "bin" / "gunicorn"
+    run(
+        [
+            str(gunicorn),
+            "libreplate.wsgi:application",
+            "--bind",
+            f"{host}:{port}",
+        ]
+    )
+
+
+@task
 def install(c, admin_password):
     """
     Full installation.
