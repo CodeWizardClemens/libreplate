@@ -53,7 +53,15 @@ class UnitScope(models.Model):
 class Unit(models.Model):
     """
     Represents a unit of measurement within a specific unit scope.
+
+    Rules:
+    - Unit names must be unique within a scope.
+    - If a unit exists in the global scope, users cannot create a unit with
+      the same name in their private scope.
+    - Different users may share the same private unit name, provided it does
+      not exist globally.
     """
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid4,
