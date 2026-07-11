@@ -22,12 +22,12 @@ def create_default_units(apps, schema_editor):
         },
         {
             "name": "Piece",
-            "abbriviation": None,
+            "abbreviation": "",
             "description": "A single piece of something."
         },
         {
             "name": "Scoop",
-            "abbriviation": None,
+            "abbreviation": "",
             "description": "A single scoop of something."
         },
     ]

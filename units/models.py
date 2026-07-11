@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Value
 
@@ -77,8 +78,34 @@ class Unit(models.Model):
             models.UniqueConstraint(
                 fields=["scope", "name"],
                 name="unique_unit_name_per_scope",
-            )
+            ),
         ]
+
+    # TODO Possible race conditions introduced with this clean and save function.
+    # Replace with a constraint, or add a database lock.
+    def clean(self):
+        super().clean()
+
+        # Only private scopes are restricted by global units.
+        if self.scope.user is None:
+            return
+
+        if Unit.objects.filter(
+            scope__user__isnull=True,
+            name=self.name,
+        ).exclude(pk=self.pk).exists():
+            raise ValidationError(
+                {
+                    "name": (
+                        "A global unit with this name already exists. "
+                        "User-defined units cannot override global units."
+                    )
+                }
+            )
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
