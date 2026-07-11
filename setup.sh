@@ -5,11 +5,7 @@
 # Generate an environment file, if the user has not already made one.
 #
 # Run:
-# DB_HOST=localhost \
-# DB_NAME=libreplate_db \
-# DB_USER=libreplate \
-# DB_PASSWORD='secret' \
-# ALLOWED_HOSTS=libreplate.example.com \
+# ADMIN_PASSWORD=unsafe_development_pwd!1 \
 # bash setup.sh
 
 # Enable strict Bash error handling:
@@ -31,7 +27,6 @@ BASE_DIR="$(pwd)"
 VENV_DIR="${BASE_DIR}/.venv"
 ENV_FILE="${BASE_DIR}/.env"
 LOG_FILE="${BASE_DIR}/install.log"
-STATIC_ROOT_DIR="${STATIC_ROOT_DIR:-${BASE_DIR}/staticfiles}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 PYTHON_REQUIRED_MAJOR=3
 PYTHON_REQUIRED_MINOR=10
@@ -145,32 +140,13 @@ print(secrets.token_hex(32))
 PY
 }
 
-create_env_file() {
-    log "Creating environment file"
+run_django_setup() {
 
-    if [[ -f "$ENV_FILE" ]]; then
-        echo ".env already exists, keeping existing file"
+    if [[ ! -f .env ]]; then
+        echo "'.env' not found."
         return
     fi
 
-    SECRET_KEY="$(generate_secret)"
-    {
-        printf 'APP_ENV=production\n'
-        printf 'DEBUG=False\n'
-        printf 'SECRET_KEY=%s\n' "$SECRET_KEY"
-        printf 'ALLOWED_HOSTS=%s\n' "$ALLOWED_HOSTS"
-        printf 'DATABASE_URL=postgres://%s:%s@%s:5432/%s\n' \
-            "$DB_USER" \
-            "$DB_PASSWORD" \
-            "$DB_HOST" \
-            "$DB_NAME"
-    } > "$ENV_FILE"
-
-    chmod 600 "$ENV_FILE"
-}
-
-
-run_django_setup() {
     if [[ ! -f manage.py ]]; then
         echo "No Django project detected"
         return
@@ -180,21 +156,19 @@ run_django_setup() {
     source "${VENV_DIR}/bin/activate"
     python manage.py migrate --noinput
     log "Collecting static files"
-    STATIC_ROOT="$STATIC_ROOT_DIR" python manage.py collectstatic --noinput
+    STATIC_ROOT="$STATIC_ROOT" python manage.py collectstatic --noinput
     deactivate
 }
+
 print_next_steps() {
 cat <<EOF
 
 Next steps:
 
-  1. Environment file
-     ${ENV_FILE}
-
-  2. Activate virtual environment
+  1. Activate virtual environment
      source ${VENV_DIR}/bin/activate
 
-  3. Start application
+  2. Start application
      ${VENV_DIR}/bin/gunicorn libreplate.wsgi:application
 
 EOF
@@ -206,11 +180,11 @@ check_environment_variables() {
     local missing=()
     local value
 
-    for name in DB_HOST DB_NAME DB_USER DB_PASSWORD ALLOWED_HOSTS; do
-        value="$(printenv "$name" || true)"
+    for environment_variable in ADMIN_PASSWORD; do
+        value="$(printenv "$environment_variable" || true)"
 
         if [[ -z "$value" ]]; then
-            missing+=("$name")
+            missing+=("$environment_variable")
         fi
     done
 
@@ -223,16 +197,52 @@ check_environment_variables() {
     echo "Environment variables OK"
 }
 
+create_admin_user() {
+    if [[ ! -f manage.py ]]; then
+        echo "No Django project detected"
+        return
+    fi
+
+    log "Creating admin user"
+
+    source "${VENV_DIR}/bin/activate"
+
+    export DJANGO_SUPERUSER_USERNAME="admin"
+    export DJANGO_SUPERUSER_EMAIL=""
+    export DJANGO_SUPERUSER_PASSWORD="$ADMIN_PASSWORD"
+
+    python manage.py createsuperuser --noinput || \
+        echo "Admin user already exists"
+
+    unset DJANGO_SUPERUSER_USERNAME
+    unset DJANGO_SUPERUSER_EMAIL
+    unset DJANGO_SUPERUSER_PASSWORD
+
+    deactivate
+}
+
+load_env_file() {
+    if [[ -f "$ENV_FILE" ]]; then
+        log "Loading environment file"
+        set -a
+        source "$ENV_FILE"
+        set +a
+    else
+        echo ".env not found"
+    fi
+}
+
 main() {
     log "Starting LibrePlate installer"
     check_environment_variables
+    load_env_file
     check_python
     check_postgresql
     create_directories
     create_virtualenv
     install_dependencies
-    create_env_file
     run_django_setup
+    create_admin_user
     log "Instalation complete!"
     print_next_steps
 }
