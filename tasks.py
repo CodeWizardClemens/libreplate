@@ -140,15 +140,11 @@ def migrate(c):
         return
 
     load_env()
-
     log("Running migrations")
-
     python = str(venv_python())
-
+    run([python, "manage.py", "makemigrations"])
     run([python, "manage.py", "migrate", "--noinput"])
-
     log("Collecting static")
-
     run([python, "manage.py", "collectstatic", "--noinput"])
 
 
@@ -183,10 +179,13 @@ def create_admin(c, password):
     except subprocess.CalledProcessError:
         print("Admin user already exists")
 
+
 @task
 def sync_default_data(c):
     load_env()
+    c.run("python manage.py sync_nutrients")
     c.run("python manage.py sync_units")
+
 
 @task
 def add_user(
@@ -278,7 +277,7 @@ def test(c, app=None):
 
 
 @task
-def install(c, admin_password):
+def install(c):
     """
     Full installation.
     """
@@ -289,7 +288,7 @@ def install(c, admin_password):
     create_virtualenv(c)
     install_dependencies(c)
     migrate(c)
-    create_admin(c, admin_password)
+    sync_default_data(c)
 
     print(
         f"""

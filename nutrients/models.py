@@ -2,6 +2,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+# TODO add way so user can make his own nutrients.
 
 class Nutrient(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -51,14 +52,6 @@ class Nutrient(models.Model):
     )
 
     order = models.PositiveIntegerField(default=0)
-
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="nutrients",
-        null=True,
-        blank=True,
-    )
 
     class Meta:
         verbose_name = "Nutrients"
