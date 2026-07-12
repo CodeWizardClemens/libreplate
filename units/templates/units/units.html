@@ -8,41 +8,65 @@
         <a href="{% url 'create_unit' %}" class="header-btn primary">+ New Unit</a>
     </div>
 
-    {% if units %}
+    {% if units_user %}
+        User defined units:
         <ul>
-        {% for unit in units %}
+        {% for unit in units_user %}
             <li style="margin-bottom: 10px; padding: 10px; border-bottom: 1px solid #eee;">
                 <strong>{{ unit.name }}
                 
-                <!-- Show abbreviation only if it exists -->
                 {% if unit.abbreviation %}
                     / {{ unit.abbreviation }}
                 {% endif %}
                 
-                <!-- Show plural name only if it exists -->
                 {% if unit.name_plural %}
                     / {{ unit.name_plural }}
                 {% endif %}
                 </strong>
-                <!-- Description if exists -->
+
                 {% if unit.description %}
                     — {{ unit.description }}
                 {% endif %}
 
-                
-                <!-- Actions -->
                 <span style="float: right;">
-                    {% if unit.user == user %}
-                        <a href="{% url 'edit_unit' unit.pk %}" style="color: blue; margin-right: 10px;">Edit</a>
-                        <a href="{% url 'delete_unit' unit.pk %}" style="color: red;" onclick="return confirm('Delete this unit?');">Delete</a>
-                    {% elif unit.user is None %}
-                        <em>(Global Unit)</em>
-                        {# Optional: Add edit/delete buttons for global units here if desired #}
-                    {% endif %}
+                    <a href="{% url 'edit_unit' unit.pk %}" style="color: blue; margin-right: 10px;">Edit</a>
+                    <form method="post" action="{% url 'delete_unit' unit.pk %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit"
+                                style="color: red; background:none; border:none; padding:0; cursor:pointer;"
+                                onclick="return confirm('Delete unit `{{ unit }}`?');">
+                            Delete
+                        </button>
+                    </form>
                 </span>
             </li>
         {% endfor %}
         </ul>
+    
+    <hr>
+    {% endif %}
+          
+    {% if units_global %}
+
+        {% for unit in units_global %}
+            <li style="margin-bottom: 10px; padding: 10px; border-bottom: 1px solid #eee;">
+                <strong>{{ unit.name }}
+                
+                {% if unit.abbreviation %}
+                    / {{ unit.abbreviation }}
+                {% endif %}
+                
+                {% if unit.name_plural %}
+                    / {{ unit.name_plural }}
+                {% endif %}
+                </strong>
+
+                {% if unit.description %}
+                    — {{ unit.description }}
+                {% endif %}
+            </li>
+        {% endfor %}
+    
     {% else %}
         <p>No units available.</p>
     {% endif %}

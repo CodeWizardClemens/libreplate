@@ -1,13 +1,43 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
 <div class="container">
-    <h1>{% if unit %}Edit Unit{% else %}New Unit{% endif %}</h1>
-    <form method="post">
+    <div class="page-header">
+        <h1>{% if unit %}Edit unit '{{unit}}'{% else %}New Unit{% endif %}</h1>
+
+        <div class="header-actions">
+            <a href="{% url 'units' %}" class="btn btn-secondary">
+                Cancel
+            </a>
+            <button type="submit" form="unitForm" class="btn btn-primary">
+                Save
+            </button>
+        </div>
+    </div>
+
+    <form method="post" id="unitForm">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Save</button>
-        <a href="{% url 'units' %}">Cancel</a>
+        {% for field in form %}
+            <div class="form-row">
+                <label for="{{ field.id_for_label }}" class="form-label">
+                    {{ field.label }}
+                </label>
+
+                <div class="form-input">
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <div class="form-help">{{ field.help_text }}</div>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                        <div class="form-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
     </form>
+
 </div>
 {% endblock %}

@@ -98,7 +98,11 @@ class Unit(models.Model):
     def clean(self):
         super().clean()
 
-        # Only private scopes are restricted by global units.
+        # Scope hasn't been assigned yet (e.g. during form validation).
+        if self.scope_id is None:
+            return
+
+        # Global units have no restriction.
         if self.scope.user is None:
             return
 

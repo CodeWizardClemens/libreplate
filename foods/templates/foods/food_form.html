@@ -8,14 +8,16 @@
         <h1>Food Form</h1>
 
         <div class="header-actions">
-            <a href="{% url 'foods' %}" class="btn btn-secondary">Cancel</a>
+            <a href="{% url 'foods' %}" class="btn btn-secondary">
+                Cancel
+            </a>
             <button type="submit" form="foodForm" class="btn btn-primary">
                 Save
             </button>
         </div>
     </div>
 
-    <form method="post" id="foodForm" class="food-form">
+    <form method="post" id="foodForm" class="form">
         {% csrf_token %}
 
         <div class="form-section">
@@ -82,89 +84,6 @@
 </div>
 
 <style>
-/* ---------- Food Form ---------- */
-
-.food-form {
-    max-width: 700px;
-}
-
-.form-section {
-    margin-bottom: 14px;
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 135px 1fr;
-    gap: 12px;
-    align-items: center;
-    padding: 4px 0;
-}
-
-.form-label {
-    font-weight: 600;
-    color: #374151;
-}
-
-.form-input {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-}
-
-/* Inputs */
-
-.form-input input,
-.form-input select,
-.form-input textarea {
-    width: 100%;
-    max-width: 200px;
-    padding: 8px 10px;
-    border: 1px solid #d5dbe3;
-    border-radius: 10px;
-    font: inherit;
-    font-size: 14px;
-    box-sizing: border-box;
-    transition: border-color .15s ease, box-shadow .15s ease;
-}
-
-.form-input textarea {
-    max-width: 460px;
-    min-height: 80px;
-    resize: vertical;
-}
-
-.form-input input:focus,
-.form-input select:focus,
-.form-input textarea:focus {
-    outline: none;
-    border-color: #1a73e8;
-    box-shadow: 0 0 0 2px rgba(26,115,232,.15);
-}
-
-/* Checkbox */
-
-.form-input input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    max-width: none;
-    padding: 0;
-}
-
-/* Help & Errors */
-
-.form-help,
-.form-error {
-    font-size: 12px;
-}
-
-.form-help {
-    color: #777;
-}
-
-.form-error {
-    color: #d32f2f;
-}
-
 /* Nutrients */
 
 .section-header {
@@ -187,23 +106,6 @@
 /* Mobile */
 
 @media (max-width: 700px) {
-
-    .food-form {
-        max-width: 100%;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
-        gap: 5px;
-        padding: 7px 0;
-    }
-
-    .form-input input,
-    .form-input select,
-    .form-input textarea {
-        max-width: none;
-    }
-
     .section-header {
         flex-direction: column;
         align-items: stretch;
