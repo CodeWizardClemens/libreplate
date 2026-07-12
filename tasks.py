@@ -25,7 +25,8 @@ def log(message: str):
 def fail(message: str):
     raise SystemExit(f"\nERROR: {message}")
 
-
+# TODO replace run command with default c.run, but add fail message to all
+# invoke runs.
 def run(command, env=None):
     try:
         subprocess.run(command, check=True, env=env)
@@ -182,6 +183,10 @@ def create_admin(c, password):
     except subprocess.CalledProcessError:
         print("Admin user already exists")
 
+@task
+def sync_default_data(c):
+    load_env()
+    c.run("python manage.py sync_units")
 
 @task
 def add_user(
