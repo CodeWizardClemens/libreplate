@@ -23,22 +23,6 @@ class UserSettings(models.Model):
         return f"Settings({self.user.username})"
 
 
-class DefaultMeal(models.Model):
-    name = models.CharField(max_length=255)
-    order = models.PositiveIntegerField(default=0)
-    description = models.TextField(blank=True, null=True)
-
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="default_meals"
-    )
-
-    class Meta:
-        ordering = ["order"]
-
-    def __str__(self):
-        return self.name
-
-
 class USDAAPISettings(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,

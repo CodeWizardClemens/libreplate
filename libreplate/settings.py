@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "goals.apps.GoalsConfig",
     "settings.apps.SettingsConfig",
     "automations.apps.AutomationsConfig",
+    "default_meals.apps.DefaultMealsConfig",
     "user_statistics.apps.UserStatisticsConfig",
     "django.contrib.admin",
     "django.contrib.auth",
