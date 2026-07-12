@@ -233,18 +233,17 @@ else:
 
 
 @task
-def serve(c, host="127.0.0.1", port=8000):
+def serve_dev(c, host="127.0.0.1", port=8000):
     """
-    Run the application server.
+    Run the application server for development.
     """
     load_env()
-    gunicorn = VENV_DIR / "bin" / "gunicorn"
+    python = VENV_DIR / "bin" / "python"
     run(
         [
-            str(gunicorn),
-            "libreplate.wsgi:application",
-            "--bind",
-            f"{host}:{port}",
+            str(python),
+            "manage.py",
+            "runserver",
         ]
     )
 
