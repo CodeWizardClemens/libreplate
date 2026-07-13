@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 from invoke import task
+from textwrap import dedent
 
 APP_NAME = "libreplate"
 
@@ -188,48 +189,47 @@ def sync_default_data(c):
 
 
 @task
-def add_user(
-    c,
-    username,
-    first_name,
-    last_name,
-    email,
-    password,
-):
+def add_user(c, username, first_name, last_name, email, password):
     """
-    Create a normal Django user.
+    Create a normal user.
     """
 
     load_env()
 
-    script = f"""
-from django.contrib.auth import get_user_model
+    script = dedent(f"""\
+        from django.contrib.auth import get_user_model
 
-User = get_user_model()
+        User = get_user_model()
 
-if User.objects.filter(username="{username}").exists():
-    print("User already exists")
-else:
-    user = User.objects.create_user(
-        username="{username}",
-        email="{email}",
-        password="{password}",
-        first_name="{first_name}",
-        last_name="{last_name}",
-    )
-    print(f"Created {{user.username}}")
-"""
+        if User.objects.filter(username={username!r}).exists():
+            print("User already exists")
+        else:
+            User.objects.create_user(
+                username={username!r},
+                email={email!r},
+                password={password!r},
+                first_name={first_name!r},
+                last_name={last_name!r},
+            )
+            print("User created")
+    """)
 
-    run(
-        [
-            str(venv_python()),
-            "manage.py",
-            "shell",
-            "-c",
-            script,
-        ]
-    )
+    run([str(venv_python()), "manage.py", "shell", "-c", script,])
+@task
 
+def add_usda_api_key(c, key):
+    """
+    Add a USDA API key.
+    """
+
+    script = dedent(f"""\
+        from integrations.models import USDAAPISettings
+
+        USDAAPISettings.objects.create(key={key!r})
+    """)
+
+
+    run([str(venv_python()), "manage.py", "shell", "-c", script,])
 
 @task
 def serve_dev(c, host="127.0.0.1", port=8000):
