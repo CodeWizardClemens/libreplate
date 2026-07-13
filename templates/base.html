@@ -145,6 +145,15 @@ document.body.addEventListener("htmx:sendError", function(evt) {
     console.error("Network error", evt.detail);
 });
 
+document.querySelectorAll("#sidebar a").forEach(link => {
+    link.addEventListener("click", () => {
+        if (window.innerWidth <= 700) {
+            setSidebarState(true);
+            localStorage.setItem(SIDEBAR_STORAGE_KEY, "true");
+        }
+    });
+});
+
 </script>
 
 {% block scripts %}{% endblock %}
