@@ -182,8 +182,9 @@ def create_admin(c, password):
 
 @task
 def sync_default_data(c):
-    load_env()
 
+    log("Syncing default data")
+    load_env()
     for sync_command in ['sync_nutrients', 'sync_units', 'sync_body_metrics']:
         c.run(f"{str(venv_python())} manage.py {sync_command}")
 
