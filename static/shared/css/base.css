@@ -527,7 +527,6 @@ body.sidebar-collapsed #content {
 
 /* mobile page title */
 
-
 .mobile-page-title {
     display: none;
     font-size: 22px;
@@ -542,4 +541,34 @@ body.sidebar-collapsed #content {
         display: block;
         margin-left: 12px;
     }
+}
+
+/* topbar right sections */
+
+.topbar-right-desktop {
+    display: flex;
+}
+
+.topbar-right-mobile {
+    display: none;
+}
+
+@media (max-width: 700px) {
+
+    .topbar-right-desktop {
+        display: none;
+    }
+
+    .topbar-right-mobile {
+        display: flex;
+    }
+}
+
+.top-bar-button {
+    color: #ffffff;
+    background: #253244;
+    padding: 7px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
 }

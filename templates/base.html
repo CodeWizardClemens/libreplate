@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +7,6 @@
     <title>{% block title %}LibrePlate{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    {% load static %}
     <link rel="stylesheet" href="{% static 'shared/css/base.css' %}">
 
     <script src="https://unpkg.com/htmx.org@2.0.7"></script>
@@ -19,7 +20,6 @@
 >
 
 <div id="globalTopbar">
-
     <div class="topbar-left">
         <button id="toggleSidebar" class="icon-btn">☰</button>
 
@@ -35,13 +35,13 @@
         </div>
     </div>
 
-    <div class="topbar-right">
-        <a href="{% url 'settings' %}" class="settings-link">
-            <span>⚙️</span>
-            <span class="settings-text">Settings</span>
-        </a>
+    <div class="topbar-right topbar-right-desktop">
+        {% block top_bar_right_desktop %}{% endblock %}
     </div>
 
+    <div class="topbar-right topbar-right-mobile">
+        {% block top_bar_right_mobile %}{% endblock %}
+    </div>
 </div>
 
 
@@ -145,9 +145,7 @@ document.body.addEventListener("htmx:sendError", function(evt) {
     console.error("Network error", evt.detail);
 });
 
-
 </script>
-
 
 {% block scripts %}{% endblock %}
 

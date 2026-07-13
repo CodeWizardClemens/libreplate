@@ -13,7 +13,10 @@ from .services import generate_grocery_items
 @login_required
 def grocery_lists(request):
     lists = GroceryList.objects.filter(user=request.user)
-    return render(request, "groceries/list.html", {"lists": lists})
+    return render(request, "groceries/list.html", {
+        "lists": lists,
+        "page_title": "Grocery lists",
+    })
 
 
 @login_required
