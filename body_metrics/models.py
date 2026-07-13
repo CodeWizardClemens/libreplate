@@ -1,34 +1,45 @@
 from django.contrib.auth.models import User
 from django.db import models
-
+from django.db.models import Q
 
 class BodyMetric(models.Model):
 
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=50)
     description = models.TextField(blank=True, null=True)
-    abbreviation = models.CharField(max_length=100, blank=True, null=True)
 
     show_in_diary_total = models.BooleanField(
-        default=True, help_text="If True, this nutrient will be visible to users"
+        default=True, 
     )
     show_in_goal_edit = models.BooleanField(
-        null=True,
-        blank=True,
+        default=True,
     )
-
-    order = models.PositiveIntegerField(default=0)
-
+    is_single_entry = models.BooleanField(
+        default=False,
+    )
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name="body_metric",
         null=True,
-        blank=True,
+        help_text="If True, this nutrient will be visible to users",
     )
 
     class Meta:
         verbose_name = "Nutrients"
-        ordering = ["order"]
+        constraints = [
+            # Global metrics
+            models.UniqueConstraint(
+                fields=["name"],
+                condition=Q(user__isnull=True),
+                name="unique_global_body_metric_name",
+            ),
+            # Per-user metrics
+            models.UniqueConstraint(
+                fields=["user", "name"],
+                condition=Q(user__isnull=False),
+                name="unique_user_body_metric_name",
+            ),
+        ]
 
     def __str__(self):
         return self.name

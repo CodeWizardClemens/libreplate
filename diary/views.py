@@ -216,7 +216,7 @@ def diary_day(request, date=None):
 
         goal_nutrients = {g.nutrient_id: float(g.amount) for g in goal_qs}
 
-    body_metrics = BodyMetric.objects.filter(show_in_diary_total=True).order_by("order")
+    body_metrics = BodyMetric.objects.filter(show_in_diary_total=True)
 
     logs = BodyMetricLog.objects.filter(
         user=request.user,
