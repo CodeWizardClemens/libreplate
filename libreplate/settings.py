@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "common.apps.CommonConfig",
     "recipes.apps.RecipesConfig",
     "diary.apps.DiaryConfig",
+    "integrations.apps.IntegrationsConfig",
     "body_metrics.apps.BodyMetricsConfig",
     "goals.apps.GoalsConfig",
     "settings.apps.SettingsConfig",

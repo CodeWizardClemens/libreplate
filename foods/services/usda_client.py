@@ -1,6 +1,6 @@
 import requests
 
-from settings.models import USDAAPISettings
+from integrations.models import USDAAPISettings
 
 
 class USDAClient:
