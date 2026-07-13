@@ -36,8 +36,6 @@ def run(command, env=None):
         fail(f"Command failed (exit code {e.returncode}):\n\n    {cmd}")
 
 def venv_python():
-    if os.name == "nt":
-        return VENV_DIR / "Scripts" / "python.exe"
     return VENV_DIR / "bin" / "python"
 
 
@@ -146,6 +144,7 @@ def migrate(c):
     run([python, "manage.py", "makemigrations"])
     run([python, "manage.py", "migrate", "--noinput"])
     log("Collecting static")
+
     run([python, "manage.py", "collectstatic", "--noinput"])
 
 
@@ -184,9 +183,9 @@ def create_admin(c, password):
 @task
 def sync_default_data(c):
     load_env()
-    c.run("python manage.py sync_nutrients")
-    c.run("python manage.py sync_units")
-    c.run("python manage.py sync_body_metrics")
+
+    for sync_command in ['sync_nutrients', 'sync_units', 'sync_body_metrics']:
+        c.run(f"{str(venv_python())} manage.py {sync_command}")
 
 
 @task
