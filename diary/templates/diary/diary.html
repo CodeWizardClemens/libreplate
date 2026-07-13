@@ -9,10 +9,10 @@
 {% block content %}
 
 <link rel="stylesheet" href="{% static 'diary/css/diary.css' %}">
+<link rel="stylesheet" href="{% static 'diary/css/mobile_date_picker.css' %}">
 
 {% include "diary/components/diary_header_desktop.html" %}
 {% include "diary/components/mobile_date_picker.html" %}
-
 <div class="card">
     {% include "diary/components/body_metrics.html" %}
 </div>
@@ -32,5 +32,6 @@
 </div>
 
 <script src="{% static 'diary/js/diary.js' %}"></script>
+<script src="{% static 'diary/js/mobile_date_picker.js' %}"></script>
 
 {% endblock %}

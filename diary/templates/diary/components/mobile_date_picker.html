@@ -1,0 +1,52 @@
+<div class="mobile-date-picker">
+
+    <div class="mdp-header">
+
+        <div class="mdp-month" id="mdpMonth"></div>
+
+        <div class="mdp-actions">
+
+            <button id="prevWeek" class="mdp-icon">
+                ◀
+            </button>
+
+            <button id="nextWeek" class="mdp-icon">
+                ▶
+            </button>
+
+            <button id="todayBtn" class="mdp-small">
+                Today
+            </button>
+
+            <button id="calendarBtn" class="mdp-small">
+                📅
+            </button>
+
+            <input
+                id="calendarInput"
+                type="date"
+                value="{{ selected_date|date:'Y-m-d' }}"
+                hidden
+            >
+
+        </div>
+
+    </div>
+
+    <div class="mdp-weekdays">
+        <span>Mon</span>
+        <span>Tue</span>
+        <span>Wed</span>
+        <span>Thu</span>
+        <span>Fri</span>
+        <span>Sat</span>
+        <span>Sun</span>
+    </div>
+
+    <div id="mdpDays" class="mdp-days"></div>
+
+</div>
+
+<script>
+window.selectedDate="{{ selected_date|date:'Y-m-d' }}";
+</script>
