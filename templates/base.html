@@ -32,12 +32,10 @@
     </div>
 
     <div class="topbar-right">
-        <form method="post" action="{% url 'logout' %}" style="margin:0;">
-            {% csrf_token %}
-            <button type="submit" class="icon-btn logout-btn-wide">
-                Logout ➜
-            </button>
-        </form>
+        <a href="{% url 'settings' %}" class="settings-link">
+            <span>⚙️</span>
+            <span class="settings-text">Settings</span>
+        </a>
     </div>
 
 </div>
@@ -78,10 +76,6 @@
 
         <a href="{% url 'profile' %}">
             <span>👤</span><span class="label">Account</span>
-        </a>
-
-        <a href="{% url 'settings' %}">
-            <span>⚙️</span><span class="label">Settings</span>
         </a>
 
     </div>
