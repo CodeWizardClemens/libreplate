@@ -2,11 +2,15 @@
 {% load diary_filters %}
 {% load static %}
 
+{% block page_title %}Diary{% endblock %}
+
 {% block content %}
 
 <link rel="stylesheet" href="{% static 'diary/css/day.css' %}">
 
+
 {% include "diary/components/day_header.html" %}
+
 
 <div class="card">
     {% include "diary/components/body_metrics.html" %}

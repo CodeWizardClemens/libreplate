@@ -1,6 +1,4 @@
-/* ===========================
-   Base
-=========================== */
+/* static/shared/css/base.css */
 
 html,
 body {
@@ -186,7 +184,7 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    height: 48px;
+    height: 55px;
     background: #071428;
     display: flex;
     align-items: center;
@@ -523,5 +521,25 @@ body.sidebar-collapsed #content {
     .form-input select,
     .form-input textarea {
         max-width: none;
+    }
+}
+
+/* mobile page title */
+
+
+.mobile-page-title {
+    display: none;
+    font-size: 22px;
+    font-weight: 600;
+    color: white;
+    text-align: center;
+}
+
+@media (max-width: 700px) {
+
+    .mobile-page-title {
+        display: block;
+        margin-left: 12px;
+
     }
 }
