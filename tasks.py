@@ -186,6 +186,7 @@ def sync_default_data(c):
     load_env()
     c.run("python manage.py sync_nutrients")
     c.run("python manage.py sync_units")
+    c.run("python manage.py sync_body_metrics")
 
 
 @task
