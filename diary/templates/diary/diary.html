@@ -1,3 +1,5 @@
+<!-- diary.html -->
+
 {% extends "base.html" %}
 {% load diary_filters %}
 {% load static %}
@@ -6,11 +8,10 @@
 
 {% block content %}
 
-<link rel="stylesheet" href="{% static 'diary/css/day.css' %}">
+<link rel="stylesheet" href="{% static 'diary/css/diary.css' %}">
 
-
-{% include "diary/components/day_header.html" %}
-
+{% include "diary/components/diary_header_desktop.html" %}
+{% include "diary/components/mobile_date_picker.html" %}
 
 <div class="card">
     {% include "diary/components/body_metrics.html" %}
@@ -30,6 +31,6 @@
     {% include "diary/components/add_meal.html" %}
 </div>
 
-<script src="{% static 'diary/js/day.js' %}"></script>
+<script src="{% static 'diary/js/diary.js' %}"></script>
 
 {% endblock %}

@@ -245,7 +245,7 @@ def diary_day(request, date=None):
         "log_map": log_map,
     }
 
-    return render(request, "diary/day.html", context)
+    return render(request, "diary/diary.html", context)
 
 
 # =========================================================
