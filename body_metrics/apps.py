@@ -1,3 +1,5 @@
+# body_metrics/apps.py
+
 from django.apps import AppConfig
 
 

@@ -216,8 +216,43 @@ def add_user(c, username, first_name, last_name, email, password):
     """)
 
     run([str(venv_python()), "manage.py", "shell", "-c", script,])
-@task
 
+
+@task
+def remove_user(c, username):
+    """
+    Remove a user by username.
+
+    """
+
+    load_env()
+
+    script = dedent(f"""\
+        from django.contrib.auth import get_user_model
+
+        User = get_user_model()
+
+        try:
+            user = User.objects.get(username={username!r})
+        except User.DoesNotExist:
+            print("User does not exist")
+        else:
+            user.delete()
+            print("User removed")
+    """)
+
+    run(
+        [
+            str(venv_python()),
+            "manage.py",
+            "shell",
+            "-c",
+            script,
+        ]
+    )
+
+
+@task
 def add_usda_api_key(c, key):
     """
     Add a USDA API key.
