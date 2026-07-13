@@ -244,8 +244,9 @@ body {
     flex-direction: column;
 
     overflow: hidden;
+    box-sizing: border-box;
 
-    transition: width .2s ease, transform .2s ease;
+    transition: width .2s ease;
 }
 
 
@@ -254,20 +255,27 @@ body {
 }
 
 
+/* Keep internal content width while parent collapses */
+.nav-links,
+.bottom-links {
+    width: 160px;
+    flex-shrink: 0;
+}
+
+
 .nav-links {
     display: flex;
     flex-direction: column;
+
     padding: 10px;
     gap: 6px;
-    flex: 1;
 
-    min-width: 160px;
+    flex: 1;
 }
 
 
 .bottom-links {
     padding: 10px;
-    min-width: 160px;
 }
 
 
@@ -317,6 +325,7 @@ body {
 body.sidebar-collapsed #content {
     margin-left: 0;
 }
+
 
 /* ===========================
    Responsive
