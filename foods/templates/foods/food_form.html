@@ -1,22 +1,27 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block header_buttons_desktop %}
+    <a href="{% url 'foods' %}" class="btn btn-secondary">
+        Cancel
+    </a>
+    <button type="submit" form="foodForm" class="btn btn-primary">
+        Save
+    </button>
+{% endblock %}
+
+{% block top_bar_right_mobile %}
+    <a href="{% url 'foods' %}" class="btn top-bar-button">
+        Cancel
+    </a>
+    <button type="submit" form="foodForm" class="btn top-bar-button">
+        Save
+    </button>
+{% endblock %}
+
 {% block content %}
 
 <div class="container">
-    <div class="page-header-desktop">
-        <h1>Food Form</h1>
-
-        <div class="header-actions">
-            <a href="{% url 'foods' %}" class="btn btn-secondary">
-                Cancel
-            </a>
-            <button type="submit" form="foodForm" class="btn btn-primary">
-                Save
-            </button>
-        </div>
-    </div>
-
     <form method="post" id="foodForm" class="form">
         {% csrf_token %}
 

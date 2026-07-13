@@ -32,7 +32,10 @@ def grocery_create(request):
             return redirect("grocery_detail", pk=grocery.pk)
     else:
         form = GroceryListCreateForm()
-    return render(request, "groceries/create.html", {"form": form})
+    return render(request, "groceries/create.html", {
+        "form": form,
+        "page_title": "Create Grocery list",
+    })
 
 
 @login_required

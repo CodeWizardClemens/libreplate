@@ -24,7 +24,7 @@
         <button id="toggleSidebar" class="icon-btn">☰</button>
 
         <div class="mobile-page-title">
-            {% block page_title %}{% endblock %}
+            {{ page_title }}
         </div>
     </div>
 
@@ -72,7 +72,6 @@
         <a href="{% url 'goals' %}">
             <span>🎯</span><span class="label">Goals</span>
         </a>
-
     </div>
 
     <div class="bottom-links">
@@ -89,6 +88,13 @@
 
 
 <div id="content">
+    <div class="page-header-desktop">
+        <h1> {{ page_title }} </h1>
+        <div class="header-actions">
+            {% block header_buttons_desktop %}{% endblock %}
+        </div>
+    </div>
+
     {% block content %}{% endblock %}
 </div>
 

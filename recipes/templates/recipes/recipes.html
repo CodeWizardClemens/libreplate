@@ -1,15 +1,23 @@
+<!-- recipes/templates/recipes/recipes.html -->
+
 {% extends "base.html" %}
 {% load static %}
 
-{% block content %}
-
-<div class="page-header-desktop">
-    <h1>Recipes</h1>
-
+{% block header_buttons_desktop %}
     <a href="{% url 'recipe_create' %}" class="btn btn-primary">
         + New recipe
     </a>
-</div>
+{% endblock %}
+
+{% block top_bar_right_mobile %}
+    <a href="{% url 'recipe_create' %}" class="top-bar-button">
+        + New
+    </a>
+{% endblock %}
+
+<!-- Main content -->
+{% block content %}
+
 
 <div class="search-toolbar">
 

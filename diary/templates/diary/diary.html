@@ -4,14 +4,18 @@
 {% load diary_filters %}
 {% load static %}
 
+{% block header_buttons_desktop %}
+    {% include "diary/components/diary_header_buttons.html" %}
+{% endblock %}
+
 {% block page_title %}Diary{% endblock %}
 
+<!-- Main content -->
 {% block content %}
 
 <link rel="stylesheet" href="{% static 'diary/css/diary.css' %}">
 <link rel="stylesheet" href="{% static 'diary/css/mobile_date_picker.css' %}">
 
-{% include "diary/components/diary_header_desktop.html" %}
 {% include "diary/components/mobile_date_picker.html" %}
 <div class="card">
     {% include "diary/components/body_metrics.html" %}

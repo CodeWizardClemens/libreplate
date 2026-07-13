@@ -1,5 +1,19 @@
+<!-- foods/templates/foods/foods.html -->
+
 {% extends "base.html" %}
 {% load static %}
+
+{% block header_buttons_desktop %}
+    <a href="{% url 'create_food' %}" class="btn btn-primary">
+        + New Food
+    </a>
+{% endblock %}
+
+{% block top_bar_right_mobile %}
+    <a href="{% url 'create_food' %}" class="btn top-bar-button">
+        + New Food
+    </a>
+{% endblock %}
 
 {% block content %}
 
@@ -7,18 +21,6 @@
 <link rel="stylesheet" href="{% static 'shared/css/search_bar.css' %}">
 
 <div class="container">
-
-    <div class="page-header-desktop">
-
-        <h1>Foods</h1>
-
-        <div class="header-actions">
-            <a href="{% url 'create_food' %}" class="btn btn-primary">
-                + New Food
-            </a>
-        </div>
-
-    </div>
 
     <div class="food-toolbar">
 

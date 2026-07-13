@@ -1,25 +1,33 @@
+<!-- recipes/templates/recipes/recipe_edit.html -->
+
 {% extends "base.html" %}
 {% load diary_filters %}
 
+{% block header_buttons_desktop %}
+    <a href="{% url 'recipes' %}" class="btn btn-secondary">
+        Back
+    </a>
+    <button
+        type="submit"
+        form="recipeForm"
+        class="btn btn-primary">
+        Save recipe
+    </button>
+{% endblock %}
+
+{% block top_bar_right_mobile %}
+    <button
+        type="submit"
+        form="recipeForm"
+        class="btn top-bar-button">
+        Save recipe
+    </button>
+{% endblock %}
+
+<!-- Main content -->
 {% block content %}
 
 <div class="container">
-
-    <div class="page-header-desktop">
-        <h1>Edit recipe</h1>
-
-        <div class="header-actions">
-            <a href="{% url 'recipes' %}" class="btn btn-secondary">
-                Back
-            </a>
-            <button
-                type="submit"
-                form="recipeForm"
-                class="btn btn-primary">
-                Save recipe
-            </button>
-        </div>
-    </div>
 
     <form method="post" id="recipeForm" class="recipe-form">
 
