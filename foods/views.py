@@ -93,7 +93,7 @@ def build_usda_food_data(user, query, nutrients):
     if not query:
         return []
 
-    client = USDAClient(user)
+    client = USDAClient()
     results = []
 
     for food in client.search(query):
@@ -333,6 +333,7 @@ def import_usda_food_view(request, fdc_id):
         return redirect("foods")
 
     food = import_usda_food(request.user, fdc_id)
+
     touch_food(food)
 
     return redirect("foods")

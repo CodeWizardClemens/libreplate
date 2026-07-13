@@ -22,7 +22,7 @@ def import_usda_food(user, fdc_id):
         if existing:
             return existing
 
-    client = USDAClient(user)
+    client = USDAClient()
     data = client.get_food(fdc_id)
 
     unit = (
@@ -49,16 +49,10 @@ def import_usda_food(user, fdc_id):
     nutrient_lookup = {}
 
     for nutrient in Nutrient.objects.filter(
-        user__isnull=True,
         usda_nutrient_number__isnull=False,
     ):
         nutrient_lookup[str(nutrient.usda_nutrient_number)] = nutrient
 
-    for nutrient in Nutrient.objects.filter(
-        user=user,
-        usda_nutrient_number__isnull=False,
-    ):
-        nutrient_lookup[str(nutrient.usda_nutrient_number)] = nutrient
 
     for nutrient in data["nutrients"]:
 

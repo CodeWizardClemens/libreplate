@@ -6,8 +6,8 @@ from integrations.models import USDAAPISettings
 class USDAClient:
     BASE_URL = "https://api.nal.usda.gov/fdc/v1"
 
-    def __init__(self, user):
-        self.api_key = USDAAPISettings.objects.get(user=user).key
+    def __init__(self):
+        self.api_key = USDAAPISettings.objects.get().key
 
     def search(self, query, page_size=10):
         response = requests.get(
@@ -21,19 +21,13 @@ class USDAClient:
         )
 
         response.raise_for_status()
-
         data = response.json()
-
         foods = []
 
         for food in data.get("foods", []):
-
             nutrients = []
-
             for nutrient in food.get("foodNutrients", []):
-
                 value = nutrient.get("value")
-
                 if value is None:
                     continue
 
@@ -85,7 +79,6 @@ class USDAClient:
         for nutrient in data.get("foodNutrients", []):
 
             info = nutrient.get("nutrient", {})
-
             amount = nutrient.get("amount")
 
             if amount is None:
@@ -94,7 +87,7 @@ class USDAClient:
             nutrients.append(
                 {
                     "name": info.get("name"),
-                    "number": str(info.get("number") or info.get("id") or ""),
+                    "number": info.get("id"),
                     "unit": info.get("unitName"),
                     "value": amount,
                 }
