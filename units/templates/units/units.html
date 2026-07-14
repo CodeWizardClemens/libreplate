@@ -1,12 +1,19 @@
 {% extends 'base.html' %}
 
+{% block header_buttons_desktop %}
+    <a href="{% url 'create_unit' %}" class="btn btn-primary">
+        + New unit
+    </a>
+{% endblock %}
+
+{% block top_bar_right_mobile %}
+    <a href="{% url 'create_unit' %}" class="btn top-bar-button">
+        + New
+    </a>
+{% endblock %}
+
 {% block content %}
 <div class="container">
-
-    <div class="page-header-desktop">
-        <h1>Units</h1>
-        <a href="{% url 'create_unit' %}" class="header-btn primary">+ New Unit</a>
-    </div>
 
     {% if units_user %}
         User defined units:
