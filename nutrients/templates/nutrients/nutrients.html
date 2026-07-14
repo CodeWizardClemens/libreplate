@@ -1,14 +1,15 @@
 {% extends 'base.html' %}
 
 {% block header_buttons_desktop %}
-    <a href="{% url 'create_nutrient' %}" class="header-btn primary">
+
+    <a href="{% url 'create_nutrient' %}" class="btn btn-primary">
         + New Nutrient
     </a>
 {% endblock %}
 
 {% block top_bar_right_mobile %}
-    <a href="{% url 'create_nutrient' %}" class="top-bar-button">
-        + New Nutrient
+    <a href="{% url 'create_nutrient' %}" class="btn top-bar-button">
+        + New
     </a>
 {% endblock %}
 

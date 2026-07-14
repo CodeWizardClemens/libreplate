@@ -2,6 +2,9 @@
 {% load dict_extras %}
 
 {% block header_buttons_desktop %}
+    <a href="{% url 'goals' %}" class="btn btn-secondary">
+        Cancel
+    </a>
     <button type="submit" class="goalForm btn btn-primary">
         Save Goal
     </button>

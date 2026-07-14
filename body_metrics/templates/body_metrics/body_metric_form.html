@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 
 {% block header_buttons_desktop %}
+    <a href="{% url 'body_metrics' %}" class="btn btn-secondary">
+        Cancel
+    </a>
    <button type="submit" class="bodyMetricForm btn btn-primary">
         Save
     </button>

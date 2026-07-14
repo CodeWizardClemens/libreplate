@@ -3,6 +3,9 @@
 {% extends "base.html" %}
 
 {% block header_buttons_desktop %}
+    <a href="{% url 'groceries' %}" class="btn btn-secondary">
+        Cancel
+    </a>
     <button class="grocery-form btn btn-primary">
     Create
     </button>

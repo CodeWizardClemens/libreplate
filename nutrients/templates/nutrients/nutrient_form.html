@@ -1,11 +1,18 @@
 {% extends 'base.html' %}
 
 {% block header_buttons_desktop %}
-   <button type="submit" class="nutrientForm btn btn-primary">Save</button>
+    <a href="{% url 'nutrients' %}" class="btn btn-secondary">
+        Cancel
+    </a>
+    <button type="submit" class="nutrientForm btn btn-primary">
+        Save
+    </button>
 {% endblock %}
 
 {% block top_bar_right_mobile %}
-    <button type="submit" class="nutrientForm btn top-bar-button">Save</button>
+    <button type="submit" class="nutrientForm btn top-bar-button">
+        Save
+    </button>
 {% endblock %}
 
 {% block content %}
