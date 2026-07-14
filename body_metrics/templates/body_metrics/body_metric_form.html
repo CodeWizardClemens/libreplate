@@ -1,13 +1,22 @@
 {% extends 'base.html' %}
 
+{% block header_buttons_desktop %}
+   <button type="submit" class="bodyMetricForm btn btn-primary">
+        Save
+    </button>
+{% endblock %}
+
+{% block top_bar_right_mobile %}
+    <button type="submit" class="bodyMetricForm btn top-bar-button">
+        Save
+    </button>
+{% endblock %}
+
 {% block content %}
 <div class="container">
-    <h1>{% if body_metric %}Edit Body Metric{% else %}New Body Metric{% endif %}</h1>
-    <form method="post">
+    <form method="post" id="bodyMetricForm">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Save</button>
-        <a href="{% url 'body_metrics' %}">Cancel</a>
     </form>
 </div>
 {% endblock %}

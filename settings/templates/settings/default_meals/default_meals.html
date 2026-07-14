@@ -1,16 +1,20 @@
 {% extends 'base.html' %}
 
+{% block header_buttons_desktop %}
+    <a href="{% url 'create_default_meal' %}" class="btn btn-primary">
+        + New default meal
+    </a>
+{% endblock %}
+
+{% block top_bar_right_mobile %}
+    <a href="{% url 'create_default_meal' %}" class="btn top-bar-button">
+        + New
+    </a>
+{% endblock %}
+
 {% block content %}
 
 <div class="container">
-
-    <div class="page-header-desktop">
-        <h1>Default Meals</h1>
-        <a href="{% url 'create_default_meal' %}" class="btn btn-primary">
-            + New default meal
-        </a>
-    </div>
-
 
     {% if default_meals %}
 

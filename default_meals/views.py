@@ -13,7 +13,8 @@ def default_meals(request):
     default_meals = DefaultMeal.objects.filter(user=request.user)
 
     context = {
-        "default_meals": default_meals
+        "default_meals": default_meals,
+        "page_title": "Meals",
     }
     return render(request, "settings/default_meals/default_meals.html", context)
 
@@ -30,7 +31,12 @@ def create_default_meal(request):
     else:
         form = DefaultMealForm()
     return render(
-        request, "settings/default_meals/default_meal_form.html", {"form": form}
+        request,
+        "settings/default_meals/default_meal_form.html",
+        {
+            "form": form,
+            "page_title": "Create meal",
+        }
     )
 
 
@@ -52,7 +58,12 @@ def edit_default_meal(request, pk):
         form = DefaultMealForm(instance=default_meal)
 
     return render(
-        request, "settings/default_meals/default_meal_form.html", {"form": form}
+        request,
+        "settings/default_meals/default_meal_form.html",
+        {
+            "form": form,
+            "page_title": "Edit meal",
+        }
     )
 
 

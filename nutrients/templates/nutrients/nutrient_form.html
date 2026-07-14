@@ -1,11 +1,17 @@
 {% extends 'base.html' %}
 
+{% block header_buttons_desktop %}
+   <button type="submit" class="nutrientForm btn btn-primary">Save</button>
+{% endblock %}
+
+{% block top_bar_right_mobile %}
+    <button type="submit" class="nutrientForm btn top-bar-button">Save</button>
+{% endblock %}
+
 {% block content %}
 <div class="container">
 
-    <h1>{% if form.instance.pk %}Edit Nutrient{% else %}New Nutrient{% endif %}</h1>
-
-    <form method="post">
+    <form method="post" id="nutrientForm">
         {% csrf_token %}
 
         <p>
@@ -39,15 +45,6 @@
 
         <p>{{ form.usda_nutrient_number }} {{ form.usda_nutrient_number.label }}</p>
 
-        <button type="submit" class="btn btn-primary">
-            Save
-        </button>
-
-        <a href="{% url 'nutrients' %}">
-            Cancel
-        </a>
-
     </form>
-
 </div>
 {% endblock %}

@@ -1,15 +1,23 @@
 {% extends 'base.html' %}
 
+{% block header_buttons_desktop %}
+    <a href="{% url 'create_body_metric' %}" class="btn btn-success">
+        + New Body Metric
+    </a>
+{% endblock %}
+
+{% block top_bar_right_mobile %}
+    <a href="{% url 'create_body_metric' %}" class="top-bar-button">
+        + New
+    </a>
+{% endblock %}
+
 {% block content %}
 
 <div class="container">
 
     <div class="body_metric-header">
-        <h1>Body Metrics</h1>
 
-        <a href="{% url 'create_body_metric' %}" class="btn btn-success">
-            + New Body Metric
-        </a>
     </div>
 
 

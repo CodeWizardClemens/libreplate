@@ -11,8 +11,14 @@ from .models import GoalBodyMetric, GoalGroup, GoalNutrient
 @login_required
 def goals_page(request):
     goal_groups = GoalGroup.objects.filter(user=request.user).order_by("-id")
-
-    return render(request, "goals/goals.html", {"goal_groups": goal_groups})
+    return render(
+        request,
+        "goals/goals.html",
+        {
+            "goal_groups": goal_groups,
+            "page_title": "Goals",
+        }
+    )
 
 
 @login_required
@@ -41,6 +47,8 @@ def goal_group_create(request):
             "body_metrics": body_metrics,
             "nutrient_values": {},
             "body_metric_values": {},
+            "page_title": "Create goal",
+
         },
     )
 
@@ -80,6 +88,7 @@ def goal_group_edit(request, pk):
             "body_metrics": BodyMetric.objects.filter(show_in_goal_edit=True),
             "nutrient_values": nutrient_values,
             "body_metric_values": body_metric_values,
+            "page_title": "Edit goal",
         },
     )
 

@@ -2,7 +2,13 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
 
-# Create your views here.
 @login_required
 def user_statistics(request):
-    return render(request, "user_statistics/user_statistics.html")
+
+    return render(
+        request, 
+        "user_statistics/user_statistics.html",
+        {
+            "page_title": "Statistics",
+        },
+    )

@@ -7,8 +7,13 @@ from django.shortcuts import render
 
 @login_required
 def settings_page(request):
-    return render(request, "settings/settings.html")
-
+    return render(
+        request,
+        "settings/settings.html",
+        {
+            "page_title": "Settings",
+        },
+    )
 
 @login_required
 def toggle_sidebar(request):

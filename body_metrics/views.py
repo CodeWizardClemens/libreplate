@@ -14,7 +14,10 @@ def body_metrics(request):
     return render(
         request=request,
         template_name="body_metrics/body_metrics.html",
-        context={"body_metrics": BodyMetric.objects.all()},
+        context={
+            "body_metrics": BodyMetric.objects.all(),
+            "page_title": "Body Metrics",
+        },
     )
 
 
@@ -29,7 +32,14 @@ def create_body_metric(request):
             return redirect("body_metrics")
     else:
         form = BodyMetricForm()
-    return render(request, "body_metrics/body_metric_form.html", {"form": form})
+    return render(
+        request,
+        "body_metrics/body_metric_form.html",
+        {
+            "form": form,
+            "page_title": "Create Body Metric"
+        }
+    )
 
 
 @login_required
@@ -49,7 +59,14 @@ def edit_body_metric(request, pk):
     else:
         form = BodyMetricForm(instance=body_metric)
 
-    return render(request, "body_metrics/body_metric_form.html", {"form": form})
+    return render(
+        request,
+        "body_metrics/body_metric_form.html",
+        {
+            "form": form,
+            "page_title": "Edit body metric",
+        }
+    )
 
 
 @login_required

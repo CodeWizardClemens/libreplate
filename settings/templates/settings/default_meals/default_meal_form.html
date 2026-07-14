@@ -1,13 +1,23 @@
 {% extends 'base.html' %}
 
+{% block header_buttons_desktop %}
+   <button type="submit" class="mealForm btn btn-primary">
+        Save
+    </button>
+{% endblock %}
+
+{% block top_bar_right_mobile %}
+    <button type="submit" class="mealForm btn top-bar-button">
+        Save
+    </button>
+{% endblock %}
+
 {% block content %}
 <div class="container">
     <h1>{% if default_meal %}Edit Default Meal{% else %}New Default Meal{% endif %}</h1>
-    <form method="post">
+    <form method="post" id="mealForm">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Save</button>
-        <a href="{% url 'default_meals' %}">Cancel</a>
     </form>
 </div>
 {% endblock %}

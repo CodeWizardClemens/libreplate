@@ -11,8 +11,14 @@ from .models import Nutrient
 @login_required
 def nutrients(request):
     nutrients = Nutrient.objects.all()
-    context = {"nutrients": nutrients}
-    return render(request, "nutrients/nutrients.html", context)
+    return render(
+        request,
+        "nutrients/nutrients.html",
+        {
+            "nutrients": nutrients,
+            "page_title": "Nutrients",
+        }
+    )
 
 
 @login_required
@@ -26,7 +32,14 @@ def create_nutrient(request):
             return redirect("nutrients")
     else:
         form = NutrientForm()
-    return render(request, "nutrients/nutrient_form.html", {"form": form})
+    return render(
+        request,
+        "nutrients/nutrient_form.html",
+        {
+            "form": form,
+            "page_title": "Create Nutrient",
+        }
+    )
 
 
 @login_required
@@ -41,7 +54,14 @@ def edit_nutrient(request, pk):
     else:
         form = NutrientForm(instance=nutrient)
 
-    return render(request, "nutrients/nutrient_form.html", {"form": form})
+    return render(
+        request,
+        "nutrients/nutrient_form.html",
+        {
+            "form": form,
+            "page_title": f"Edit '{nutrient.name}'",
+        }
+    )
 
 
 @login_required
