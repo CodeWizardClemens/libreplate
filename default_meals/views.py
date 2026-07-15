@@ -14,7 +14,6 @@ def default_meals(request):
 
     context = {
         "default_meals": default_meals,
-        "page_title": "Meals",
     }
     return render(request, "settings/default_meals/default_meals.html", context)
 
@@ -35,7 +34,6 @@ def create_default_meal(request):
         "settings/default_meals/default_meal_form.html",
         {
             "form": form,
-            "page_title": "Create meal",
         }
     )
 
@@ -62,7 +60,6 @@ def edit_default_meal(request, pk):
         "settings/default_meals/default_meal_form.html",
         {
             "form": form,
-            "page_title": "Edit meal",
         }
     )
 

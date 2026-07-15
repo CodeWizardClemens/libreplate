@@ -220,7 +220,6 @@ class FoodView(LoginRequiredMixin, View):
                 "use_usda_search": context["use_usda_search"],
                 "food_sort_options": self.get_sort_options(),
                 "search_hidden_fields": hidden_fields,
-                "page_title": "Foods",
             },
         )
 
@@ -360,7 +359,6 @@ def create_food(request):
         {
             "form": form,
             "show_all": show_all,
-            "page_title": "Create food",
         },
     )
 
@@ -415,8 +413,6 @@ def edit_food(request, pk):
         {
             "form": form,
             "show_all": show_all,
-            "page_title": f"Edit '{food.name}'",
-
         },
     )
 

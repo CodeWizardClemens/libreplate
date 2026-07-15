@@ -38,7 +38,6 @@ def recipes(request):
             "meal_id": meal_id,
             "meal_name": meal_name,
             "meal_date": meal_date,
-            "page_title": "Recipes",
         },
     )
 
@@ -165,7 +164,6 @@ def recipe_create(request):
             "ingredients": [],
             "ingredient_form": None,
             "visible_nutrients": [],
-            "page_title": "Create Recipe",
         },
     )
 
@@ -273,7 +271,6 @@ def recipe_edit(request, recipe_id):
         form,
         request.user,
     )
-    context["page_title"] = f"Edit '{recipe.name}'"
 
     return render(
         request,

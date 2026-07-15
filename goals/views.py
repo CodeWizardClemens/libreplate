@@ -16,7 +16,6 @@ def goals_page(request):
         "goals/goals.html",
         {
             "goal_groups": goal_groups,
-            "page_title": "Goals",
         }
     )
 
@@ -47,8 +46,6 @@ def goal_group_create(request):
             "body_metrics": body_metrics,
             "nutrient_values": {},
             "body_metric_values": {},
-            "page_title": "Create goal",
-
         },
     )
 
@@ -88,7 +85,6 @@ def goal_group_edit(request, pk):
             "body_metrics": BodyMetric.objects.filter(show_in_goal_edit=True),
             "nutrient_values": nutrient_values,
             "body_metric_values": body_metric_values,
-            "page_title": "Edit goal",
         },
     )
 

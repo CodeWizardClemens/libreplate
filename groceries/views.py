@@ -15,7 +15,6 @@ def grocery_lists(request):
     lists = GroceryList.objects.filter(user=request.user)
     return render(request, "groceries/list.html", {
         "lists": lists,
-        "page_title": "Grocery lists",
     })
 
 
@@ -34,7 +33,6 @@ def grocery_create(request):
         form = GroceryListCreateForm()
     return render(request, "groceries/create.html", {
         "form": form,
-        "page_title": "Create Grocery list",
     })
 
 

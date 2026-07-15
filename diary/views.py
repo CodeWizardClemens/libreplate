@@ -243,7 +243,6 @@ def diary_day(request, date=None):
         "goal_nutrients": to_int_dict(goal_nutrients),
         "body_metrics": body_metrics,
         "log_map": log_map,
-        "page_title": "Diary",
     }
 
     return render(request, "diary/diary.html", context)

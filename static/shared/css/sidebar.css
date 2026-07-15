@@ -1,65 +1,12 @@
-#sidebar {
-    position: fixed;
-    top: 48px;
-    left: 0;
-    width: 160px;
-    height: calc(100vh - 48px);
-    background: #123052;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-sizing: border-box;
+.offcanvas {
+    --sidebar-width: 320px;
+    width: var(--sidebar-width);
+    touch-action: none;
+
+    transition:
+        transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#sidebar.hidden {
-    width: 0;
-}
-
-.nav-links,
-.bottom-links {
-    width: 160px;
-    flex-shrink: 0;
-}
-
-.nav-links {
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    gap: 6px;
-    flex: 1;
-}
-
-.bottom-links {
-    padding: 10px;
-}
-
-.nav-links a,
-.bottom-links a {
-    color: white;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    border-radius: 8px;
-}
-
-.nav-links a:hover,
-.bottom-links a:hover {
-    background: rgba(255,255,255,.1);
-}
-
-@media (max-width:700px) {
-
-    #sidebar {
-        width:160px;
-        transform:translateX(0);
-        z-index:999;
-    }
-
-    #sidebar.hidden {
-        width:160px;
-        transform:translateX(-160px);
-    }
+.offcanvas.dragging {
+    transition: none !important;
 }

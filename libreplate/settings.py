@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "units.apps.UnitsConfig",
     "nutrients.apps.NutrientsConfig",
     "groceries.apps.GroceriesConfig",
+    "accounts.apps.AccountsConfig",
     "common.apps.CommonConfig",
     "recipes.apps.RecipesConfig",
     "diary.apps.DiaryConfig",
@@ -56,7 +57,6 @@ INSTALLED_APPS = [
     "body_metrics.apps.BodyMetricsConfig",
     "goals.apps.GoalsConfig",
     "settings.apps.SettingsConfig",
-    "automations.apps.AutomationsConfig",
     "default_meals.apps.DefaultMealsConfig",
     "user_statistics.apps.UserStatisticsConfig",
     "django.contrib.admin",
@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "shared",
 ]
 
 MIDDLEWARE = [

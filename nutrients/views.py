@@ -16,7 +16,6 @@ def nutrients(request):
         "nutrients/nutrients.html",
         {
             "nutrients": nutrients,
-            "page_title": "Nutrients",
         }
     )
 
@@ -37,7 +36,6 @@ def create_nutrient(request):
         "nutrients/nutrient_form.html",
         {
             "form": form,
-            "page_title": "Create Nutrient",
         }
     )
 
@@ -59,7 +57,6 @@ def edit_nutrient(request, pk):
         "nutrients/nutrient_form.html",
         {
             "form": form,
-            "page_title": f"Edit '{nutrient.name}'",
         }
     )
 

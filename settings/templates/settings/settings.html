@@ -1,6 +1,7 @@
 <!-- settings/templates/settings/settings.html -->
 
 {% extends 'base.html' %}
+{% block page_heading %}Settings{% endblock %}
 
 {% block content %}
 
@@ -105,5 +106,78 @@
 
   </div>
 </div>
+
+<form method="post"
+      action="{% url 'toggle_dark_mode' %}"
+      id="themeModeForm">
+    {% csrf_token %}
+</form>
+
+
+<label>
+    <input type="checkbox"
+           id="darkModeToggle"
+           {% if request.user.preferences.dark_mode %}checked{% endif %}>
+    Dark mode
+</label>
+
+<input
+    type="color"
+    id="themePicker"
+    value="{{ request.user.preferences.theme_color }}"
+>
+
+<script>
+const picker = document.getElementById("themePicker");
+
+picker.addEventListener("input", async (e) => {
+    const color = e.target.value;
+
+    // instant preview
+    document.documentElement.style.setProperty(
+        "--bs-primary",
+        color
+    );
+
+    document.documentElement.style.setProperty(
+        "--bs-primary-rgb",
+        hexToRgb(color)
+    );
+
+    // save automatically
+    await fetch("{% url 'update_theme_color' %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `theme_color=${encodeURIComponent(color)}`
+    });
+});
+
+
+function hexToRgb(hex) {
+    hex = hex.replace("#", "");
+
+    return [
+        parseInt(hex.substring(0,2), 16),
+        parseInt(hex.substring(2,4), 16),
+        parseInt(hex.substring(4,6), 16)
+    ].join(",");
+}
+
+document.getElementById("darkModeToggle")
+.addEventListener("change", async e => {
+    await fetch("{% url 'toggle_dark_mode' %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}"
+        }
+    });
+
+    location.reload();
+});
+
+</script>
 
 {% endblock %}

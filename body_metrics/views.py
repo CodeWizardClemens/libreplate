@@ -16,7 +16,6 @@ def body_metrics(request):
         template_name="body_metrics/body_metrics.html",
         context={
             "body_metrics": BodyMetric.objects.all(),
-            "page_title": "Body Metrics",
         },
     )
 
@@ -37,7 +36,6 @@ def create_body_metric(request):
         "body_metrics/body_metric_form.html",
         {
             "form": form,
-            "page_title": "Create Body Metric"
         }
     )
 
@@ -64,7 +62,6 @@ def edit_body_metric(request, pk):
         "body_metrics/body_metric_form.html",
         {
             "form": form,
-            "page_title": "Edit body metric",
         }
     )
 

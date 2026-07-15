@@ -10,9 +10,6 @@ def settings_page(request):
     return render(
         request,
         "settings/settings.html",
-        {
-            "page_title": "Settings",
-        },
     )
 
 @login_required
