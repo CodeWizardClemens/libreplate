@@ -282,7 +282,10 @@ def graph_list(request):
     return render(
         request,
         "user_statistics/graph_list.html",
-        {"graphs": graphs},
+        {
+            "graphs": graphs,
+            "page_title": "Statistics",
+        },
     )
 
 
@@ -348,6 +351,7 @@ def graph_edit(request, pk):
             "lines": lines,
             "form": form,
             "line_choices": get_graph_line_choices(),
+            "page_title": "Edit Graph",
         },
     )
 
