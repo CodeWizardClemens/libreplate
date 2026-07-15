@@ -5,179 +5,91 @@
 
 {% block content %}
 
-<style>
-.settings-container {
-  max-width: 800px;
-  margin: 40px auto;
-  padding: 0 20px;
-}
+<div class="container py-5">
 
-.settings-title {
-  font-size: 2rem;
-  margin-bottom: 20px;
-  font-weight: 600;
-}
+  <div class="row g-3">
 
-.settings-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 15px;
-}
+    <div class="col-12 col-md-6">
+      <a href="{% url 'appearance' %}" class="text-decoration-none">
+        <div class="card h-100 border bg-body-tertiary shadow-sm rounded-4">
+          <div class="card-body">
+            <h3 class="h5 fw-semibold text-body mb-1">
+              Appearance
+            </h3>
+            <p class="text-body-secondary small mb-0">
+              Customize appearance
+            </p>
+          </div>
+        </div>
+      </a>
+    </div>
 
-@media (min-width: 600px) {
-  .settings-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
 
-.settings-card {
-  display: flex;
-  gap: 15px;
-  padding: 16px;
-  border-radius: 12px;
-  background: #f8f9fa;
-  text-decoration: none;
-  color: inherit;
-  transition: all 0.2s ease;
-  border: 1px solid #e9ecef;
-}
+    <div class="col-12 col-md-6">
+      <a href="{% url 'body_metrics' %}" class="text-decoration-none">
+        <div class="card h-100 border bg-body-tertiary shadow-sm rounded-4">
+          <div class="card-body">
+            <h3 class="h5 fw-semibold text-body mb-1">
+              Body metrics
+            </h3>
+            <p class="text-body-secondary small mb-0">
+              Track weight, height, and progress
+            </p>
+          </div>
+        </div>
+      </a>
+    </div>
 
-.settings-card:hover {
-  transform: translateY(-2px);
-  background: #ffffff;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-}
 
-.icon {
-  font-size: 1.8rem;
-  width: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+    <div class="col-12 col-md-6">
+      <a href="{% url 'units' %}" class="text-decoration-none">
+        <div class="card h-100 border bg-body-tertiary shadow-sm rounded-4">
+          <div class="card-body">
+            <h3 class="h5 fw-semibold text-body mb-1">
+              Units
+            </h3>
+            <p class="text-body-secondary small mb-0">
+              Metric or imperial preferences
+            </p>
+          </div>
+        </div>
+      </a>
+    </div>
 
-.text h3 {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
 
-.text p {
-  margin: 4px 0 0;
-  font-size: 0.9rem;
-  color: #6c757d;
-}
-</style>
+    <div class="col-12 col-md-6">
+      <a href="{% url 'nutrients' %}" class="text-decoration-none">
+        <div class="card h-100 border bg-body-tertiary shadow-sm rounded-4">
+          <div class="card-body">
+            <h3 class="h5 fw-semibold text-body mb-1">
+              Nutrients
+            </h3>
+            <p class="text-body-secondary small mb-0">
+              Adjust macro and calorie settings
+            </p>
+          </div>
+        </div>
+      </a>
+    </div>
 
-<div class="settings-container">
-  <div class="settings-grid">
 
-    <a class="settings-card" href="{% url 'body_metrics' %}">
-      <div class="icon">📊</div>
-      <div class="text">
-        <h3>Body metrics</h3>
-        <p>Track weight, height, and progress</p>
-      </div>
-    </a>
-
-    <a class="settings-card" href="{% url 'units' %}">
-      <div class="icon">⚙️</div>
-      <div class="text">
-        <h3>Units</h3>
-        <p>Metric or imperial preferences</p>
-      </div>
-    </a>
-
-    <a class="settings-card" href="{% url 'nutrients' %}">
-      <div class="icon">🥗</div>
-      <div class="text">
-        <h3>Nutrients</h3>
-        <p>Adjust macro and calorie settings</p>
-      </div>
-    </a>
-
-    <a class="settings-card" href="{% url 'default_meals' %}">
-      <div class="icon">🍽️</div>
-      <div class="text">
-        <h3>Default meals</h3>
-        <p>Manage your meal templates</p>
-      </div>
-    </a>
+    <div class="col-12 col-md-6">
+      <a href="{% url 'default_meals' %}" class="text-decoration-none">
+        <div class="card h-100 border bg-body-tertiary shadow-sm rounded-4">
+          <div class="card-body">
+            <h3 class="h5 fw-semibold text-body mb-1">
+              Default meals
+            </h3>
+            <p class="text-body-secondary small mb-0">
+              Manage your meal templates
+            </p>
+          </div>
+        </div>
+      </a>
+    </div>
 
   </div>
+
 </div>
-
-<form method="post"
-      action="{% url 'toggle_dark_mode' %}"
-      id="themeModeForm">
-    {% csrf_token %}
-</form>
-
-
-<label>
-    <input type="checkbox"
-           id="darkModeToggle"
-           {% if request.user.preferences.dark_mode %}checked{% endif %}>
-    Dark mode
-</label>
-
-<input
-    type="color"
-    id="themePicker"
-    value="{{ request.user.preferences.theme_color }}"
->
-
-<script>
-const picker = document.getElementById("themePicker");
-
-picker.addEventListener("input", async (e) => {
-    const color = e.target.value;
-
-    // instant preview
-    document.documentElement.style.setProperty(
-        "--bs-primary",
-        color
-    );
-
-    document.documentElement.style.setProperty(
-        "--bs-primary-rgb",
-        hexToRgb(color)
-    );
-
-    // save automatically
-    await fetch("{% url 'update_theme_color' %}", {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": "{{ csrf_token }}",
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: `theme_color=${encodeURIComponent(color)}`
-    });
-});
-
-
-function hexToRgb(hex) {
-    hex = hex.replace("#", "");
-
-    return [
-        parseInt(hex.substring(0,2), 16),
-        parseInt(hex.substring(2,4), 16),
-        parseInt(hex.substring(4,6), 16)
-    ].join(",");
-}
-
-document.getElementById("darkModeToggle")
-.addEventListener("change", async e => {
-    await fetch("{% url 'toggle_dark_mode' %}", {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": "{{ csrf_token }}"
-        }
-    });
-
-    location.reload();
-});
-
-</script>
 
 {% endblock %}

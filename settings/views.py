@@ -13,6 +13,13 @@ def settings_page(request):
     )
 
 @login_required
+def appearance(request):
+    return render(
+        request,
+        "settings/appearance.html",
+    )
+
+@login_required
 def toggle_sidebar(request):
     if request.method != "POST":
         return JsonResponse({"error": "POST required"}, status=400)

@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block page_heading %}Settings / Appearance{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-palette"></i>
+                        Appearance Settings
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <!-- Dark Mode -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h6 class="mb-1">Dark mode</h6>
+                            <small class="text-muted">
+                                Switch between light and dark themes
+                            </small>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                role="switch"
+                                id="darkModeToggle"
+                                {% if request.user.preferences.dark_mode %}checked{% endif %}
+                            >
+                        </div>
+                    </div>
+
+
+                    <hr>
+
+
+                    <!-- Theme Colour -->
+                    <div class="mb-3">
+
+                        <label for="themePicker" class="form-label">
+                            Theme colour
+                        </label>
+
+                        <div class="input-group">
+
+                            <span class="input-group-text">
+                                <i class="bi bi-droplet-fill"></i>
+                            </span>
+
+                            <input
+                                type="color"
+                                class="form-control form-control-color"
+                                id="themePicker"
+                                value="{{ request.user.preferences.theme_color }}"
+                                title="Choose theme colour"
+                            >
+
+                        </div>
+
+                        <div class="form-text">
+                            Your selected colour is applied instantly.
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+<form method="post"
+      action="{% url 'toggle_dark_mode' %}"
+      id="themeModeForm">
+    {% csrf_token %}
+</form>
+
+
+<script>
+
+const picker = document.getElementById("themePicker");
+
+picker.addEventListener("input", async (e) => {
+
+    const color = e.target.value;
+
+    // Instant preview
+    document.documentElement.style.setProperty(
+        "--bs-primary",
+        color
+    );
+
+    document.documentElement.style.setProperty(
+        "--bs-primary-rgb",
+        hexToRgb(color)
+    );
+
+
+    // Save automatically
+    await fetch("{% url 'update_theme_color' %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `theme_color=${encodeURIComponent(color)}`
+    });
+
+});
+
+
+function hexToRgb(hex) {
+
+    hex = hex.replace("#", "");
+
+    return [
+        parseInt(hex.substring(0,2), 16),
+        parseInt(hex.substring(2,4), 16),
+        parseInt(hex.substring(4,6), 16)
+    ].join(",");
+
+}
+
+
+
+document.getElementById("darkModeToggle")
+.addEventListener("change", async e => {
+
+    await fetch("{% url 'toggle_dark_mode' %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}"
+        }
+    });
+
+    location.reload();
+
+});
+
+
+</script>
+
+{% endblock %}
