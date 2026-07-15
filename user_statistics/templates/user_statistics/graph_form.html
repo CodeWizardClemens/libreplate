@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{% if graph %}Edit Graph{% else %}Create Graph{% endif %}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <h2>Lines</h2>
+
+    <div id="line-list">
+        {% for line in lines %}
+        <div class="card mb-2 line-row">
+            <div class="card-body">
+                <select class="form-control mb-2" name="line_choice" data-selected="{{ line.selected_value }}">
+                    <option value="">Choose metric or nutrient</option>
+                    {% for group,items in line_choices %}
+                    <optgroup label="{{ group }}">
+                        {% for value,label in items %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+
+                <input class="form-control mb-2" name="line_name" type="text" value="{{ line.name }}" placeholder="Custom line name">
+
+                <input class="form-control mb-2" name="moving_average_amount" type="number" value="{{ line.moving_average_amount }}">
+
+                <select class="form-control mb-2" name="moving_average_unit">
+                    <option value="">No average</option>
+                    <option value="day" {% if line.moving_average_unit == "day" %}selected{% endif %}>Day</option>
+                    <option value="week" {% if line.moving_average_unit == "week" %}selected{% endif %}>Week</option>
+                    <option value="month" {% if line.moving_average_unit == "month" %}selected{% endif %}>Month</option>
+                    <option value="year" {% if line.moving_average_unit == "year" %}selected{% endif %}>Year</option>
+                </select>
+
+                <button type="button" class="btn btn-danger remove-line">Remove</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <button type="button" id="add-line" class="btn btn-secondary">Add another line</button>
+
+    <hr>
+
+    <button class="btn btn-primary">Save</button>
+</form>
+
+<script>
+document.querySelectorAll("select[data-selected]").forEach(select => {
+    select.value = select.dataset.selected;
+});
+
+document.getElementById("add-line").addEventListener("click", () => {
+    const container = document.getElementById("line-list");
+    const div = document.createElement("div");
+
+    div.className = "card mb-2 line-row";
+    div.innerHTML = `
+        <div class="card-body">
+            <select class="form-control mb-2" name="line_choice">
+                <option value="">Choose metric or nutrient</option>
+                {% for group,items in line_choices %}
+                <optgroup label="{{ group }}">
+                    {% for value,label in items %}
+                    <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                </optgroup>
+                {% endfor %}
+            </select>
+
+            <input class="form-control mb-2" name="line_name" type="text" placeholder="Custom line name">
+
+            <input class="form-control mb-2" name="moving_average_amount" type="number" value="1">
+
+            <select class="form-control mb-2" name="moving_average_unit">
+                <option value="">No average</option>
+                <option value="day">Day</option>
+                <option value="week">Week</option>
+                <option value="month">Month</option>
+                <option value="year">Year</option>
+            </select>
+
+            <button type="button" class="btn btn-danger remove-line">Remove</button>
+        </div>
+    `;
+
+    container.appendChild(div);
+});
+
+document.addEventListener("click", e => {
+    if (e.target.classList.contains("remove-line")) {
+        e.target.closest(".line-row").remove();
+    }
+});
+</script>
+{% endblock %}

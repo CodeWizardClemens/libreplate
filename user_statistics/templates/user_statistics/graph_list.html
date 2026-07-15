@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<a href="{% url 'graph_create' %}" class="btn btn-primary mb-3">
+    New Graph
+</a>
+
+<div id="graphs">
+
+{% for graph in graphs %}
+
+<div class="card mb-4" id="graph-{{ graph.id }}">
+
+    <div class="card-header d-flex justify-content-between">
+
+        <strong>{{ graph.name }}</strong>
+
+        <div>
+
+            <a
+                href="{% url 'graph_edit' graph.id %}"
+                class="btn btn-sm btn-secondary"
+            >
+                Edit
+            </a>
+
+            <button
+                class="btn btn-sm btn-danger"
+
+                hx-post="{% url 'graph_delete' graph.id %}"
+                hx-target="#graph-{{ graph.id }}"
+                hx-swap="outerHTML"
+
+                hx-confirm="Delete graph?"
+            >
+                Delete
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="card-body">
+
+        <canvas
+            id="chart-{{ graph.id }}"
+            height="120"
+        ></canvas>
+
+    </div>
+
+</div>
+
+{% empty %}
+
+<p>No graphs.</p>
+
+{% endfor %}
+
+</div>
+
+<script>
+
+{% for graph in graphs %}
+
+fetch("{% url 'graph_data' graph.id %}")
+.then(r=>r.json())
+.then(data=>{
+
+    new Chart(
+
+        document.getElementById("chart-{{ graph.id }}"),
+
+        {
+
+            type:data.type,
+
+            data:{
+
+                labels:data.labels,
+
+                datasets:data.datasets
+
+            },
+
+            options:{
+
+                responsive:true,
+
+                interaction:{
+                    mode:'index',
+                    intersect:false
+                },
+
+                plugins:{
+                    legend:{
+                        display:true
+                    }
+                },
+
+                scales:{
+                    y:{
+                        beginAtZero:false
+                    }
+                }
+
+            }
+
+        }
+
+    );
+
+});
+
+{% endfor %}
+
+</script>
+
+{% endblock %}

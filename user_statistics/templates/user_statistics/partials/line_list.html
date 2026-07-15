@@ -1,0 +1,86 @@
+{% if graph %}
+
+    {% for line in graph.lines.all %}
+
+        <div
+            class="card mb-2"
+            id="line-{{ line.id }}">
+
+            <div class="card-body">
+
+                {{ line.name }}
+
+                <button
+                    class="btn btn-danger btn-sm float-end"
+                    hx-post="{% url 'graph_line_delete' line.id %}"
+                    hx-target="#line-list"
+                    hx-swap="innerHTML"
+                    hx-confirm="Remove line?">
+
+                    Remove
+
+                </button>
+
+            </div>
+
+        </div>
+
+    {% empty %}
+
+        <p class="text-muted">No lines yet.</p>
+
+    {% endfor %}
+
+{% else %}
+
+    {% for line in draft_lines %}
+
+        <div
+            class="card mb-2"
+            id="line-{{ forloop.counter0 }}">
+
+            <div class="card-body">
+
+                {{ line.name }}
+
+                <button
+                    class="btn btn-danger btn-sm float-end"
+                    hx-post="{% url 'graph_line_delete' forloop.counter0 %}"
+                    hx-target="#line-list"
+                    hx-swap="innerHTML"
+                    hx-confirm="Remove line?">
+
+                    Remove
+
+                </button>
+
+            </div>
+
+        </div>
+
+    {% empty %}
+
+        <p class="text-muted">
+            No lines yet.
+        </p>
+
+    {% endfor %}
+
+{% endif %}
+
+<hr>
+
+<form
+    hx-post="{% url 'graph_line_add' %}"
+    hx-target="#line-list"
+    hx-swap="innerHTML">
+
+    {% csrf_token %}
+
+    {{ line_form.as_p }}
+
+    <button class="btn btn-primary">
+        Add Line
+    </button>
+
+</form>
