@@ -1,21 +1,49 @@
-<!-- body_metrics.html -->
-
 {% load diary_filters %}
 
-<h3>Body metrics</h3>
 
-<div class="body-metrics">
+<h6 class="fw-bold mb-2">
+    Body metrics
+</h6>
+
+
+<div class="row g-2">
+
+
     {% for metric in body_metrics %}
-    <div class="metric-row">
-        <label>{{ metric.name }}</label>
 
-        <input
-            type="number"
-            step="any"
-            value="{{ log_map|get_item:metric.id|default:'' }}"
-            data-metric-id="{{ metric.id }}"
-            oninput="saveMetric(this)"
-        />
+
+    <div class="col-12 col-sm-6 col-lg-4">
+
+
+        <div class="d-flex justify-content-between align-items-center bg-body-tertiary border rounded-3 p-2">
+
+
+            <label class="small fw-semibold text-body-secondary mb-0">
+
+                {{ metric.name }}
+
+            </label>
+
+
+
+            <input
+                type="number"
+                step="any"
+                value="{{ log_map|get_item:metric.id|default:'' }}"
+                data-metric-id="{{ metric.id }}"
+                class="form-control form-control-sm text-end"
+                style="width:80px"
+                oninput="saveMetric(this)"
+            >
+
+
+        </div>
+
+
     </div>
+
+
     {% endfor %}
+
+
 </div>

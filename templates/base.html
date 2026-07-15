@@ -2,7 +2,8 @@
 {% load nav_tags %}
 
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="{% if request.user.is_authenticated and request.user.preferences.dark_mode %}dark{% else %}light{% endif %}"><head>
+<html lang="en" data-bs-theme="{% if request.user.is_authenticated and request.user.preferences.dark_mode %}dark{% else %}light{% endif %}">
+<head>
     <meta charset="UTF-8">
     <title>{% block title %}LibrePlate{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,34 +14,39 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
-    :root {
-        --bs-primary: {{ request.user.preferences.theme_color }};
-        --bs-primary-rgb: {{ request.user.preferences.theme_color_rgb }};
+        :root {
+            --bs-primary: {{ request.user.preferences.theme_color }};
+            --bs-primary-rgb: {{ request.user.preferences.theme_color_rgb }};
 
-        --bs-link-color: {{ request.user.preferences.theme_color }};
-        --bs-link-hover-color: {{ request.user.preferences.theme_color }};
-    }
+            --bs-link-color: {{ request.user.preferences.theme_color }};
+            --bs-link-hover-color: {{ request.user.preferences.theme_color }};
+        }
 
-    .btn-primary {
-        --bs-btn-bg: {{ request.user.preferences.theme_color }};
-        --bs-btn-border-color: {{ request.user.preferences.theme_color }};
-    }
+        .btn-primary {
+            --bs-btn-bg: {{ request.user.preferences.theme_color }};
+            --bs-btn-border-color: {{ request.user.preferences.theme_color }};
+        }
 
-    .text-primary {
-        color: {{ request.user.preferences.theme_color }} !important;
-    }
+        .text-primary {
+            color: {{ request.user.preferences.theme_color }} !important;
+        }
     </style>
+
     {% block extra_head %}{% endblock %}
 </head>
+
 
 <body
     hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
     hx-ext="json-enc"
 >
 
+
 <nav class="navbar bg-body border-bottom sticky-top">
     <div class="container-fluid">
+
         <div class="d-flex align-items-center">
+
             <button
                 class="btn me-3"
                 type="button"
@@ -50,6 +56,7 @@
                 <i class="bi bi-list fs-4"></i>
             </button>
 
+
             <a href="{% url 'diary_today' %}" class="me-3 d-none d-md-block">
                 <img
                     src="{% static 'shared/img/logo.png' %}"
@@ -57,23 +64,28 @@
                     height="50">
             </a>
 
+
             <span class="navbar-brand mb-0">
                 {% block page_heading %}{% endblock %}
             </span>
+
         </div>
+
 
         <div class="d-md-none">
             {% block top_bar_right_mobile %}{% endblock %}
         </div>
-    
-        <!-- TODO should have quick access settings like dark theme -->
+
+
         <a href="{% url 'settings' %}"
-        class="btn d-none d-md-block">
+           class="btn d-none d-md-block">
             <i class="bi bi-three-dots-vertical fs-4"></i>
         </a>
 
     </div>
 </nav>
+
+
 
 <div
     class="offcanvas offcanvas-start"
@@ -81,16 +93,18 @@
     id="sidebar"
     aria-labelledby="sidebarLabel">
 
+
     <div class="offcanvas-header">
-        
+
         <img
-        src="{% static 'shared/img/logo.png' %}"
-        alt="LibrePlate"
-        height="50"
-        >
+            src="{% static 'shared/img/logo.png' %}"
+            alt="LibrePlate"
+            height="50">
+
         <h5 class="offcanvas-title" id="sidebarLabel">
             LibrePlate
         </h5>
+
 
         <button
             type="button"
@@ -98,88 +112,107 @@
             data-bs-dismiss="offcanvas"
             aria-label="Close">
         </button>
+
     </div>
+
 
 
     <div class="offcanvas-body d-flex flex-column">
 
         <div class="nav nav-pills flex-column gap-1 flex-grow-1">
 
+
             <a href="{% url 'diary_today' %}"
-            class="nav-link d-flex align-items-center {% active_url 'diary_today' %}">
+               class="nav-link d-flex align-items-center {% active_url 'diary_today' %}">
                 <i class="bi bi-journal-text me-2"></i>
                 <span>Diary</span>
             </a>
 
+
             <a href="{% url 'groceries' %}"
-            class="nav-link d-flex align-items-center {% active_url 'groceries' %}">
+               class="nav-link d-flex align-items-center {% active_url 'groceries' %}">
                 <i class="bi bi-cart3 me-2"></i>
                 <span>Groceries</span>
             </a>
 
+
             <a href="{% url 'recipes' %}"
-            class="nav-link d-flex align-items-center {% active_url 'recipes' %}">
+               class="nav-link d-flex align-items-center {% active_url 'recipes' %}">
                 <i class="bi bi-book me-2"></i>
                 <span>Recipes</span>
             </a>
 
+
             <a href="{% url 'foods' %}"
-            class="nav-link d-flex align-items-center {% active_url 'foods' %}">
+               class="nav-link d-flex align-items-center {% active_url 'foods' %}">
                 <i class="bi bi-cake2 me-2"></i>
                 <span>Foods</span>
             </a>
 
+
             <a href="{% url 'graph_list' %}"
-            class="nav-link d-flex align-items-center {% active_url 'graph_list' %}">
+               class="nav-link d-flex align-items-center {% active_url 'graph_list' %}">
                 <i class="bi bi-bar-chart me-2"></i>
                 <span>Statistics</span>
             </a>
 
+
             <a href="{% url 'goals' %}"
-            class="nav-link d-flex align-items-center {% active_url 'goals' %}">
+               class="nav-link d-flex align-items-center {% active_url 'goals' %}">
                 <i class="bi bi-bullseye me-2"></i>
                 <span>Goals</span>
             </a>
 
+
         </div>
+
+
 
         <div class="nav nav-pills flex-column gap-1 border-top pt-3">
 
             <a href="{% url 'settings' %}"
-            class="nav-link d-flex align-items-center {% active_url 'settings' %}">
+               class="nav-link d-flex align-items-center {% active_url 'settings' %}">
                 <i class="bi bi-gear me-2"></i>
                 <span>Settings</span>
             </a>
 
+
             <a href="{% url 'profile' %}"
-            class="nav-link d-flex align-items-center {% active_url 'profile' %}">
+               class="nav-link d-flex align-items-center {% active_url 'profile' %}">
                 <i class="bi bi-person-circle me-2"></i>
                 <span>Account</span>
             </a>
+
         </div>
+
     </div>
+
 </div>
 
 
-<main id="content">
+
+<main id="content" class="pt-3">
+
     <div class="container-lg">
 
-        <div class="page-header-desktop mb-3">
-            <div class="header-actions">
-                {% block header_buttons_desktop %}{% endblock %}
-            </div>
+        <div class="mb-3 d-none d-md-block">
+            {% block header_buttons_desktop %}{% endblock %}
         </div>
 
         {% block content %}{% endblock %}
 
     </div>
+
 </main>
+
 
 
 {% block scripts %}{% endblock %}
 
+
 <script src="https://unpkg.com/htmx.org@2.0.7"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
 
 </body>
 </html>

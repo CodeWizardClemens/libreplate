@@ -1,7 +1,21 @@
-<!-- add_meal.html -->
+<form
+    method="post"
+    action="{% url 'add_meal' selected_date %}"
+    class="d-flex gap-2 align-items-center flex-wrap">
 
-<form method="post" action="{% url 'add_meal' selected_date %}">
     {% csrf_token %}
-    {{ meal_form.name }}
-    <button type="submit">Add meal</button>
+
+
+    {{ meal_form.name.as_widget|default:meal_form.name }}
+
+
+    <button
+        type="submit"
+        class="btn btn-primary">
+
+        Add meal
+
+    </button>
+
+
 </form>

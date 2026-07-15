@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const month = document.getElementById("mdpMonth");
     const days = document.getElementById("mdpDays");
 
+
     function getMonday(date) {
 
         const d = new Date(date);
@@ -15,11 +16,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const day = (d.getDay() + 6) % 7;
 
         d.setDate(d.getDate() - day);
-
         d.setHours(0, 0, 0, 0);
 
         return d;
     }
+
 
     function formatISO(date) {
 
@@ -30,13 +31,15 @@ document.addEventListener("DOMContentLoaded", () => {
         return `${year}-${month}-${day}`;
     }
 
+
     function render() {
 
         days.innerHTML = "";
 
-        // Display month (or month range if week crosses months)
+
         const weekEnd = new Date(weekStart);
         weekEnd.setDate(weekEnd.getDate() + 6);
+
 
         if (weekStart.getMonth() === weekEnd.getMonth()) {
 
@@ -50,7 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
             month.textContent =
                 weekStart.toLocaleDateString(undefined, {
                     month: "short"
-                }) +
+                })
+                +
                 " / " +
                 weekEnd.toLocaleDateString(undefined, {
                     month: "short",
@@ -59,8 +63,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
 
+
         const today = new Date();
         today.setHours(0, 0, 0, 0);
+
 
         for (let i = 0; i < 7; i++) {
 
@@ -68,27 +74,66 @@ document.addEventListener("DOMContentLoaded", () => {
             d.setDate(d.getDate() + i);
             d.setHours(0, 0, 0, 0);
 
+
+            const iso = formatISO(d);
+
             const button = document.createElement("button");
 
-            button.className = "mdp-day";
             button.textContent = d.getDate();
 
-            if (d.getTime() === today.getTime()) {
-                button.classList.add("today");
+            button.type = "button";
+
+
+            /*
+                Bootstrap states:
+
+                selected day:
+                    btn-primary
+
+                today but not selected:
+                    btn-secondary
+
+                normal:
+                    btn-outline-secondary
+            */
+
+            if (iso === window.selectedDate) {
+
+                button.className =
+                    "btn btn-primary btn-sm rounded-circle";
+
+            }
+            else if (d.getTime() === today.getTime()) {
+
+                button.className =
+                    "btn btn-secondary btn-sm rounded-circle";
+
+            }
+            else {
+
+                button.className =
+                    "btn btn-outline-secondary btn-sm rounded-circle";
+
             }
 
-            if (formatISO(d) === window.selectedDate) {
-                button.classList.add("selected");
-            }
+
+            button.style.width = "38px";
+            button.style.height = "38px";
+
 
             button.addEventListener("click", () => {
-                goToDate(formatISO(d));
+
+                goToDate(iso);
+
             });
 
+
             days.appendChild(button);
+
         }
 
     }
+
 
     document.getElementById("prevWeek").addEventListener("click", () => {
 
@@ -98,6 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
+
     document.getElementById("nextWeek").addEventListener("click", () => {
 
         weekStart.setDate(weekStart.getDate() + 7);
@@ -106,11 +152,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
+
     document.getElementById("todayBtn").addEventListener("click", () => {
 
         goToDate(formatISO(new Date()));
 
     });
+
 
     document.getElementById("calendarBtn").addEventListener("click", () => {
 
@@ -118,17 +166,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (input.showPicker) {
             input.showPicker();
-        } else {
+        }
+        else {
             input.click();
         }
 
     });
 
-    document.getElementById("calendarInput").addEventListener("change", e => {
 
-        goToDate(e.target.value);
+    document.getElementById("calendarInput")
+        .addEventListener("change", e => {
 
-    });
+            goToDate(e.target.value);
+
+        });
+
 
     render();
 

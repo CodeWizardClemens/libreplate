@@ -1,49 +1,120 @@
-<!-- day_totals.html -->
-
 {% load diary_filters %}
 
-<h3>Day total</h3>
 
-<table class="day-table">
+<h6 class="fw-bold mb-2">
+    Day total
+</h6>
 
-    <!-- HEADER ROW -->
-    <tr>
-        <th></th>
-        {% for nutrient in nutrients_total %}
-            <th>
-                {% if nutrient.abbreviation %}
-                    {{ nutrient.abbreviation }}
-                {% else %}
-                    {{ nutrient.name }}
-                {% endif %}
-            </th>
-        {% endfor %}
-    </tr>
 
-    <!-- DAY TOTAL ROW -->
-    <tr>
-        <td class="row-label">Total</td>
+<div class="table-responsive">
 
-        {% for nutrient in nutrients_total %}
-            <td class="day-total" data-nutrient="{{ nutrient.id }}">
-                {{ day_total|get_item:nutrient.id|default:"0" }}
-                {{ nutrient.unit }}
-            </td>
-        {% endfor %}
-    </tr>
 
-    <!-- GOAL ROW -->
-    {% if goal_nutrients %}
-    <tr class="day-goals">
-        <td class="row-label">Goal</td>
+    <table class="table table-sm align-middle mb-0">
 
-        {% for nutrient in nutrients_total %}
-            <td class="day-goal" data-nutrient="{{ nutrient.id }}">
-                {{ goal_nutrients|get_item:nutrient.id|default:"-" }}
-                {{ nutrient.unit }}
-            </td>
-        {% endfor %}
-    </tr>
-    {% endif %}
 
-</table>
+        <thead class="bg-body-tertiary">
+
+
+            <tr>
+
+                <th></th>
+
+
+                {% for nutrient in nutrients_total %}
+
+                <th class="text-center text-nowrap small text-secondary text-uppercase">
+
+                    {% if nutrient.abbreviation %}
+                        {{ nutrient.abbreviation }}
+                    {% else %}
+                        {{ nutrient.name }}
+                    {% endif %}
+
+                </th>
+
+                {% endfor %}
+
+
+            </tr>
+
+
+        </thead>
+
+
+
+        <tbody>
+
+
+
+            <tr class="fw-semibold">
+
+
+                <td>
+                    Total
+                </td>
+
+
+                {% for nutrient in nutrients_total %}
+
+                <td
+                    class="text-center"
+                    data-nutrient="{{ nutrient.id }}">
+
+                    {{ day_total|get_item:nutrient.id|default:"0" }}
+                    {{ nutrient.unit }}
+
+                </td>
+
+
+                {% endfor %}
+
+
+            </tr>
+
+
+
+
+
+            {% if goal_nutrients %}
+
+
+            <tr class="text-secondary">
+
+
+                <td>
+                    Goal
+                </td>
+
+
+
+                {% for nutrient in nutrients_total %}
+
+
+                <td
+                    class="text-center"
+                    data-nutrient="{{ nutrient.id }}">
+
+                    {{ goal_nutrients|get_item:nutrient.id|default:"-" }}
+                    {{ nutrient.unit }}
+
+
+                </td>
+
+
+                {% endfor %}
+
+
+            </tr>
+
+
+            {% endif %}
+
+
+
+        </tbody>
+
+
+    </table>
+
+
+</div>

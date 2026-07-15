@@ -1,53 +1,85 @@
-<!-- mobile_date_picker.html -->
+<div class="card shadow-sm border rounded-3 mb-3 d-block d-md-none">
 
-<div class="mobile-date-picker">
+    <div class="card-body p-3">
 
-    <div class="mdp-header">
+        <div class="d-flex justify-content-between align-items-center mb-3">
 
-        <div class="mdp-month" id="mdpMonth"></div>
+            <div
+                class="fw-bold fs-5"
+                id="mdpMonth">
+            </div>
 
-        <div class="mdp-actions">
 
-            <button id="prevWeek" class="mdp-icon">
-                ◀
-            </button>
+            <div class="d-flex gap-1">
 
-            <button id="nextWeek" class="mdp-icon">
-                ▶
-            </button>
+                <button
+                    id="prevWeek"
+                    class="btn btn-outline-secondary btn-sm">
+                    ◀
+                </button>
 
-            <button id="todayBtn" class="mdp-small">
-                Today
-            </button>
 
-            <button id="calendarBtn" class="mdp-small">
-                📅
-            </button>
+                <button
+                    id="nextWeek"
+                    class="btn btn-outline-secondary btn-sm">
+                    ▶
+                </button>
 
-            <input
-                id="calendarInput"
-                type="date"
-                value="{{ selected_date|date:'Y-m-d' }}"
-                hidden
-            >
+
+                <button
+                    id="todayBtn"
+                    class="btn btn-outline-secondary btn-sm">
+                    Today
+                </button>
+
+
+                <button
+                    id="calendarBtn"
+                    class="btn btn-outline-secondary btn-sm">
+
+                    <i class="bi bi-calendar"></i>
+
+                </button>
+
+
+                <input
+                    id="calendarInput"
+                    type="date"
+                    class="d-none"
+                    value="{{ selected_date|date:'Y-m-d' }}"
+                >
+
+            </div>
 
         </div>
 
-    </div>
 
-    <div class="mdp-weekdays">
-        <span>Mon</span>
-        <span>Tue</span>
-        <span>Wed</span>
-        <span>Thu</span>
-        <span>Fri</span>
-        <span>Sat</span>
-        <span>Sun</span>
-    </div>
+        <div class="d-grid text-center small text-secondary fw-semibold mb-2"
+             style="grid-template-columns: repeat(7, 1fr);">
 
-    <div id="mdpDays" class="mdp-days"></div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+            <div>Sun</div>
+
+        </div>
+
+
+        <div
+            id="mdpDays"
+            class="d-grid text-center gap-2"
+            style="grid-template-columns: repeat(7, 1fr);">
+
+        </div>
+
+
+    </div>
 
 </div>
+
 
 <script>
 window.selectedDate="{{ selected_date|date:'Y-m-d' }}";

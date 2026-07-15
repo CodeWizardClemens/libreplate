@@ -1,24 +1,49 @@
-<!-- diary_header.html -->
+<div class="d-flex gap-2 align-items-center flex-wrap">
 
-<a href="{% url 'diary_day' yesterday %}" class="btn btn-secondary">
-    ⬅ Yesterday
-</a>
 
-<a href="{% url 'diary_today' %}" class="btn btn-primary">
-    Go to today
-</a>
+    <a
+        href="{% url 'diary_day' yesterday %}"
+        class="btn btn-secondary">
 
-<input
-    class="calendar-picker"
-    type="date"
-    value="{{ selected_date|date:'Y-m-d' }}"
-    onchange="goToDate(this.value)"
->
+        ⬅ Yesterday
 
-<a href="{% url 'diary_day' tomorrow %}" class="btn btn-secondary">
-    Tomorrow ➡
-</a>
+    </a>
+
+
+
+    <a
+        href="{% url 'diary_today' %}"
+        class="btn btn-primary">
+
+        Go to today
+
+    </a>
+
+
+
+    <input
+        class="form-control"
+        style="width:160px"
+        type="date"
+        value="{{ selected_date|date:'Y-m-d' }}"
+        onchange="goToDate(this.value)"
+    >
+
+
+
+    <a
+        href="{% url 'diary_day' tomorrow %}"
+        class="btn btn-secondary">
+
+        Tomorrow ➡
+
+    </a>
+
+
+</div>
+
+
 
 <script>
-    window.selectedDate = "{{ selected_date|date:'Y-m-d' }}";
+window.selectedDate = "{{ selected_date|date:'Y-m-d' }}";
 </script>
