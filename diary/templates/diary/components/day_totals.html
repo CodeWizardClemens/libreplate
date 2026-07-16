@@ -57,7 +57,7 @@
                 {% for nutrient in nutrients_total %}
 
                 <td
-                    class="text-center"
+                    class="text-center day-total"
                     data-nutrient="{{ nutrient.id }}">
 
                     {{ day_total|get_item:nutrient.id|default:"0" }}

@@ -30,7 +30,6 @@ function saveMetric(input) {
 function saveMealFood(input) {
     const row = input.closest("tr");
     const id = input.dataset.mealFood;
-
     clearTimeout(mealFoodTimers[id]);
 
     mealFoodTimers[id] = setTimeout(() => {
