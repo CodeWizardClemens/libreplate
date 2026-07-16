@@ -251,28 +251,6 @@ def diary_day(request, date=None):
 # =========================================================
 # MEALS
 # =========================================================
-def add_meal(request, date):
-
-    if request.method == "POST":
-
-        form = MealForm(request.POST)
-
-        if form.is_valid():
-            meal = form.save(commit=False)
-            meal.user = request.user
-            meal.date = datetime.strptime(date, "%Y-%m-%d").date()
-
-            last_order = (
-                Meal.objects.filter(date=meal.date, user=request.user)
-                .order_by("-order")
-                .values_list("order", flat=True)
-                .first()
-            )
-
-            meal.order = (last_order + 1) if last_order is not None else 0
-            meal.save()
-
-    return redirect("diary_day", date=date)
 
 
 def delete_meal(request, meal_id):
