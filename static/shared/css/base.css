@@ -1,9 +1,3 @@
 /* static/shared/css/base.css */
 
-@import "layout.css";
-@import "topbar.css";
-@import "sidebar.css";
-@import "buttons.css";
 @import "forms.css";
-@import "header.css";
-@import "settings.css";
