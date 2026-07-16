@@ -71,7 +71,7 @@ function saveNote(textarea) {
             })
         })
         .catch(err => console.error("Note save failed:", err));
-    }, 400);
+    }, 300);
 }
 
 /* -----------------------

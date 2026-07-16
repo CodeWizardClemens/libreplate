@@ -2,7 +2,7 @@
     method="{{ method|default:'get' }}"
     id="{{ form_id }}"
     action="{{ action|default:'' }}"
-    class="search-bar-form"
+    class="flex-grow-1"
 >
 
     {% csrf_token %}
@@ -15,10 +15,9 @@
         >
     {% endfor %}
 
-    <div class="search-bar">
+    <div class="d-flex gap-2 align-items-center w-100 flex-wrap">
 
-        <div class="search-bar-input">
-
+        <div class="flex-grow-1">
             <input
                 id="{{ input_id }}"
                 type="text"
@@ -26,49 +25,45 @@
                 value="{{ query }}"
                 placeholder="{{ placeholder|default:'Search...' }}"
                 autocomplete="off"
+                class="form-control"
             >
-
         </div>
 
-        {% if sort_options %}
-        <div class="search-bar-sort">
-
+        <div class="flex-shrink-0">
             <select
                 name="{{ sort_name|default:'sort' }}"
                 id="{{ sort_id|default:'sortSelect' }}"
+                class="form-select"
             >
 
-                {% for option in sort_options %}
+                <option value="last_used" {% if selected_sort == "last_used" %}selected{% endif %}>
+                    Last used
+                </option>
 
-                    <option
-                        value="{{ option.value }}"
-                        {% if option.value == selected_sort %}selected{% endif %}
-                    >
-                        {{ option.label }}
-                    </option>
+                <option value="last_added" {% if selected_sort == "last_added" %}selected{% endif %}>
+                    Last added
+                </option>
 
-                {% endfor %}
+                <option value="name" {% if selected_sort == "name" %}selected{% endif %}>
+                    Name
+                </option>
 
             </select>
-
         </div>
-        {% endif %}
 
-        <div class="search-bar-button">
-
+        <div class="flex-shrink-0">
             <button
                 type="submit"
                 class="btn btn-secondary"
             >
                 Search
             </button>
-
         </div>
 
     </div>
 
     {% if filters_template %}
-    <div class="search-bar-filters">
+    <div class="mt-2 w-100">
         {% include filters_template %}
     </div>
     {% endif %}

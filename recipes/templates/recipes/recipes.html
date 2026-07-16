@@ -1,4 +1,4 @@
-<!-- recipes/templates/recipes/recipes.html -->
+<!-- recipes.html -->
 
 {% extends "base.html" %}
 {% block page_heading %}Recipes{% endblock %}
@@ -11,55 +11,49 @@
 {% endblock %}
 
 {% block top_bar_right_mobile %}
-    <a href="{% url 'recipe_create' %}" class="btn top-bar-button">
+    <a href="{% url 'recipe_create' %}" class="btn">
         + New
     </a>
 {% endblock %}
 
-<!-- Main content -->
 {% block content %}
 
-
-<div class="search-toolbar">
-
-    <div class="add-button">
-        <button
-            id="addSelectedBtn"
-            type="submit"
-            form="recipeSelectionForm"
-            disabled>
-
-            {% if meal_name %}
+{% if meal_name %}
+    <div class="search-toolbar">
+        <div class="add-button">
+            <button
+                id="addSelectedBtn"
+                type="submit"
+                form="recipeSelectionForm"
+                disabled>
                 Add to {{ meal_name }}
-            {% else %}
-                Add
-            {% endif %}
-        </button>
+            </button>
+        </div>
     </div>
+
+    <form
+        id="recipeSelectionForm"
+        method="post"
+        action="
+        {% if meal_id %}
+            {% url 'add_recipes_to_meal_direct' meal_id meal_name meal_date %}
+        {% else %}
+            {% url 'recipes' %} 
+        {% endif %}
+        "
+    >
+        {% csrf_token %}
+{% endif %}
+
+
+<div id="recipesContainer">
+
+    {% for recipe in recipes %}
+        {% include "recipes/partials/recipe_card.html" %}
+    {% endfor %}
 </div>
 
-<!-- TODO replace recipes url later when other funcitonality works first. -->
-<form
-    id="recipeSelectionForm"
-    method="post"
-    action="
-    {% if meal_id %}
-        {% url 'add_recipes_to_meal_direct' meal_id meal_name meal_date %}
-    {% else %}
-        {% url 'recipes' %} 
-    {% endif %}
-    "
->
 
-    {% csrf_token %}
-
-    <div id="recipesContainer">
-
-        {% for recipe in recipes %}
-            {% include "recipes/partials/recipe_card.html" %}
-        {% endfor %}
-
-    </div>
 
 <script src="{% static 'recipes/js/recipes.js' %}"></script>
 

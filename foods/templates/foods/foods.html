@@ -1,66 +1,63 @@
-<!-- foods/templates/foods/foods.html -->
-
 {% extends "base.html" %}
 {% block page_heading %}Foods{% endblock %}
 {% load static %}
 
 {% block header_buttons_desktop %}
-    <a href="{% url 'create_food' %}" class="btn btn-primary">
-        + New Food
-    </a>
+<a href="{% url 'create_food' %}" class="btn btn-primary">
+    + New Food
+</a>
 {% endblock %}
 
 {% block top_bar_right_mobile %}
-    <a href="{% url 'create_food' %}" class="btn top-bar-button">
-        + New Food
-    </a>
+<a href="{% url 'create_food' %}" class="btn top-bar-button">
+    + New Food
+</a>
 {% endblock %}
 
 {% block content %}
 
-<link rel="stylesheet" href="{% static 'foods/css/food.css' %}">
 <link rel="stylesheet" href="{% static 'shared/css/search_bar.css' %}">
 
-<div class="container">
+<div class="food-toolbar">
 
-    <div class="food-toolbar">
+    {% if meal_name or recipe_name %}
+    <div class="add-button">
 
-        <div class="add-button">
+        <button
+            id="addSelectedBtn"
+            type="submit"
+            form="foodSelectionForm"
+            class="btn btn-primary px-4"
+            disabled>
 
-            <button
-                id="addSelectedBtn"
-                type="submit"
-                form="foodSelectionForm"
-                disabled>
-
-                {% if meal_id %}
-                    Add to {{ meal_name }}
-                {% elif recipe_name %}
-                    Add to {{ recipe_name }}
-                {% else %}
-                    Add
-                {% endif %}
-
-            </button>
-
-        </div>
-
-        {% include "components/search_bar.html" with form_id="foodSearchForm" input_id="foodSearch" placeholder="Search foods..." query=user_food_search_query filters_template="foods/partials/food_search_filters.html" selected_sort=sort sort_options=food_sort_options hidden_fields=search_hidden_fields %}
+            {% if meal_id %}
+                Add to {{ meal_name }}
+            {% elif recipe_name %}
+                Add to {{ recipe_name }}
+            {% endif %}
+        </button>
 
     </div>
+    {% endif %}
 
-    {% if foods %}
+    <div class="flex-grow-1">
+
+        {% include "foods/partials/search_bar.html" %}
+    </div>
+
+</div>
+
+{% if foods %}
 
     {% for food in foods %}
         {% if food.source != "local" %}
-            <form
-                id="import-food-{{ food.fdc_id }}"
-                method="post"
-                action="{% url 'import_usda_food' food.fdc_id %}"
-                style="display:none;"
-            >
-                {% csrf_token %}
-            </form>
+        <form
+            id="import-food-{{ food.fdc_id }}"
+            method="post"
+            action="{% url 'import_usda_food' food.fdc_id %}"
+            class="d-none">
+            {% csrf_token %}
+        </form>
         {% endif %}
     {% endfor %}
 
@@ -77,25 +74,25 @@
         {% endif %}
         "
     >
-    {% csrf_token %}
+        {% csrf_token %}
 
-    <div id="foodsContainer">
+        <div id="foodsContainer">
 
-        {% for food in foods %}
-            {% include "foods/partials/food_card.html" %}
-        {% endfor %}
+            {% for food in foods %}
+                {% include "foods/partials/food_card.html" %}
+            {% endfor %}
 
-    </div>
+        </div>
 
     </form>
 
-    {% else %}
+{% else %}
 
-        <p>No foods found.</p>
+    <div class="text-center py-5 text-muted">
+        No foods found.
+    </div>
 
-    {% endif %}
-
-</div>
+{% endif %}
 
 <script src="{% static 'foods/js/food.js' %}"></script>
 <script src="{% static 'shared/js/search_bar.js' %}"></script>

@@ -1,25 +1,39 @@
-<div class="search-sources">
+<div class="search-sources d-flex flex-wrap align-items-center gap-3">
 
-    Search options:
+    <span class="fw-semibold">
+        Search options:
+    </span>
 
-    <label style="margin-right:12px;">
+    <div class="form-check">
+
         <input
+            class="form-check-input"
             type="checkbox"
+            id="searchLocal"
             name="use_local_search"
             value="1"
-            checked
-        >
-        Local
-    </label>
+            checked>
 
-    <label>
+        <label class="form-check-label" for="searchLocal">
+            Local
+        </label>
+
+    </div>
+
+    <div class="form-check">
+
         <input
+            class="form-check-input"
             type="checkbox"
+            id="searchUsda"
             name="use_usda_search"
             value="1"
-            checked
-        >
-        USDA
-    </label>
+            checked>
+
+        <label class="form-check-label" for="searchUsda">
+            USDA
+        </label>
+
+    </div>
 
 </div>

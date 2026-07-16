@@ -310,6 +310,7 @@ class FoodView(LoginRequiredMixin, View):
 
         return hidden_fields
 
+    # TODO use database for this...
     def get_sort_options(self):
         return [
             {

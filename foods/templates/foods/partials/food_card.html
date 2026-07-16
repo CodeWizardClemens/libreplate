@@ -1,79 +1,73 @@
 <div
-    class="food-card food-item"
+    class="food-card food-item py-2 border-bottom"
     data-name="{{ food.name|lower }}"
     data-description="{{ food.description|lower }}"
 >
 
-    <div class="food-header">
+    <div class="food-header d-flex justify-content-between align-items-start gap-2 flex-nowrap">
 
-        <div class="food-left">
+        <div class="food-left d-flex align-items-start gap-2 flex-grow-1">
 
-            <input
-                type="checkbox"
-                class="food-checkbox"
-                name="foods"
-                value="{{ food.id }}"
-            >
+            {% if meal_name or recipe_name %}
+                <input
+                    type="checkbox"
+                    class="food-checkbox form-check-input mt-1"
+                    name="foods"
+                    value="{{ food.id }}"
+                >
+            {% endif %}
 
-            <div class="food-info">
+            <div class="food-info flex-grow-1">
 
-                <div class="food-name">
+                <div class="food-name fw-semibold fs-6 text-body">
                     {{ food.name }}
                 </div>
 
                 {% if food.brand %}
-                <div class="food-brand">
+                <div class="food-brand text-body-secondary small">
                     {{ food.brand }}
                 </div>
                 {% endif %}
 
-                <div class="serving">
+                <div class="serving text-body-secondary small mt-1">
                     Portion: {{ food.serving|floatformat:"-1" }} {{ food.unit }}
-                </div>
-
-                <div class="nutrients-row">
-                    {% for n in food.nutrients %}
-                    <div class="nutrient-chip">
-
-                        <span class="nutrient-label">
-                            {{ n.abbr|default:n.name }}
-                        </span>
-
-                        <span class="nutrient-value">
-                            {% with v=n.value|floatformat:0 %}
-                                {% if v|slice:"-3:" == ".00" %}
-                                    {{ n.value|floatformat:0 }}
-                                {% else %}
-                                    {{ v }}
-                                {% endif %}
-                            {% endwith %}
-                        </span>
-
-                    </div>
-                    {% endfor %}
                 </div>
 
             </div>
 
         </div>
 
-        <div class="actions">
+
+        <div class="actions d-flex flex-nowrap gap-1 flex-shrink-0">
 
             {% if food.source == "local" %}
 
-                <a href="{% url 'food_toggle_favorite' food.id %}" class="action-btn edit-btn">
+                <a
+                    href="{% url 'food_toggle_favorite' food.id %}"
+                    class="btn btn-outline-warning btn-sm"
+                    title="{% if food.is_favorite %}Remove favorite{% else %}Add favorite{% endif %}"
+                >
                     {% if food.is_favorite %}
-                    ★
+                        <i class="bi bi-star-fill"></i>
                     {% else %}
-                    ☆
+                        <i class="bi bi-star"></i>
                     {% endif %}
                 </a>
-                <a href="{% url 'edit_food' food.id %}" class="action-btn edit-btn">
-                    Edit
+
+                <a
+                    href="{% url 'edit_food' food.id %}"
+                    class="btn btn-outline-primary btn-sm"
+                    title="Edit"
+                >
+                    <i class="bi bi-pencil"></i>
                 </a>
 
-                <a href="{% url 'delete_food' food.id %}" class="action-btn delete-btn">
-                    Delete
+                <a
+                    href="{% url 'delete_food' food.id %}"
+                    class="btn btn-outline-danger btn-sm"
+                    title="Delete"
+                >
+                    <i class="bi bi-trash"></i>
                 </a>
 
             {% else %}
@@ -81,14 +75,39 @@
                 <button
                     type="submit"
                     form="import-food-{{ food.fdc_id }}"
-                    class="action-btn edit-btn"
+                    class="btn btn-primary btn-sm"
                 >
                     Import
                 </button>
 
             {% endif %}
-
         </div>
+    </div>
+
+    <div class="nutrients-row  {% if meal_name or recipe_name %}ms-4{% endif %}">
+
+        {% for n in food.nutrients %}
+
+        <span
+            class="nutrient-chip badge rounded-pill bg-body-tertiary border text-body d-inline-flex align-items-center gap-1 px-2 py-1">
+
+            <span class="nutrient-label text-body-secondary">
+                {{ n.abbr|default:n.name }}
+            </span>
+
+            <span class="nutrient-value fw-semibold text-body">
+                {% with v=n.value|floatformat:0 %}
+                    {% if v|slice:"-3:" == ".00" %}
+                        {{ n.value|floatformat:0 }}
+                    {% else %}
+                        {{ v }}
+                    {% endif %}
+                {% endwith %}
+            </span>
+
+        </span>
+
+        {% endfor %}
 
     </div>
 
