@@ -96,12 +96,12 @@ function updateUI(data) {
         }
     }
 
-    document.querySelectorAll(".meal-total").forEach(cell => {
-        cell.innerText = data.meal[cell.dataset.nutrient] ?? 0;
-    });
+    const mealCard = document.querySelector(
+        `.meal-card[data-meal="${data.meal_id}"]`
+    );
 
-    document.querySelectorAll(".day-total").forEach(cell => {
-        cell.innerText = data.day[cell.dataset.nutrient] ?? 0;
+    mealCard?.querySelectorAll(".meal-total").forEach(cell => {
+        cell.innerText = data.meal[cell.dataset.nutrient] ?? 0;
     });
 }
 
