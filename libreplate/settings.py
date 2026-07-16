@@ -97,10 +97,6 @@ TEMPLATES = [
     },
 ]
 
-TEMPLATES[0]["OPTIONS"]["context_processors"] += [
-    "settings.context_processors.user_settings",
-]
-
 WSGI_APPLICATION = "libreplate.wsgi.application"
 
 

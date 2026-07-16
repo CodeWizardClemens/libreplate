@@ -3,7 +3,11 @@ from django.db import models
 
 
 class UserPreferences(models.Model):
-
+    SORT_CHOICES = [
+        ("name", "Name"),
+        ("-created_at", "Newest"),
+        ("created_at", "Oldest"),
+    ]
     def theme_color_rgb(self):
         hex_color = self.theme_color.lstrip("#")
         return ",".join(
@@ -18,6 +22,10 @@ class UserPreferences(models.Model):
     )
 
     dark_mode = models.BooleanField(default=False)
+
+    food_sort_mode = models.CharField(
+        max_length=50, choices=SORT_CHOICES, default="-created_at"
+    )
 
     theme_color = models.CharField(
         max_length=7,
