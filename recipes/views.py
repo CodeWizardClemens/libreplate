@@ -12,7 +12,7 @@ from foods.models import FoodNutrient
 from nutrients.models import Nutrient
 
 from .forms import AddRecipeToDiaryForm, RecipeForm, RecipeIngredientForm
-from .models import Recipe, RecipeIngredient
+from .models import Recipe, RecipeIngredient, RecipeTag
 
 
 def selected_recipes(user, ids):
@@ -21,6 +21,51 @@ def selected_recipes(user, ids):
         id__in=ids,
     ).prefetch_related("ingredients__food")
 
+
+@login_required
+@require_POST
+def recipe_tags_save(request, recipe_id):
+    recipe = get_object_or_404(
+        Recipe,
+        id=recipe_id,
+        user=request.user,
+    )
+
+    tag_ids = request.POST.getlist("tags")
+
+    recipe.tags.set(tag_ids)
+
+    return render(
+        request,
+        "recipes/partials/tag_button.html",
+        {
+            "recipe": recipe,
+        },
+    )
+
+
+@login_required
+@login_required
+@require_POST
+def recipe_tags_modal(request, recipe_id):
+    recipe = get_object_or_404(
+        Recipe,
+        id=recipe_id,
+        user=request.user,
+    )
+
+    tags = RecipeTag.objects.all()
+    selected_tags = recipe.tags.values_list("id", flat=True)
+
+    return render(
+        request,
+        "recipes/partials/tag_modal.html",
+        {
+            "recipe": recipe,
+            "tags": tags,
+            "selected_tags": selected_tags,
+        },
+    )
 
 @login_required
 @require_POST

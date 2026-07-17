@@ -35,4 +35,14 @@ urlpatterns = [
         views.ingredient_delete,
         name="ingredient_delete",
     ),
+    path(
+        "<int:recipe_id>/tags/modal/",
+        views.recipe_tags_modal,
+        name="recipe_tags_modal",
+    ),
+    path(
+        "<int:recipe_id>/tags/save/",
+        views.recipe_tags_save,
+        name="recipe_tags_save",
+    ),
 ]
