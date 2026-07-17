@@ -23,22 +23,59 @@ def selected_recipes(user, ids):
 
 
 @login_required
-def recipes(request):
+@require_POST
+def toggle_favorite(request, recipe_id):
+    recipe = get_object_or_404(
+        Recipe,
+        id=recipe_id,
+        user=request.user,
+    )
 
+    recipe.is_favorite = not recipe.is_favorite
+    recipe.save(update_fields=["is_favorite"])
+
+    response = render(
+        request,
+        "recipes/partials/favorite_button.html",
+        {
+            "recipe": recipe,
+        },
+    )
+
+    response["HX-Trigger"] = "recipesChanged"
+
+    return response
+
+
+@login_required
+def recipes(request):
     meal_id = request.GET.get("meal_id")
     meal_name = request.GET.get("meal_name")
     meal_date = request.GET.get("meal_date")
-    recipes = Recipe.objects.filter(user=request.user).order_by("-last_used_at")
+
+    recipes = (
+        Recipe.objects.filter(user=request.user)
+        .order_by("-is_favorite", "-last_used_at")
+    )
+
+    context = {
+        "recipes": recipes,
+        "meal_id": meal_id,
+        "meal_name": meal_name,
+        "meal_date": meal_date,
+    }
+
+    if request.headers.get("HX-Request"):
+        return render(
+            request,
+            "recipes/partials/recipe_list.html",
+            context,
+        )
 
     return render(
         request,
         "recipes/recipes.html",
-        {
-            "recipes": recipes,
-            "meal_id": meal_id,
-            "meal_name": meal_name,
-            "meal_date": meal_date,
-        },
+        context,
     )
 
 @login_required

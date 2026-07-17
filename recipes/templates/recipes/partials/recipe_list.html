@@ -1,0 +1,11 @@
+<div
+    id="recipesContainer"
+    hx-get="{% url 'recipes' %}{% if meal_name %}?meal_id={{ meal_id }}&meal_name={{ meal_name|urlencode }}&meal_date={{ meal_date|urlencode }}{% endif %}"
+    hx-trigger="recipesChanged from:body"
+    hx-swap="outerHTML">
+
+    {% for recipe in recipes %}
+        {% include "recipes/partials/recipe_card.html" %}
+    {% endfor %}
+
+</div>

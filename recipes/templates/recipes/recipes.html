@@ -45,12 +45,7 @@
         {% csrf_token %}
 {% endif %}
 
-<div id="recipesContainer">
-
-    {% for recipe in recipes %}
-        {% include "recipes/partials/recipe_card.html" %}
-    {% endfor %}
-</div>
+{% include "recipes/partials/recipe_list.html" %}
 
 <script src="{% static 'recipes/js/recipes.js' %}"></script>
 

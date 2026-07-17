@@ -7,6 +7,8 @@ class Recipe(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recipes")
     name = models.CharField(max_length=255)
+    is_favorite = models.BooleanField(default=False)
+
     thumbnail_path = models.CharField(max_length=500, blank=True, null=True)
     summary = models.CharField(max_length=50, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
@@ -15,6 +17,7 @@ class Recipe(models.Model):
     portions = models.FloatField(
         default=1, help_text="Number of portions this recipe creates"
     )
+
     last_used_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

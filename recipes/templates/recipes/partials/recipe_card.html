@@ -31,6 +31,10 @@
 
             <div class="d-flex gap-2 flex-wrap">
 
+                <div id="favorite-button">
+                    {% include "recipes/partials/favorite_button.html" %}
+                </div>
+
                 <a
                     href="{% url 'recipe_edit' recipe.id %}"
                     class="btn btn-sm btn-outline-primary">
