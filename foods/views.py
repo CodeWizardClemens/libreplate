@@ -2,6 +2,8 @@
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404, redirect, render
@@ -21,6 +23,39 @@ from recipes.models import Recipe, RecipeIngredient
 # Helpers
 # =============================================================================
 
+def tags_modal(request, food_id):
+    # TODO
+    pass
+
+
+def tags_save(request, food_id):
+    # TODO
+    pass
+
+
+@login_required
+@require_POST
+def toggle_favorite(request, food_id):
+    food = get_object_or_404(
+        Food,
+        id=food_id,
+        user=request.user,
+    )
+
+    food.is_favorite = not food.is_favorite
+    food.save(update_fields=["is_favorite"])
+
+    response = render(
+        request,
+        "foods/partials/favorite_button.html",
+        {
+            "food": food,
+        },
+    )
+
+    # response["HX-Trigger"] = "foodsChanged"
+
+    return response
 
 def get_food_queryset(user, sort):
     foods = (
@@ -362,23 +397,6 @@ def create_food(request):
             "show_all": show_all,
         },
     )
-
-@login_required
-def food_toggle_favorite(request, pk):
-    food = get_object_or_404(
-        Food,
-        pk=pk,
-        user=request.user,
-    )
-    print(pk)
-    print(food.is_favorite)
-
-    food.is_favorite = not food.is_favorite
-
-    food.save()
-    print(food.is_favorite)
-
-    return redirect("foods")
 
 
 @login_required

@@ -42,17 +42,13 @@
 
             {% if food.source == "local" %}
 
-                <a
-                    href="{% url 'food_toggle_favorite' food.id %}"
-                    class="btn btn-outline-warning btn-sm"
-                    title="{% if food.is_favorite %}Remove favorite{% else %}Add favorite{% endif %}"
-                >
-                    {% if food.is_favorite %}
-                        <i class="bi bi-star-fill"></i>
-                    {% else %}
-                        <i class="bi bi-star"></i>
-                    {% endif %}
-                </a>
+                <div id="favorite-button">
+                    {% include "foods/partials/favorite_button.html" %}
+                </div>
+
+                <div id="tag-button">
+                    {% include "foods/partials/tag_button.html" %}
+                </div>
 
                 <a
                     href="{% url 'edit_food' food.id %}"

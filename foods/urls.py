@@ -9,6 +9,8 @@ urlpatterns = [
     path("create/", views.create_food, name="create_food"),
     path("<int:pk>/edit/", views.edit_food, name="edit_food"),
     path("<int:pk>/delete/", views.delete_food, name="delete_food"),
+    path("<int:food_id>/favorite/", views.toggle_favorite, name="food_toggle_favorite"),
+
     path(
         "usda/<int:fdc_id>/import/",
         views.import_usda_food_view,
@@ -30,8 +32,13 @@ urlpatterns = [
         name="add_foods_to_recipe_direct",
     ),
     path(
-        "<int:pk>/food-toggle-favorite/",
-        views.food_toggle_favorite,
-        name="food_toggle_favorite",
+        "<int:food_id>/tags/modal/",
+        views.tags_modal,
+        name="tags_modal",
+    ),
+    path(
+        "<int:food_id>/tags/save/",
+        views.tags_save,
+        name="tags_save",
     ),
 ]
