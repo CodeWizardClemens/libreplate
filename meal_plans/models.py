@@ -97,8 +97,12 @@ class MealPlanRecipe(models.Model):
         related_name="meal_plan_entries",
     )
 
-    models.DecimalField(max_digits=10, decimal_places=2)
-    models.DecimalField(max_digits=10, decimal_places=2)
+    day = models.PositiveSmallIntegerField(
+        choices=WeekDay.choices,
+    )
+
+    serving_size = models.DecimalField(max_digits=10, decimal_places=2, default=1)
+    number_of_servings = models.DecimalField(max_digits=10, decimal_places=2, default=1)
 
     def __str__(self):
         return (

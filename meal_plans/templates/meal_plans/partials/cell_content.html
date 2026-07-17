@@ -1,0 +1,24 @@
+<!-- cell_content.html -->
+
+{% for item in cell_items %}
+    <span class="d-inline-flex align-items-center bg-light border rounded-pill px-2 py-1 my-1 small">
+        {% if item.type == "food" %}
+            <i class="bi bi-egg-fill me-1"></i>
+            {% url 'cell_remove_food' meal_plan.id item.id as delete_url %}
+        {% else %}
+            <i class="bi bi-card-text me-1"></i>
+            {% url 'cell_remove_recipe' meal_plan.id item.id as delete_url %}
+        {% endif %}
+        {{ item.name }}
+        <button type="button"
+                class="btn btn-sm btn-link text-decoration-none py-0 px-1 ms-1 lh-1"
+                title="Remove"
+                hx-post="{{ delete_url }}"
+                hx-vals='{"meal_id": "{{ meal_id }}", "day": "{{ day }}"}'
+                hx-target="closest td"
+                hx-swap="innerHTML"
+                onclick="event.stopPropagation()">
+            &times;
+        </button>
+    </span>
+{% endfor %}
