@@ -24,7 +24,7 @@ def selected_recipes(user, ids):
 
 @login_required
 @require_POST
-def recipe_tags_save(request, recipe_id):
+def tags_save(request, recipe_id):
     recipe = get_object_or_404(
         Recipe,
         id=recipe_id,
@@ -47,7 +47,7 @@ def recipe_tags_save(request, recipe_id):
 @login_required
 @login_required
 @require_POST
-def recipe_tags_modal(request, recipe_id):
+def tags_modal(request, recipe_id):
     recipe = get_object_or_404(
         Recipe,
         id=recipe_id,

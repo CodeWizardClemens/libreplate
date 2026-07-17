@@ -37,12 +37,12 @@ urlpatterns = [
     ),
     path(
         "<int:recipe_id>/tags/modal/",
-        views.recipe_tags_modal,
+        views.tags_modal,
         name="recipe_tags_modal",
     ),
     path(
         "<int:recipe_id>/tags/save/",
-        views.recipe_tags_save,
-        name="recipe_tags_save",
+        views.tags_save,
+        name="tags_save",
     ),
 ]
