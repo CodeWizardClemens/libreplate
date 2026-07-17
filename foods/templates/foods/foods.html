@@ -61,19 +61,19 @@
         {% endif %}
     {% endfor %}
 
-    <form
-        id="foodSelectionForm"
-        method="post"
-        action="
-        {% if meal_id %}
-            {% url 'add_foods_to_meal_direct' meal_id meal_name meal_date %}
-        {% elif recipe_id %}
-            {% url 'add_foods_to_recipe_direct' recipe_id %}
-        {% else %}
-            {% url 'select_meal' %}
-        {% endif %}
-        "
-    >
+    {% if meal_id or recipe_id %}
+        <form
+            id="foodSelectionForm"
+            method="post"
+            action="
+            {% if meal_id %}
+                {% url 'add_foods_to_meal_direct' meal_id meal_name meal_date %}
+            {% elif recipe_id %}
+                {% url 'add_foods_to_recipe_direct' recipe_id %}
+            {% endif %}
+            "
+        >
+    {% endif %}
         {% csrf_token %}
 
         <div id="foodsContainer">

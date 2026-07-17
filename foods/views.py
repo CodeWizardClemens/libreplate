@@ -440,30 +440,6 @@ def delete_food(request, pk):
 
 
 @login_required
-def select_meal(request):
-    if request.method != "POST":
-        return redirect("foods")
-
-    selected_ids = request.POST.getlist("foods")
-    foods = selected_foods(request.user, selected_ids)
-
-    meals = Meal.objects.filter(
-        user=request.user,
-        date=timezone.localdate(),
-    )
-
-    return render(
-        request,
-        "foods/select_meal.html",
-        {
-            "foods": foods,
-            "food_ids": [food.id for food in foods],
-            "meals": meals,
-        },
-    )
-
-
-@login_required
 def add_foods_to_meal(request, meal_id):
     if request.method != "POST":
         return redirect("foods")

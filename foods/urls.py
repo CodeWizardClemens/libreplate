@@ -14,7 +14,6 @@ urlpatterns = [
         views.import_usda_food_view,
         name="import_usda_food",
     ),
-    path("select_meal/", views.select_meal, name="select_meal"),
     path(
         "meals/<int:meal_id>/add_foods/",
         views.add_foods_to_meal,
