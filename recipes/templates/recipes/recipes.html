@@ -45,7 +45,6 @@
         {% csrf_token %}
 {% endif %}
 
-
 <div id="recipesContainer">
 
     {% for recipe in recipes %}
@@ -53,9 +52,6 @@
     {% endfor %}
 </div>
 
-
-
 <script src="{% static 'recipes/js/recipes.js' %}"></script>
-
 
 {% endblock %}

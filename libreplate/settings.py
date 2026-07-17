@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "django_htmx",
     "rest_framework",
     "foods.apps.FoodsConfig",
+    "meal_plans.apps.MealPlansConfig",
     "units.apps.UnitsConfig",
     "nutrients.apps.NutrientsConfig",
     "groceries.apps.GroceriesConfig",

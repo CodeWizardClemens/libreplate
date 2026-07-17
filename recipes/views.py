@@ -134,6 +134,7 @@ def add_recipes_to_meal_direct(request, meal_id, meal_name, meal_date):
     )
 
 
+@login_required
 def recipe_create(request):
 
     if request.method == "POST":

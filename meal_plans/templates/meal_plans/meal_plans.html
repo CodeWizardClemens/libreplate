@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block page_heading %}
+Meal Plans
+{% endblock %}
+
+{% block header_buttons_desktop %}
+<a href="{% url 'meal_plan_create' %}" class="btn btn-primary">
+    + New Meal Plan
+</a>
+{% endblock %}
+
+{% block top_bar_right_mobile %}
+<a href="{% url 'meal_plan_create' %}" class="btn">
+    + New
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div id="mealPlanForm"></div>
+
+<div id="meal_plansContainer">
+    {% for meal_plan in meal_plans %}
+        {% include "meal_plans/partials/meal_plan_card.html" %}
+    {% empty %}
+        <p id="noMealPlans">
+            You don't have any meal plans yet.
+        </p>
+    {% endfor %}
+</div>
+
+{% endblock %}

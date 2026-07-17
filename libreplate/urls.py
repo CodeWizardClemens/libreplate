@@ -5,17 +5,17 @@ from . import views
 
 urlpatterns = [
     path("", views.default_page),
-    path("admin/", admin.site.urls),
+    path("accounts/", include("accounts.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
     path("accounts/profile/", views.profile, name="profile"),
     path("diary/", include("diary.urls")),
     path("foods/", include("foods.urls")),
     path("goals/", include("goals.urls")),
     path("groceries/", include("groceries.urls")),
+    path("meal_plans/", include("meal_plans.urls")),
     path("recipes/", include("recipes.urls")),
-    path("accounts/", include("accounts.urls")),
 
-    path("user_statistics/", include("user_statistics.urls")),
+    path("user-statistics/", include("user_statistics.urls")),
 
     path("settings/", include("settings.urls")),
     path("settings/body-metrics/", include("body_metrics.urls")),

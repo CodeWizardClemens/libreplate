@@ -37,11 +37,7 @@
 </head>
 
 
-<body
-    hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
-    hx-ext="json-enc"
->
-
+<body>
 
 <nav class="navbar bg-body border-bottom sticky-top">
     <div class="container-fluid">
@@ -141,6 +137,12 @@
                class="nav-link d-flex align-items-center {% active_url 'foods' %}">
                 <i class="bi bi-cake2 me-2"></i>
                 <span>Foods</span>
+            </a>
+
+            <a href="{% url 'meal_plans' %}"
+               class="nav-link d-flex align-items-center {% active_url 'meal_plans' %}">
+                <i class="bi bi-calendar2-week me-2"></i>
+                <span>Meal Plans</span>
             </a>
 
 
