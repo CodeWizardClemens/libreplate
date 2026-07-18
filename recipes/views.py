@@ -115,6 +115,7 @@ def tags_modal(request, recipe_id):
         },
     )
 
+
 @login_required
 @require_POST
 def toggle_favorite(request, recipe_id):
