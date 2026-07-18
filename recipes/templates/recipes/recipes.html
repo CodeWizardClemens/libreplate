@@ -5,7 +5,7 @@
 {% load static %}
 
 {% block top_bar_right_mobile %}
-    {% if meal_name %}
+    {% if meal_id %}
         {% include "recipes/partials/add_to_meal_button_mobile.html" %}
     {% else %}
         <a href="{% url 'recipe_create' %}" class="btn">
