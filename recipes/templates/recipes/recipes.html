@@ -5,9 +5,7 @@
 {% load static %}
 
 {% block header_buttons_desktop %}
-    <a href="{% url 'recipe_create' %}" class="btn btn-primary">
-        + New recipe
-    </a>
+
 {% endblock %}
 
 {% block top_bar_right_mobile %}
@@ -18,35 +16,14 @@
 
 {% block content %}
 
-{% if meal_name %}
-    <div class="search-toolbar">
-        <div class="add-button">
-            <button
-                id="addSelectedBtn"
-                type="submit"
-                form="recipeSelectionForm"
-                disabled>
-                Add to {{ meal_name }}
-            </button>
-        </div>
-    </div>
+{% include "recipes/partials/action_bar.html" %}
 
-    <form
-        id="recipeSelectionForm"
-        method="post"
-        action="
-        {% if meal_id %}
-            {% url 'add_recipes_to_meal_direct' meal_id meal_name meal_date %}
-        {% else %}
-            {% url 'recipes' %} 
-        {% endif %}
-        "
-    >
-        {% csrf_token %}
-{% endif %}
+{% include "recipes/partials/add_to_meal_button.html" %}
 
 {% include "recipes/partials/recipe_list.html" %}
 
 <script src="{% static 'recipes/js/recipes.js' %}"></script>
+
+<div id="recipe-tag-selector-modal"></div>
 
 {% endblock %}

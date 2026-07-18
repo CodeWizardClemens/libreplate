@@ -1,0 +1,55 @@
+<form class="row g-2 mb-3">
+
+    <div class="col-auto">
+        <a href="{% url 'recipe_create' %}" class="btn btn-primary">
+            + New recipe
+        </a>
+    </div>
+
+    <div class="col">
+        <input
+            type="search"
+            class="form-control"
+            name="search"
+            placeholder="Search recipes..."
+            value="{{ search }}"
+            hx-get="{% url 'recipes' %}"
+            hx-include="closest form"
+            hx-trigger="keyup changed delay:300ms, search"
+            hx-target="#recipesContainer"
+            hx-swap="outerHTML">
+    </div>
+
+    <div class="col-auto">
+        <select
+            id="recipe-filters"
+            name="sort"
+            class="form-select"
+            hx-get="{% url 'recipes' %}"
+            hx-include="closest form"
+            hx-trigger="change"
+            hx-target="#recipesContainer"
+            hx-swap="outerHTML">
+
+            <option value="last_used" {% if sort == "last_used" %}selected{% endif %}>
+                Last used
+            </option>
+
+            <option value="created" {% if sort == "created" %}selected{% endif %}>
+                Last created
+            </option>
+
+            <option value="updated" {% if sort == "updated" %}selected{% endif %}>
+                Last updated
+            </option>
+
+            <option value="name" {% if sort == "name" %}selected{% endif %}>
+                Name
+            </option>
+
+        </select>
+    </div>
+
+    {% include "recipes/partials/searchbar_tag_dropdown.html" %}
+    
+</form>

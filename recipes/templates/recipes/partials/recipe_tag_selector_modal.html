@@ -1,0 +1,58 @@
+<div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,.5);">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Recipe tags
+                </h5>
+
+                <button 
+                    type="button"
+                    class="btn-close"
+                    onclick="document.getElementById('recipe-tag-selector-modal').innerHTML=''"
+                ></button>
+            </div>
+
+            {% csrf_token %}
+
+            <div class="modal-body">
+
+                <div id="tag-list">
+                    {% include "recipes/partials/tag_list.html" %}
+                </div>
+
+                <hr>
+
+                <div class="input-group mt-3">
+
+                    <input
+                        id="new-tag-input"
+                        class="form-control"
+                        name="name"
+                        placeholder="New tag"
+                    >
+
+                    <button
+                        class="btn btn-outline-primary"
+                        type="button"
+                        hx-post="{% url 'recipe_tag_create' %}"
+                        hx-include="[name='name']"
+                        hx-vals='{"recipe_id":"{{ recipe.id }}"}'
+                        hx-target="#tag-list"
+                        hx-swap="innerHTML"
+                        hx-on::after-request="
+                            document.getElementById('new-tag-input').value='';
+                            htmx.trigger('#searchbar-tag-dropdown', 'refreshTags');
+                        "
+                    >
+                        Add
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>

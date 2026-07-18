@@ -2,23 +2,23 @@
 // Add button enable/disable
 //
 document.addEventListener("DOMContentLoaded", () => {
-
     const addButton = document.getElementById("addSelectedBtn");
 
-    function updateAddButton() {
-        if (!addButton) return;
+    if (!addButton) return;
 
-        const checked = document.querySelectorAll(
+    function updateAddButton() {
+        addButton.disabled = !document.querySelector(
             ".food-checkbox:checked, .recipe-checkbox:checked"
         );
-
-        addButton.disabled = checked.length === 0;
     }
 
-    document
-        .querySelectorAll(".food-checkbox, .recipe-checkbox")
-        .forEach(cb => cb.addEventListener("change", updateAddButton));
+    document.addEventListener("change", (e) => {
+        if (
+            e.target.matches(".food-checkbox, .recipe-checkbox")
+        ) {
+            updateAddButton();
+        }
+    });
 
     updateAddButton();
-
 });

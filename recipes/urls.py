@@ -42,7 +42,17 @@ urlpatterns = [
     ),
     path(
         "<int:recipe_id>/tags/save/",
-        views.tags_save,
-        name="tags_save",
+        views.recipe_tags_save,
+        name="recipe_tags_save",
+    ),
+    path(
+        "tags/create/",
+        views.recipe_tag_create,
+        name="recipe_tag_create",
+    ),
+    path(
+        "tags/<int:tag_id>/delete/",
+        views.recipe_tag_delete,
+        name="recipe_tag_delete",
     ),
 ]

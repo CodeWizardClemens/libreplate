@@ -1,8 +1,9 @@
 <button
     hx-post="{% url 'recipe_tags_modal' recipe.id %}"
-    hx-target="#tag-modal"
+    hx-target="#recipe-tag-selector-modal"
     hx-swap="innerHTML"
     class="btn btn-sm btn-outline-primary"
 >
-    <i class="bi bi-tags-fill"></i>
+    <i class="bi bi-tags"></i>
+    Tags
 </button>

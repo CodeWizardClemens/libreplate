@@ -34,6 +34,11 @@ class Recipe(models.Model):
 
 class RecipeTag(models.Model):
 
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="recipe_tags",
+    )
     name = models.CharField(max_length=50, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

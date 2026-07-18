@@ -13,7 +13,56 @@ from nutrients.models import Nutrient
 
 from .forms import AddRecipeToDiaryForm, RecipeForm, RecipeIngredientForm
 from .models import Recipe, RecipeIngredient, RecipeTag
+from django.http import HttpResponse
+from django.db.models import Count, Q
 
+@login_required
+@require_POST
+def recipe_tag_create(request):
+    name = request.POST.get("name", "").strip()
+
+    if name:
+        RecipeTag.objects.get_or_create(name=name, user=request.user)
+
+    recipe = get_object_or_404(
+        Recipe,
+        id=request.POST["recipe_id"],
+        user=request.user,
+    )
+
+    return render(
+        request,
+        "recipes/partials/tag_list.html",
+        {
+            "recipe": recipe,
+            "tags": RecipeTag.objects.filter(user=request.user),
+            "selected_tags": recipe.tags.values_list("id", flat=True),
+        },
+    )
+
+
+@login_required
+@require_POST
+def recipe_tag_delete(request, tag_id):
+    tag = get_object_or_404(RecipeTag, id=tag_id, user=request.user)
+
+    recipe = get_object_or_404(
+        Recipe,
+        id=request.POST["recipe_id"],
+        user=request.user,
+    )
+
+    tag.delete()
+
+    return render(
+        request,
+        "recipes/partials/tag_list.html",
+        {
+            "recipe": recipe,
+            "tags": RecipeTag.objects.filter(user=request.user),
+            "selected_tags": recipe.tags.values_list("id", flat=True),
+        },
+    )
 
 def selected_recipes(user, ids):
     return Recipe.objects.filter(
@@ -24,7 +73,7 @@ def selected_recipes(user, ids):
 
 @login_required
 @require_POST
-def tags_save(request, recipe_id):
+def recipe_tags_save(request, recipe_id):
     recipe = get_object_or_404(
         Recipe,
         id=recipe_id,
@@ -45,7 +94,6 @@ def tags_save(request, recipe_id):
 
 
 @login_required
-@login_required
 @require_POST
 def tags_modal(request, recipe_id):
     recipe = get_object_or_404(
@@ -54,12 +102,12 @@ def tags_modal(request, recipe_id):
         user=request.user,
     )
 
-    tags = RecipeTag.objects.all()
+    tags = RecipeTag.objects.filter(user=request.user)
     selected_tags = recipe.tags.values_list("id", flat=True)
 
     return render(
         request,
-        "recipes/partials/tag_modal.html",
+        "recipes/partials/recipe_tag_selector_modal.html",
         {
             "recipe": recipe,
             "tags": tags,
@@ -98,16 +146,49 @@ def recipes(request):
     meal_name = request.GET.get("meal_name")
     meal_date = request.GET.get("meal_date")
 
-    recipes = (
-        Recipe.objects.filter(user=request.user)
-        .order_by("-is_favorite", "-last_used_at")
+    search = request.GET.get("search", "").strip()
+    sort = request.GET.get("sort", "last_used")
+
+    selected_tags = request.GET.getlist("tags")
+
+    recipes = Recipe.objects.filter(user=request.user)
+
+    if search:
+        recipes = recipes.filter(name__icontains=search)
+
+    if selected_tags:
+        recipes = (
+            recipes.filter(tags__id__in=selected_tags)
+            .annotate(
+                matched_tags=Count(
+                    "tags",
+                    filter=Q(tags__id__in=selected_tags),
+                )
+            )
+            .filter(matched_tags=len(selected_tags))
+        )
+
+    # Sorting
+    ordering = {
+        "last_used": ["-is_favorite", "-last_used_at"],
+        "created": ["-is_favorite", "-created_at"],
+        "updated": ["-is_favorite", "-updated_at"],
+        "name": ["-is_favorite", "name"],
+    }
+
+    recipes = recipes.distinct().order_by(
+        *ordering.get(sort, ordering["last_used"])
     )
 
     context = {
         "recipes": recipes,
+        "tags": RecipeTag.objects.filter(user=request.user),
+        "selected_tags": [int(t) for t in selected_tags],
         "meal_id": meal_id,
         "meal_name": meal_name,
         "meal_date": meal_date,
+        "search": search,
+        "sort": sort,
     }
 
     if request.headers.get("HX-Request"):
@@ -122,6 +203,7 @@ def recipes(request):
         "recipes/recipes.html",
         context,
     )
+
 
 @login_required
 def recipe_copy(request, recipe_id):
@@ -153,7 +235,7 @@ def recipe_copy(request, recipe_id):
             **ingredient_data,
         )
     
-    return redirect("recipe_edit", recipe_id=new_recipe.id)
+    return redirect("recipes")
 
 
 @login_required
@@ -373,6 +455,14 @@ def recipe_delete(request, recipe_id):
 
     recipe.delete()
 
+    if request.headers.get("HX-Request"):
+        response = render(
+            request,
+            "recipes/partials/empty.html",
+        )
+        response["HX-Trigger"] = "recipesChanged"
+        return response
+    
     return redirect("recipes")
 
 

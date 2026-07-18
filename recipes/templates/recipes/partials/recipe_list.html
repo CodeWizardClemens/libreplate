@@ -1,11 +1,17 @@
+<!-- recipes_list.html -->
+
 <div
     id="recipesContainer"
-    hx-get="{% url 'recipes' %}{% if meal_name %}?meal_id={{ meal_id }}&meal_name={{ meal_name|urlencode }}&meal_date={{ meal_date|urlencode }}{% endif %}"
+    hx-get="{% url 'recipes' %}?search={{ search|urlencode }}&sort={{ sort }}{% if meal_name %}&meal_id={{ meal_id }}&meal_name={{ meal_name|urlencode }}&meal_date={{ meal_date|urlencode }}{% endif %}"
     hx-trigger="recipesChanged from:body"
     hx-swap="outerHTML">
 
     {% for recipe in recipes %}
         {% include "recipes/partials/recipe_card.html" %}
+    {% empty %}
+        <div class="alert alert-light">
+            No recipes found.
+        </div>
     {% endfor %}
 
 </div>
