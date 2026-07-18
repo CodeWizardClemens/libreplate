@@ -2,14 +2,7 @@
 {% block page_heading %}Edit Goal{% endblock %}
 {% load dict_extras %}
 
-{% block header_buttons_desktop %}
-    <a href="{% url 'goals' %}" class="btn btn-secondary">
-        Cancel
-    </a>
-    <button type="submit" class="goalForm btn btn-primary">
-        Save Goal
-    </button>
-{% endblock %}
+
 
 {% block top_bar_right_mobile %}
     <button type="submit" class="goalForm btn top-bar-button">
@@ -18,6 +11,15 @@
 {% endblock %}
 
 {% block content %}
+
+<div class="mb-3 d-none d-md-block">
+    <a href="{% url 'goals' %}" class="btn btn-secondary">
+        Cancel
+    </a>
+    <button type="submit" class="goalForm btn btn-primary">
+        Save Goal
+    </button>
+</div>
 
 <div style="border:1px solid #ccc; padding:20px; max-width:700px;">
 

@@ -2,12 +2,6 @@
 {% block page_heading %}Foods{% endblock %}
 {% load static %}
 
-{% block header_buttons_desktop %}
-<a href="{% url 'food_create' %}" class="btn btn-primary">
-    + New Food
-</a>
-{% endblock %}
-
 {% block top_bar_right_mobile %}
 <a href="{% url 'food_create' %}" class="btn top-bar-button">
     + New Food
@@ -15,6 +9,12 @@
 {% endblock %}
 
 {% block content %}
+
+<div class="mb-3 d-none d-md-block">
+    <a href="{% url 'food_create' %}" class="btn btn-primary">
+        + New Food
+    </a>
+</div>
 
 <link rel="stylesheet" href="{% static 'shared/css/search_bar.css' %}">
 

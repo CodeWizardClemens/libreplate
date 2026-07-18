@@ -3,26 +3,22 @@
 {% extends "base.html" %}
 {% block page_heading %}Create Grocery list{% endblock %}
 
-
-{% block header_buttons_desktop %}
-    <a href="{% url 'groceries' %}" class="btn btn-secondary">
-        Cancel
-    </a>
-    <button class="grocery-form btn btn-primary">
-    Create
-    </button>
-{% endblock %}
-
 {% block top_bar_right_mobile %}
     <button class="grocery-form btn top-bar-button">
     Create
     </button>
 {% endblock %}
 
-<!-- Main content -->
 {% block content %}
 
-
+<div class="mb-3 d-none d-md-block">
+    <a href="{% url 'groceries' %}" class="btn btn-secondary">
+        Cancel
+    </a>
+    <button class="grocery-form btn btn-primary">
+    Create
+    </button>
+</div>
 
 <form method="post" id="grocery-form">
 

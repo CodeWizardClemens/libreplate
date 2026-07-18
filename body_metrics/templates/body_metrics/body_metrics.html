@@ -2,12 +2,6 @@
 
 {% block page_heading %}Body Metrics{% endblock %}
 
-{% block header_buttons_desktop %}
-    <a href="{% url 'create_body_metric' %}" class="btn btn-primary">
-        + New Body Metric
-    </a>
-{% endblock %}
-
 {% block top_bar_right_mobile %}
     <a href="{% url 'create_body_metric' %}" class="btn top-bar-button">
         + New
@@ -15,6 +9,13 @@
 {% endblock %}
 
 {% block content %}
+
+<div class="mb-3 d-none d-md-block">
+    <a href="{% url 'create_body_metric' %}" class="btn btn-primary">
+        + New Body Metric
+    </a>
+</div>
+
 
 <div class="container">
 

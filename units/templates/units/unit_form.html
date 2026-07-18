@@ -1,15 +1,6 @@
 {% extends 'base.html' %}
 {% block page_heading %}Edit Unit{% endblock %}
 
-{% block header_buttons_desktop %}
-    <a href="{% url 'units' %}" class="btn btn-secondary">
-        Cancel
-    </a>
-    <button type="submit" form="unitForm" class="btn btn-primary">
-        Save
-    </button>
-{% endblock %}
-
 {% block top_bar_right_mobile %}
     <button type="submit" form="unitForm" class="btn top-bar-button">
         Save
@@ -17,6 +8,15 @@
 {% endblock %}
 
 {% block content %}
+
+<div class="mb-3 d-none d-md-block">
+    <a href="{% url 'units' %}" class="btn btn-secondary">
+        Cancel
+    </a>
+    <button type="submit" form="unitForm" class="btn btn-primary">
+        Save
+    </button>
+</div>
 
 <div class="container">
     <form method="post" id="unitForm">

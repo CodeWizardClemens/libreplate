@@ -5,13 +5,15 @@
 {% load diary_filters %}
 {% load static %}
 
-{% block header_buttons_desktop %}
-    {% include "diary/components/diary_header_buttons.html" %}
-{% endblock %}
+
 
 {% block page_title %}Diary{% endblock %}
 
 {% block content %}
+
+<div class="mb-3 d-none d-md-block">
+    {% include "diary/components/diary_header_buttons.html" %}
+</div>
 
 {% include "diary/components/mobile_date_picker.html" %}
 

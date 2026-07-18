@@ -5,18 +5,6 @@
 
 {% load diary_filters %}
 
-{% block header_buttons_desktop %}
-    <a href="{% url 'recipes' %}" class="btn btn-secondary">
-        Back
-    </a>
-    <button
-        type="submit"
-        form="recipeForm"
-        class="btn btn-primary">
-        Save recipe
-    </button>
-{% endblock %}
-
 {% block top_bar_right_mobile %}
     <button
         type="submit"
@@ -26,8 +14,19 @@
     </button>
 {% endblock %}
 
-<!-- Main content -->
 {% block content %}
+
+<div class="mb-3 d-none d-md-block">
+    <a href="{% url 'recipes' %}" class="btn btn-secondary">
+        Back
+    </a>
+    <button
+        type="submit"
+        form="recipeForm"
+        class="btn btn-primary">
+        Save recipe
+    </button>
+</div>
 
 <div class="container">
 

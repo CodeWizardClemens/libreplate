@@ -2,15 +2,6 @@
 {% block page_heading %}Edit Food{% endblock %}
 {% load static %}
 
-{% block header_buttons_desktop %}
-    <a href="{% url 'foods' %}" class="btn btn-secondary">
-        Cancel
-    </a>
-    <button type="submit" form="foodForm" class="btn btn-primary">
-        Save
-    </button>
-{% endblock %}
-
 {% block top_bar_right_mobile %}
     <button type="submit" form="foodForm" class="btn top-bar-button">
         Save
@@ -18,6 +9,15 @@
 {% endblock %}
 
 {% block content %}
+
+<div class="mb-3 d-none d-md-block">
+    <a href="{% url 'foods' %}" class="btn btn-secondary">
+        Cancel
+    </a>
+    <button type="submit" form="foodForm" class="btn btn-primary">
+        Save
+    </button>
+</div>
 
 <div class="container">
     <form method="post" id="foodForm" class="form">
