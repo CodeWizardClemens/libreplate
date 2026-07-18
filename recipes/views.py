@@ -16,6 +16,7 @@ from .models import Recipe, RecipeIngredient, RecipeTag
 from django.http import HttpResponse
 from django.db.models import Count, Q
 
+
 @login_required
 @require_POST
 def recipe_tag_create(request):
@@ -63,6 +64,7 @@ def recipe_tag_delete(request, tag_id):
             "selected_tags": recipe.tags.values_list("id", flat=True),
         },
     )
+
 
 def selected_recipes(user, ids):
     return Recipe.objects.filter(
