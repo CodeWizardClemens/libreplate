@@ -36,6 +36,7 @@ def run(command, env=None):
         cmd = " ".join(map(str, e.cmd))
         fail(f"Command failed (exit code {e.returncode}):\n\n    {cmd}")
 
+
 def venv_python():
     return VENV_DIR / "bin" / "python"
 
@@ -289,7 +290,7 @@ def add_usda_api_key(c, key):
 
 
 @task
-def run(c, host="127.0.0.1", port=8000):
+def serve(c, host="127.0.0.1", port=8000):
     """
     Run the application server for development.
     """
