@@ -6,9 +6,9 @@ from .views import FoodView
 
 urlpatterns = [
     path("", FoodView.as_view(), name="foods"),
-    path("create/", views.create_food, name="create_food"),
-    path("<int:pk>/edit/", views.edit_food, name="edit_food"),
-    path("<int:pk>/delete/", views.delete_food, name="delete_food"),
+    path("create/", views.food_create, name="food_create"),
+    path("<int:pk>/edit/", views.food_edit, name="food_edit"),
+    path("<int:food_id>/delete/", views.food_delete, name="food_delete"),
     path("<int:food_id>/favorite/", views.toggle_favorite, name="food_toggle_favorite"),
 
     path(

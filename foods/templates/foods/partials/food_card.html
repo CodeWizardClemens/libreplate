@@ -51,20 +51,26 @@
                 </div>
 
                 <a
-                    href="{% url 'edit_food' food.id %}"
+                    href="{% url 'food_edit' food.id %}"
                     class="btn btn-outline-primary btn-sm"
                     title="Edit"
                 >
                     <i class="bi bi-pencil"></i>
                 </a>
 
-                <a
-                    href="{% url 'delete_food' food.id %}"
-                    class="btn btn-outline-danger btn-sm"
-                    title="Delete"
-                >
-                    <i class="bi bi-trash"></i>
-                </a>
+                <form>
+                    {% csrf_token %}
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-danger"
+                        hx-post="{% url 'food_delete' food.id %}"
+                        hx-target="#food-{{ food.id }}"
+                        hx-swap="outerHTML"
+                        hx-confirm="Are you sure you want to delete this food? This action cannot be undone.">
+                        <i class="bi bi-trash"></i>
+                        Delete
+                    </button>
+                </form>
 
             {% else %}
 

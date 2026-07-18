@@ -53,7 +53,7 @@ def toggle_favorite(request, food_id):
         },
     )
 
-    # response["HX-Trigger"] = "foodsChanged"
+    response["HX-Trigger"] = "foodsChanged"
 
     return response
 
@@ -376,7 +376,7 @@ def import_usda_food_view(request, fdc_id):
 
 
 @login_required
-def create_food(request):
+def food_create(request):
     show_all = request.GET.get("all") == "1"
 
     if request.method == "POST":
@@ -400,7 +400,7 @@ def create_food(request):
 
 
 @login_required
-def edit_food(request, pk):
+def food_edit(request, pk):
     food = get_object_or_404(
         Food,
         pk=pk,
@@ -437,24 +437,25 @@ def edit_food(request, pk):
 
 
 @login_required
-def delete_food(request, pk):
-    food = get_object_or_404(
-        Food,
-        pk=pk,
+@require_POST
+def food_delete(request, food_id):
+    recipe = get_object_or_404(
+        Recipe,
+        id=food_id,
         user=request.user,
     )
 
-    if request.method == "POST":
-        food.delete()
-        return redirect("foods")
+    recipe.delete()
 
-    return render(
-        request,
-        "foods/food_confirm_delete.html",
-        {
-            "food": food,
-        },
-    )
+    if request.headers.get("HX-Request"):
+        response = render(
+            request,
+            "foods/partials/empty.html",
+        )
+        response["HX-Trigger"] = "foodsChanged"
+        return response
+    
+    return redirect("foods")
 
 
 @login_required
