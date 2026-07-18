@@ -26,6 +26,7 @@ def log(message: str):
 def fail(message: str):
     raise SystemExit(f"\nERROR: {message}")
 
+
 # TODO replace run command with default c.run, but add fail message to all
 # invoke runs.
 def run(command, env=None):
@@ -149,6 +150,25 @@ def migrate(c):
 
 
 @task
+def collectstatic(c):
+    if not (BASE_DIR / "manage.py").exists():
+        print("No Django project detected")
+        return
+
+    load_env()
+    python = str(venv_python())
+    log("Collecting static")
+    run([python, "manage.py", "collectstatic", "--noinput"])
+
+@task
+def update(c):
+    log("Updating LibrePlate")
+    c.run("git pull origin master")
+    migrate(c)
+    collectstatic(c)
+
+
+@task
 def create_admin(c, password):
     if not password:
         fail("--password is required")
@@ -267,8 +287,9 @@ def add_usda_api_key(c, key):
 
     run([str(venv_python()), "manage.py", "shell", "-c", script,])
 
+
 @task
-def serve_dev(c, host="127.0.0.1", port=8000):
+def run(c, host="127.0.0.1", port=8000):
     """
     Run the application server for development.
     """
@@ -281,6 +302,7 @@ def serve_dev(c, host="127.0.0.1", port=8000):
             "runserver",
         ]
     )
+
 
 @task
 def test(c, app=None):
@@ -314,9 +336,6 @@ def test(c, app=None):
 
 @task
 def install(c):
-    """
-    Full installation.
-    """
 
     check_python(c)
     check_postgresql(c)
@@ -324,6 +343,7 @@ def install(c):
     create_virtualenv(c)
     install_dependencies(c)
     migrate(c)
+    collectstatic(c)
     sync_default_data(c)
 
     print(
