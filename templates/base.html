@@ -45,6 +45,11 @@
             --bs-btn-active-color: #fff;
             --bs-btn-active-bg: {{ request.user.preferences.theme_color }};
             --bs-btn-active-border-color: {{ request.user.preferences.theme_color }};
+
+            /* Fix disabled state */
+            --bs-btn-disabled-color: #fff;
+            --bs-btn-disabled-bg: {{ request.user.preferences.theme_color }};
+            --bs-btn-disabled-border-color: {{ request.user.preferences.theme_color }};
         }
 
         /* Outline primary buttons */
@@ -61,6 +66,11 @@
             --bs-btn-active-color: #fff;
             --bs-btn-active-bg: {{ request.user.preferences.theme_color }};
             --bs-btn-active-border-color: {{ request.user.preferences.theme_color }};
+
+            /* Fix disabled state */
+            --bs-btn-disabled-color: {{ request.user.preferences.theme_color }};
+            --bs-btn-disabled-bg: transparent;
+            --bs-btn-disabled-border-color: {{ request.user.preferences.theme_color }};
         }
 
         /* Text utilities */
@@ -247,10 +257,7 @@
 
 </main>
 
-
-
 {% block scripts %}{% endblock %}
-
 
 <script src="https://unpkg.com/htmx.org@2.0.7"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
