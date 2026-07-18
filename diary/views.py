@@ -159,7 +159,20 @@ def get_or_create_real_meal(meal_id, user, date=None):
 def diary_day(request, date=None):
 
     if date:
-        selected_date = datetime.strptime(date, "%Y-%m-%d").date()
+        formats = [
+            "%Y-%m-%d",   # 2026-07-18
+            "%B %d, %Y",  # July 18, 2026
+        ]
+
+        for fmt in formats:
+            try:
+                selected_date = datetime.strptime(date, fmt).date()
+                break
+            except ValueError:
+                continue
+        else:
+            # handle invalid date format
+            selected_date = timezone.localdate()
     else:
         selected_date = timezone.localdate()
 

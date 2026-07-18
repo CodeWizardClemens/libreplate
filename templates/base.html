@@ -46,7 +46,6 @@
             --bs-btn-active-bg: {{ request.user.preferences.theme_color }};
             --bs-btn-active-border-color: {{ request.user.preferences.theme_color }};
 
-            /* Fix disabled state */
             --bs-btn-disabled-color: #fff;
             --bs-btn-disabled-bg: {{ request.user.preferences.theme_color }};
             --bs-btn-disabled-border-color: {{ request.user.preferences.theme_color }};
@@ -67,7 +66,6 @@
             --bs-btn-active-bg: {{ request.user.preferences.theme_color }};
             --bs-btn-active-border-color: {{ request.user.preferences.theme_color }};
 
-            /* Fix disabled state */
             --bs-btn-disabled-color: {{ request.user.preferences.theme_color }};
             --bs-btn-disabled-bg: transparent;
             --bs-btn-disabled-border-color: {{ request.user.preferences.theme_color }};
@@ -88,10 +86,69 @@
             border-color: {{ request.user.preferences.theme_color }} !important;
         }
 
-        /* Links using Bootstrap's primary color */
+        /* Links */
         a {
             --bs-link-color: {{ request.user.preferences.theme_color }};
             --bs-link-hover-color: {{ request.user.preferences.theme_color }};
+        }
+
+        /* ==========================
+        Checkboxes & Radio Buttons
+        ========================== */
+
+        .form-check-input:checked {
+            background-color: {{ request.user.preferences.theme_color }} !important;
+            border-color: {{ request.user.preferences.theme_color }} !important;
+        }
+
+        .form-check-input:focus {
+            border-color: {{ request.user.preferences.theme_color }} !important;
+            box-shadow: 0 0 0 .25rem rgba({{ request.user.preferences.theme_color_rgb }}, .25) !important;
+        }
+
+        .form-check-input[type="checkbox"]:indeterminate {
+            background-color: {{ request.user.preferences.theme_color }} !important;
+            border-color: {{ request.user.preferences.theme_color }} !important;
+        }
+
+        .form-switch .form-check-input:checked {
+            background-color: {{ request.user.preferences.theme_color }} !important;
+            border-color: {{ request.user.preferences.theme_color }} !important;
+        }
+
+        /* ==========================
+        Form Controls
+        ========================== */
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: {{ request.user.preferences.theme_color }};
+            box-shadow: 0 0 0 .25rem rgba({{ request.user.preferences.theme_color_rgb }}, .25);
+        }
+
+        /* ==========================
+        Progress Bars
+        ========================== */
+
+        .progress-bar {
+            background-color: {{ request.user.preferences.theme_color }};
+        }
+
+        /* ==========================
+        Active Pagination
+        ========================== */
+
+        .page-link {
+            color: {{ request.user.preferences.theme_color }};
+        }
+
+        .page-item.active .page-link {
+            background-color: {{ request.user.preferences.theme_color }};
+            border-color: {{ request.user.preferences.theme_color }};
+        }
+
+        .page-link:focus {
+            box-shadow: 0 0 0 .25rem rgba({{ request.user.preferences.theme_color_rgb }}, .25);
         }
     </style>
 

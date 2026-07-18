@@ -8,8 +8,8 @@
     {% if meal_id %}
         {% include "recipes/partials/add_to_meal_button_mobile.html" %}
     {% else %}
-        <a href="{% url 'recipe_create' %}" class="btn">
-            + New
+        <a href="{% url 'recipe_create' %}" class="btn btn-primary">
+            + New Recipe
         </a>
     {% endif %}
 {% endblock %}
