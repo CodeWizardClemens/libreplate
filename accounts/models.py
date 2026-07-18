@@ -10,6 +10,10 @@ class UserPreferences(models.Model):
     ]
     def theme_color_rgb(self):
         hex_color = self.theme_color.lstrip("#")
+
+        if len(hex_color) != 6:
+            return "13,110,253"
+
         return ",".join(
             str(int(hex_color[i:i+2], 16))
             for i in (0, 2, 4)

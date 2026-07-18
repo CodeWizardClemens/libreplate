@@ -1,12 +1,18 @@
 <form class="row g-2 mb-3">
 
-    <div class="col-auto">
-        <a href="{% url 'recipe_create' %}" class="btn btn-primary">
-            + New recipe
-        </a>
-    </div>
+    {% if meal_name %}
+        <div class="col-12 col-md-auto d-none d-md-block">
+            {% include "recipes/partials/add_to_meal_button.html" %}
+        </div>
+    {% else %}
+        <div class="col-12 col-md-auto d-none d-md-block">
+            <a href="{% url 'recipe_create' %}" class="btn btn-primary">
+                + New recipe
+            </a>
+        </div>
+    {% endif %}
 
-    <div class="col">
+    <div class="col-12 col-md">
         <input
             type="search"
             class="form-control"
@@ -20,36 +26,44 @@
             hx-swap="outerHTML">
     </div>
 
-    <div class="col-auto">
-        <select
-            id="recipe-filters"
-            name="sort"
-            class="form-select"
-            hx-get="{% url 'recipes' %}"
-            hx-include="closest form"
-            hx-trigger="change"
-            hx-target="#recipesContainer"
-            hx-swap="outerHTML">
+    <div class="col-12 col-md-auto">
+        <div class="row g-2">
 
-            <option value="last_used" {% if sort == "last_used" %}selected{% endif %}>
-                Last used
-            </option>
+            <div class="col">
+                <select
+                    id="recipe-filters"
+                    name="sort"
+                    class="form-select"
+                    hx-get="{% url 'recipes' %}"
+                    hx-include="closest form"
+                    hx-trigger="change"
+                    hx-target="#recipesContainer"
+                    hx-swap="outerHTML">
 
-            <option value="created" {% if sort == "created" %}selected{% endif %}>
-                Last created
-            </option>
+                    <option value="last_used" {% if sort == "last_used" %}selected{% endif %}>
+                        Last used
+                    </option>
 
-            <option value="updated" {% if sort == "updated" %}selected{% endif %}>
-                Last updated
-            </option>
+                    <option value="created" {% if sort == "created" %}selected{% endif %}>
+                        Last created
+                    </option>
 
-            <option value="name" {% if sort == "name" %}selected{% endif %}>
-                Name
-            </option>
+                    <option value="updated" {% if sort == "updated" %}selected{% endif %}>
+                        Last updated
+                    </option>
 
-        </select>
+                    <option value="name" {% if sort == "name" %}selected{% endif %}>
+                        Name
+                    </option>
+
+                </select>
+            </div>
+
+            <div class="dropdown col-auto">
+                {% include "recipes/partials/searchbar_tag_dropdown.html" %}
+            </div>
+
+        </div>
     </div>
 
-    {% include "recipes/partials/searchbar_tag_dropdown.html" %}
-    
 </form>

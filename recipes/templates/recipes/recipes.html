@@ -9,16 +9,18 @@
 {% endblock %}
 
 {% block top_bar_right_mobile %}
-    <a href="{% url 'recipe_create' %}" class="btn">
-        + New
-    </a>
+    {% if meal_name %}
+        {% include "recipes/partials/add_to_meal_button_mobile.html" %}
+    {% else %}
+        <a href="{% url 'recipe_create' %}" class="btn">
+            + New
+        </a>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
 
 {% include "recipes/partials/action_bar.html" %}
-
-{% include "recipes/partials/add_to_meal_button.html" %}
 
 {% include "recipes/partials/recipe_list.html" %}
 
