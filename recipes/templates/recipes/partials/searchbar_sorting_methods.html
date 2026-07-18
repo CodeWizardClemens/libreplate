@@ -1,0 +1,17 @@
+<select
+    id="recipe-filters"
+    name="sort"
+    class="form-select"
+    hx-get="{% url 'recipes' %}"
+    hx-include="closest form"
+    hx-trigger="change"
+    hx-target="#recipesContainer"
+    hx-swap="outerHTML">
+
+    {% for value, label in sort_choices %}
+        <option value="{{ value }}" {% if sort == value %}selected{% endif %}>
+            {{ label }}
+        </option>
+    {% endfor %}
+
+</select>

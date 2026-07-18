@@ -36,5 +36,20 @@ class UserPreferences(models.Model):
         default="#0d6efd"
     )
 
+
+
+    RECIPE_SORT_CHOICES = [
+        ("last_used", "Last used"),
+        ("created", "Last created"),
+        ("updated", "Last updated"),
+        ("name", "Name"),
+    ]
+
+    recipe_sort = models.CharField(
+        max_length=20,
+        choices=RECIPE_SORT_CHOICES,
+        default="last_used",
+    )
+
     def __str__(self):
         return f"{self.user.username}'s preferences"

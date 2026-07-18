@@ -30,33 +30,7 @@
         <div class="row g-2">
 
             <div class="col">
-                <select
-                    id="recipe-filters"
-                    name="sort"
-                    class="form-select"
-                    hx-get="{% url 'recipes' %}"
-                    hx-include="closest form"
-                    hx-trigger="change"
-                    hx-target="#recipesContainer"
-                    hx-swap="outerHTML">
-
-                    <option value="last_used" {% if sort == "last_used" %}selected{% endif %}>
-                        Last used
-                    </option>
-
-                    <option value="created" {% if sort == "created" %}selected{% endif %}>
-                        Last created
-                    </option>
-
-                    <option value="updated" {% if sort == "updated" %}selected{% endif %}>
-                        Last updated
-                    </option>
-
-                    <option value="name" {% if sort == "name" %}selected{% endif %}>
-                        Name
-                    </option>
-
-                </select>
+                {% include "recipes/partials/searchbar_sorting_methods.html" %}
             </div>
 
             <div class="dropdown col-auto">

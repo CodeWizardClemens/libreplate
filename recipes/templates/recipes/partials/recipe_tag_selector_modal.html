@@ -1,4 +1,9 @@
-<div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,.5);">
+<div
+    id="recipeTagSelectorModal"
+    class="modal fade"
+    tabindex="-1"
+    aria-hidden="true"
+>
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
 
@@ -7,10 +12,10 @@
                     Recipe tags
                 </h5>
 
-                <button 
+                <button
                     type="button"
                     class="btn-close"
-                    onclick="document.getElementById('recipe-tag-selector-modal').innerHTML=''"
+                    data-bs-dismiss="modal"
                 ></button>
             </div>
 
@@ -56,3 +61,16 @@
         </div>
     </div>
 </div>
+
+<script>
+(() => {
+    const modalEl = document.getElementById("recipeTagSelectorModal");
+    const modal = new bootstrap.Modal(modalEl);
+
+    modalEl.addEventListener("hidden.bs.modal", () => {
+        document.getElementById("recipe-tag-selector-modal").innerHTML = "";
+    });
+
+    modal.show();
+})();
+</script>

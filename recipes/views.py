@@ -148,9 +148,22 @@ def recipes(request):
     meal_date = request.GET.get("meal_date")
 
     search = request.GET.get("search", "").strip()
-    sort = request.GET.get("sort", "last_used")
-
     selected_tags = request.GET.getlist("tags")
+
+    user_preferences = request.user.preferences
+
+    valid_sorts = {
+        choice[0] for choice in user_preferences._meta.get_field("recipe_sort").choices
+    }
+
+    sort = request.GET.get("sort")
+
+    if sort in valid_sorts:
+        if sort != user_preferences.recipe_sort:
+            user_preferences.recipe_sort = sort
+            user_preferences.save(update_fields=["recipe_sort"])
+    else:
+        sort = user_preferences.recipe_sort
 
     recipes = Recipe.objects.filter(user=request.user)
 
@@ -169,7 +182,6 @@ def recipes(request):
             .filter(matched_tags=len(selected_tags))
         )
 
-    # Sorting
     ordering = {
         "last_used": ["-is_favorite", "-last_used_at"],
         "created": ["-is_favorite", "-created_at"],
@@ -177,9 +189,7 @@ def recipes(request):
         "name": ["-is_favorite", "name"],
     }
 
-    recipes = recipes.distinct().order_by(
-        *ordering.get(sort, ordering["last_used"])
-    )
+    recipes = recipes.distinct().order_by(*ordering[sort])
 
     context = {
         "recipes": recipes,
@@ -190,6 +200,7 @@ def recipes(request):
         "meal_date": meal_date,
         "search": search,
         "sort": sort,
+        "sort_choices": user_preferences._meta.get_field("recipe_sort").choices,
     }
 
     if request.headers.get("HX-Request"):
