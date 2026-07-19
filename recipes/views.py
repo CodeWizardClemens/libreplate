@@ -73,6 +73,29 @@ def recipe_tag_delete(request, tag_id):
     )
 
 
+@require_POST
+@login_required
+def delete_tag_from_recipe(request, recipe_id, tag_id):
+
+    recipe = get_object_or_404(
+        Recipe,
+        id=recipe_id,
+        user=request.user,
+    )
+
+    recipe.tags.remove(tag_id)
+
+    context = get_recipes_context(request)
+
+    print(f"Edit mode: {context["edit"]}")
+
+    return render(
+        request,
+        "recipes/partials/recipes_content.html",
+        context,
+    )
+
+
 def selected_recipes(user, ids):
     return Recipe.objects.filter(
         user=user,
@@ -163,17 +186,13 @@ def toggle_pin(request, recipe_id):
     recipe.is_pinned = not recipe.is_pinned
     recipe.save(update_fields=["is_pinned"])
 
-    response = render(
+    context = get_recipes_context(request)
+
+    return render(
         request,
-        "recipes/partials/pin_button.html",
-        {
-            "recipe": recipe,
-        },
+        "recipes/partials/recipes_content.html",
+        context,
     )
-
-    response["HX-Trigger"] = "change"
-
-    return response
 
 
 def get_recipes_context(
@@ -292,7 +311,6 @@ def get_recipes_context(
         "sort": sort,
 
         "favorites_only": favorites_only,
-
         "sort_choices": user_preferences
             ._meta
             .get_field("recipe_sort")
@@ -302,10 +320,10 @@ def get_recipes_context(
 
 @login_required
 def recipes(request):
-    meal_id = request.GET.get("meal_id")
-    meal_name = request.GET.get("meal_name")
-    meal_date = request.GET.get("meal_date")
-
+    meal_name = request.GET.get("meal_name", "")
+    meal_date = request.GET.get("meal_date", "")
+    meal_id = request.GET.get("meal_id", "")
+    edit = request.GET.get("edit") == "1"
     search = request.GET.get("search", "").strip()
     selected_tags = request.GET.getlist("tags")
     favorites_only = request.GET.get("favorites") == "1"
@@ -352,6 +370,7 @@ def recipes(request):
             "meal_name": meal_name,
             "meal_date": meal_date,
             "favorites_only": favorites_only,
+            "edit": edit,
         }
     )
 

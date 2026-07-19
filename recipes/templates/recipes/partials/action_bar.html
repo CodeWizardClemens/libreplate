@@ -1,17 +1,7 @@
-<form id="filterForm" class="row g-2 mb-3">
+<!-- action_bar.html -->
 
-    {% if meal_name %}
-        <input type="hidden" name="meal_id" value="{{ meal_id }}">
-        <input type="hidden" name="meal_name" value="{{ meal_name }}">
-        <input type="hidden" name="meal_date" value="{{ meal_date }}">
-    {% endif %}
 
-    <input
-        type="hidden"
-        id="favorites-input"
-        name="favorites"
-        value="{% if favorites_only %}1{% else %}0{% endif %}"
-    >
+<div class="row g-2 mb-3">
 
     {% if meal_name %}
 
@@ -43,7 +33,6 @@
             placeholder="Search recipes..."
             value="{{ search }}"
             hx-get="{% url 'recipes' %}"
-            hx-include="closest form"
             hx-trigger="keyup changed delay:300ms, search"
             hx-target="#recipesContent"
             hx-swap="outerHTML"
@@ -52,7 +41,6 @@
 
     <div class="col-12 col-md-auto">
         <div class="d-flex flex-column gap-2">
-
             <div class="row g-2">
                 <div class="col-auto">
                     {% include "recipes/partials/action_bar/favorite_button.html" %}
@@ -61,13 +49,16 @@
                 <div class="col">
                     {% include "recipes/partials/action_bar/sorting_method.html" %}
                 </div>
+
+                <div class="col-auto">
+                    {% include "recipes/partials/action_bar/edit_mode_button.html" %}
+                </div>
             </div>
         </div>
-
     </div>
 
     <div>
         {% include "recipes/partials/action_bar/tag_selection.html" %}
     </div>
 
-</form>
+</div>

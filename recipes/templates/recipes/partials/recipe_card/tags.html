@@ -1,0 +1,32 @@
+<!-- recipe_card_tags.html -->
+
+{% if recipe.tags.exists %}
+<div class="recipe-card-tags d-flex flex-wrap gap-1 mt-2">
+
+    {% for tag in recipe.tags.all %}
+    <form
+        class="d-inline-flex"
+        onclick="event.stopPropagation();"
+        hx-post="{% url 'delete_tag_from_recipe' recipe.id tag.id %}"
+        hx-target="#recipesContent"
+        hx-swap="innerHTML">
+
+        {% csrf_token %}
+
+        <span class="badge rounded-pill text-bg-primary d-inline-flex align-items-center">
+            {{ tag.name }}
+
+            {% if edit %}
+            <button
+                type="submit"
+                class="btn-close btn-close-white ms-2"
+                style="font-size: .45rem;"
+                aria-label="Remove tag">
+            </button>
+            {% endif %}
+        </span>
+    </form>
+    {% endfor %}
+
+</div>
+{% endif %}

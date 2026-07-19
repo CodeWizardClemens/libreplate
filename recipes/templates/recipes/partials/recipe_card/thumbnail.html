@@ -1,0 +1,23 @@
+<!-- recipe_card_thumbnail.html -->
+
+{% with picture=recipe.pictures.first %}
+<div class="me-3">
+
+    {% if picture %}
+        <img
+            src="{{ picture.image.url }}"
+            alt="{{ recipe.name }}"
+            class="rounded border flex-shrink-0 d-block object-fit-cover"
+            width="72"
+            height="72">
+
+    {% else %}
+        <div
+            class="rounded border bg-body-secondary d-flex align-items-center justify-content-center flex-shrink-0"
+            style="width:72px; height:72px;">
+            <i class="bi bi-image fs-4 text-secondary"></i>
+        </div>
+    {% endif %}
+
+</div>
+{% endwith %}

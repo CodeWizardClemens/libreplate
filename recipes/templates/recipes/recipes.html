@@ -16,9 +16,33 @@
 
 {% block content %}
 
-<div id="recipesContent">
-    {% include "recipes/partials/recipes_content.html" %}
-</div>
+<form id="filterForm">
+
+    {% if meal_name %}
+        <input type="hidden" name="meal_id" value="{{ meal_id }}">
+        <input type="hidden" name="meal_name" value="{{ meal_name }}">
+        <input type="hidden" name="meal_date" value="{{ meal_date }}">
+    {% endif %}
+
+    <input
+        type="hidden"
+        id="favorites-input"
+        name="favorites"
+        value="{% if favorites_only %}1{% else %}0{% endif %}"
+    >
+
+    <input
+        type="hidden"
+        id="edit"
+        name="edit"
+        value="0"
+    >
+
+    <div id="recipesContent">
+        {% include "recipes/partials/recipes_content.html" %}
+    </div>
+
+</form>
 
 <script src="{% static 'recipes/js/recipes.js' %}"></script>
 

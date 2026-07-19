@@ -10,7 +10,6 @@ class Recipe(models.Model):
     is_favorite = models.BooleanField(default=False)
     is_pinned = models.BooleanField(default=False)
 
-    thumbnail_path = models.CharField(max_length=500, blank=True, null=True)
     summary = models.CharField(max_length=50, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     instructions = models.TextField(blank=True, null=True)
@@ -31,6 +30,29 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+
+class RecipePicture(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name="pictures",
+    )
+    image = models.ImageField(upload_to="recipes/")
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["recipe", "order"],
+                name="unique_recipe_picture_order",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.recipe.name} ({self.order})"
 
 
 class RecipeTag(models.Model):

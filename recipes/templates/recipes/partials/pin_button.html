@@ -1,8 +1,8 @@
 <button
     class="btn btn-sm btn-outline-primary"
     hx-post="{% url 'toggle_pin' recipe.id %}"
-    hx-target="this"
-    hx-swap="outerHTML">
+    hx-target="#recipesContent"
+    hx-swap="innerHTML">
     {% csrf_token %}
     {% if recipe.is_pinned %}
         <i class="bi bi-pin-angle-fill"></i>
