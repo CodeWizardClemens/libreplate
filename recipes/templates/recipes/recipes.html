@@ -16,9 +16,9 @@
 
 {% block content %}
 
-{% include "recipes/partials/action_bar.html" %}
-
-{% include "recipes/partials/recipe_list.html" %}
+<div id="recipesContent">
+    {% include "recipes/partials/recipes_content.html" %}
+</div>
 
 <script src="{% static 'recipes/js/recipes.js' %}"></script>
 

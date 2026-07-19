@@ -1,6 +1,17 @@
-<!-- action_bar.html -->
+<form id="filterForm" class="row g-2 mb-3">
 
-<form class="row g-2 mb-3">
+    {% if meal_name %}
+        <input type="hidden" name="meal_id" value="{{ meal_id }}">
+        <input type="hidden" name="meal_name" value="{{ meal_name }}">
+        <input type="hidden" name="meal_date" value="{{ meal_date }}">
+    {% endif %}
+
+    <input
+        type="hidden"
+        id="favorites-input"
+        name="favorites"
+        value="{% if favorites_only %}1{% else %}0{% endif %}"
+    >
 
     {% if meal_name %}
 
@@ -13,12 +24,15 @@
         <div class="col-12 col-md-auto d-none d-md-block">
             {% include "recipes/partials/add_to_meal_button.html" %}
         </div>
+
     {% else %}
+
         <div class="col-12 col-md-auto d-none d-md-block">
             <a href="{% url 'recipe_create' %}" class="btn btn-primary">
                 New recipe
             </a>
         </div>
+
     {% endif %}
 
     <div class="col-12 col-md">
@@ -28,25 +42,32 @@
             name="search"
             placeholder="Search recipes..."
             value="{{ search }}"
-            hx-get="{% url 'recipes' %}{{ request.get_full_path|cut:'/recipes/' }}"
+            hx-get="{% url 'recipes' %}"
             hx-include="closest form"
             hx-trigger="keyup changed delay:300ms, search"
-            hx-target="#recipesContainer"
-            hx-swap="outerHTML">
+            hx-target="#recipesContent"
+            hx-swap="outerHTML"
+            hx-push-url="true">
     </div>
 
     <div class="col-12 col-md-auto">
-        <div class="row g-2">
+        <div class="d-flex flex-column gap-2">
 
-            <div class="col">
-                {% include "recipes/partials/searchbar_sorting_methods.html" %}
+            <div class="row g-2">
+                <div class="col-auto">
+                    {% include "recipes/partials/action_bar/favorite_button.html" %}
+                </div>
+
+                <div class="col">
+                    {% include "recipes/partials/action_bar/sorting_method.html" %}
+                </div>
             </div>
-
-            <div class="dropdown col-auto">
-                {% include "recipes/partials/searchbar_tag_dropdown.html" %}
-            </div>
-
         </div>
+
+    </div>
+
+    <div>
+        {% include "recipes/partials/action_bar/tag_selection.html" %}
     </div>
 
 </form>

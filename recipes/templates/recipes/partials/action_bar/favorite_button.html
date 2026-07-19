@@ -1,0 +1,12 @@
+<button
+    type="button"
+    class="btn btn-outline-primary"
+    onclick="const f=document.getElementById('favorites-input'); f.value = f.value === '1' ? '0' : '1';"
+    hx-get="{% url 'recipes' %}"
+    hx-include="#filterForm"
+    hx-target="#recipesContent"
+    hx-swap="outerHTML"
+    hx-push-url="true"
+>
+    <i class="bi bi-star{% if favorites_only %}-fill{% endif %}"></i>
+</button>

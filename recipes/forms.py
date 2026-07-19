@@ -4,11 +4,8 @@ from common.food_selection import get_user_foods
 
 from .models import Recipe, RecipeIngredient
 
-
 class RecipeForm(forms.ModelForm):
-
     class Meta:
-
         model = Recipe
 
         fields = [
@@ -23,9 +20,7 @@ class RecipeForm(forms.ModelForm):
 
 
 class RecipeIngredientForm(forms.ModelForm):
-
     class Meta:
-
         model = RecipeIngredient
 
         fields = [
