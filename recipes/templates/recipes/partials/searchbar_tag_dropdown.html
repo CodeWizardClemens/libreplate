@@ -17,8 +17,7 @@
                     value="{{ tag.id }}"
                     id="search-tag-{{ tag.id }}"
                     {% if tag.id in selected_tags %}checked{% endif %}
-                    hx-get="{% url 'recipes' %}"
-                    hx-include="closest form"
+                    hx-get="{% url 'recipes' %}{{ request.get_full_path|cut:'/recipes/' }}"                    hx-include="closest form"
                     hx-trigger="change"
                     hx-target="#recipesContainer"
                     hx-swap="outerHTML">

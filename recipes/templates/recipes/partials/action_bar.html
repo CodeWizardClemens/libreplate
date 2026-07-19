@@ -28,7 +28,7 @@
             name="search"
             placeholder="Search recipes..."
             value="{{ search }}"
-            hx-get="{% url 'recipes' %}"
+            hx-get="{% url 'recipes' %}{{ request.get_full_path|cut:'/recipes/' }}"
             hx-include="closest form"
             hx-trigger="keyup changed delay:300ms, search"
             hx-target="#recipesContainer"

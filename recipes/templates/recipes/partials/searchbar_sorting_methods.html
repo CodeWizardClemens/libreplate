@@ -2,7 +2,7 @@
     id="recipe-filters"
     name="sort"
     class="form-select"
-    hx-get="{% url 'recipes' %}"
+    hx-get="{% url 'recipes' %}{{ request.get_full_path|cut:'/recipes/' }}"                    hx-include="closest form"
     hx-include="closest form"
     hx-trigger="change"
     hx-target="#recipesContainer"
