@@ -1,13 +1,13 @@
-<div id="searchbar-tag-dropdown">
+<div id="searchbar-tag-dropdown" class="dropdown">
     <button
-        class="btn btn-outline-primary dropdown-toggle"
+        class="form-select text-start"
         type="button"
         data-bs-toggle="dropdown"
         data-bs-auto-close="outside">
         Filter by tags
     </button>
 
-    <div class="dropdown-menu p-3" style="min-width: 250px;">
+    <div class="dropdown-menu dropdown-menu-end p-3 overflow-auto" style="min-width: 250px; max-height: 300px;">
         {% for tag in tags %}
             <div class="form-check">
                 <input
@@ -17,7 +17,8 @@
                     value="{{ tag.id }}"
                     id="search-tag-{{ tag.id }}"
                     {% if tag.id in selected_tags %}checked{% endif %}
-                    hx-get="{% url 'recipes' %}{{ request.get_full_path|cut:'/recipes/' }}"                    hx-include="closest form"
+                    hx-get="{% url 'recipes' %}{{ request.get_full_path|cut:'/recipes/' }}"
+                    hx-include="closest form"
                     hx-trigger="change"
                     hx-target="#recipesContainer"
                     hx-swap="outerHTML">
@@ -27,6 +28,10 @@
                     for="search-tag-{{ tag.id }}">
                     {{ tag.name }}
                 </label>
+            </div>
+        {% empty %}
+            <div class="text-muted">
+                No tags available
             </div>
         {% endfor %}
     </div>

@@ -8,6 +8,7 @@ class Recipe(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recipes")
     name = models.CharField(max_length=255)
     is_favorite = models.BooleanField(default=False)
+    is_pinned = models.BooleanField(default=False)
 
     thumbnail_path = models.CharField(max_length=500, blank=True, null=True)
     summary = models.CharField(max_length=50, blank=True, null=True)
