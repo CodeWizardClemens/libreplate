@@ -1,5 +1,7 @@
-<form
-    method="post"
+<button
+    type="button"
+    class="btn btn-sm btn-outline-secondary"
+    onclick="event.stopPropagation();"
     hx-post="{% url 'recipe_copy' recipe.id %}"
     hx-target="#recipesContent"
     hx-swap="innerHTML"
@@ -7,12 +9,6 @@
 
     {% csrf_token %}
 
-    <input type="hidden" name="favorites" value="0">
-
-    <button
-        type="submit"
-        class="btn btn-sm btn-outline-secondary">
-        <i class="bi bi-copy"></i>
-        Copy
-    </button>
-</form>
+    <i class="bi bi-copy"></i>
+    Copy
+</button>

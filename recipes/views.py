@@ -564,8 +564,6 @@ def get_recipes_context(request):
 
     recipe_nutrients = list(Nutrient.objects.filter(show_in_recipes=True))
 
-    print(recipe_nutrients)
-
     # Calculate recipe nutrient values once
     recipe_nutrient_values = {recipe.id: recipe.get_nutrients() for recipe in recipes}
 
