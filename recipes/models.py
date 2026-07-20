@@ -5,6 +5,13 @@ from django.utils import timezone
 
 class Recipe(models.Model):
 
+    def available_tags(self):
+        return RecipeTag.objects.filter(
+            user=self.user
+        ).exclude(
+            recipes=self
+        )
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recipes")
     name = models.CharField(max_length=255)
     is_favorite = models.BooleanField(default=False)

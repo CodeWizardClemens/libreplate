@@ -1,12 +1,12 @@
 <button
     type="button"
-    class="btn btn-outline-primary"
-    onclick="const f=document.getElementById('edit'); f.value = f.value === '1' ? '0' : '1';"
+    class="{% if edit %}btn btn-outline-primary{% else %}form-control text-start{% endif %}"
+    onclick="toggleFilter('edit')"
     hx-get="{% url 'recipes' %}"
     hx-include="#filterForm"
     hx-target="#recipesContent"
     hx-swap="outerHTML"
-    hx-push-url="true"
->
+    hx-push-url="true">
+    
     <i class="bi bi-pencil{% if edit %}-fill{% endif %}"></i> Edit
 </button>

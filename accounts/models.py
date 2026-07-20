@@ -3,11 +3,26 @@ from django.db import models
 
 
 class UserPreferences(models.Model):
+
     SORT_CHOICES = [
         ("name", "Name"),
         ("-created_at", "Newest"),
         ("created_at", "Oldest"),
     ]
+
+    def update_recipe_sort(self, recipe_sort):
+        valid_sorts = {
+            choice[0]
+            for choice in self._meta.get_field("recipe_sort").choices
+        }
+
+        if recipe_sort not in valid_sorts:
+            return
+
+        if recipe_sort != self.recipe_sort:
+            self.recipe_sort = recipe_sort
+            self.save(update_fields=["recipe_sort"])
+
     def theme_color_rgb(self):
         hex_color = self.theme_color.lstrip("#")
 

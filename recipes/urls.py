@@ -61,4 +61,9 @@ urlpatterns = [
         views.delete_tag_from_recipe,
         name="delete_tag_from_recipe",
     ),
+    path(
+        "recipes/<int:recipe_id>/tags/<int:tag_id>/add/",
+        views.add_tag_to_recipe,
+        name="add_tag_to_recipe",
+    ),
 ]

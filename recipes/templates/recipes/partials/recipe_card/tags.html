@@ -1,32 +1,52 @@
-<!-- recipe_card_tags.html -->
+<!-- tags.html -->
 
-{% if recipe.tags.exists %}
 <div class="recipe-card-tags d-flex flex-wrap gap-1 mt-2">
 
-    {% for tag in recipe.tags.all %}
-    <form
-        class="d-inline-flex"
-        onclick="event.stopPropagation();"
-        hx-post="{% url 'delete_tag_from_recipe' recipe.id tag.id %}"
-        hx-target="#recipesContent"
-        hx-swap="innerHTML">
+    {% if recipe.tags.exists %}
 
-        {% csrf_token %}
+        {% for tag in recipe.tags.all %}
 
-        <span class="badge rounded-pill text-bg-primary d-inline-flex align-items-center">
-            {{ tag.name }}
+            <div
+                class="d-inline-flex"
+                onclick="event.stopPropagation();">
 
-            {% if edit %}
-            <button
-                type="submit"
-                class="btn-close btn-close-white ms-2"
-                style="font-size: .45rem;"
-                aria-label="Remove tag">
-            </button>
-            {% endif %}
-        </span>
-    </form>
-    {% endfor %}
+                {% if edit %}
+                    <form
+                        hx-post="{% url 'delete_tag_from_recipe' recipe.id tag.id %}"
+                        hx-target="#recipesContent"
+                        hx-swap="innerHTML"
+                        hx-include="#filterForm"
+                        class="d-inline-flex">
+
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="badge rounded-pill text-bg-primary border-0 d-inline-flex align-items-center">
+                            {{ tag.name }}
+                            <span
+                                class="btn-close btn-close-white ms-2"
+                                style="font-size: .45rem;"
+                                aria-label="Remove tag">
+                            </span>
+                        </button>
+
+                    </form>
+                {% else %}
+                    <span class="badge rounded-pill text-bg-primary">
+                        {{ tag.name }}
+                    </span>
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    {% if edit %}
+        {% include "recipes/partials/recipe_card/tag_add.html" %}
+    {% endif %}
 
 </div>
-{% endif %}

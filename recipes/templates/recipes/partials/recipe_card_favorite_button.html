@@ -1,8 +1,10 @@
 <button
     class="btn btn-sm btn-outline-primary"
     hx-post="{% url 'toggle_favorite' recipe.id %}"
-    hx-target="this"
-    hx-swap="outerHTML">
+    hx-target="#recipesContent"
+    hx-swap="innerHTML"
+    hx-include="#filterForm">
+
     {% csrf_token %}
     {% if recipe.is_favorite %}
         <i class="bi bi-star-fill"></i>

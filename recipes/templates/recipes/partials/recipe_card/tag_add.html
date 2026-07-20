@@ -1,0 +1,37 @@
+<!-- tag_add.html -->
+
+{% if edit and recipe.available_tags %}
+<div class="dropdown d-inline-block">
+    <button
+        type="button"
+        class="btn btn-sm btn-outline-primary rounded-pill py-0 px-2"
+        data-bs-toggle="dropdown"
+        onclick="event.stopPropagation();">
+        +
+    </button>
+
+    <ul class="dropdown-menu">
+        {% for tag in recipe.available_tags %}
+        <li onclick="event.stopPropagation();">
+            <button
+                type="button"
+                class="dropdown-item"
+                hx-post="{% url 'add_tag_to_recipe' recipe.id tag.id %}"
+                hx-target="#recipesContent"
+                hx-swap="innerHTML"
+                hx-include="#filterForm">
+
+                {{ tag.name }}
+
+            </button>
+        </li>
+        {% empty %}
+        <li>
+            <span class="dropdown-item-text text-muted">
+                No more tags
+            </span>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}

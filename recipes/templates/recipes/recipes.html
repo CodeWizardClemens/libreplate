@@ -24,23 +24,12 @@
         <input type="hidden" name="meal_date" value="{{ meal_date }}">
     {% endif %}
 
-    <input
-        type="hidden"
-        id="favorites-input"
-        name="favorites"
-        value="{% if favorites_only %}1{% else %}0{% endif %}"
-    >
+    <input type="hidden" name="favorites" value="{{ favorites_only|yesno:'1,0' }}">    
+    <input type="hidden" name="edit" value="{{ edit|yesno:'1,0' }}">
+    <input type="hidden" name="search" value="{{ search }}">
+    <input type="hidden" name="sort" value="{{ sort }}">
 
-    <input
-        type="hidden"
-        id="edit"
-        name="edit"
-        value="0"
-    >
-
-    <div id="recipesContent">
-        {% include "recipes/partials/recipes_content.html" %}
-    </div>
+    {% include "recipes/partials/recipes_content.html" %}
 
 </form>
 

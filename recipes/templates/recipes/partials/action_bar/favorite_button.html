@@ -1,7 +1,15 @@
+<!-- favorite_button.html -->
+
 <button
     type="button"
-    class="btn btn-outline-primary"
-    onclick="const f=document.getElementById('favorites-input'); f.value = f.value === '1' ? '0' : '1';"
+    class="
+        {% if favorites_only %}
+            btn btn-outline-primary
+        {% else %}
+            form-control text-start
+        {% endif %}
+    "
+    onclick="toggleFilter('favorites')"
     hx-get="{% url 'recipes' %}"
     hx-include="#filterForm"
     hx-target="#recipesContent"

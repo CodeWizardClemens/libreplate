@@ -84,10 +84,46 @@ def delete_tag_from_recipe(request, recipe_id, tag_id):
     )
 
     recipe.tags.remove(tag_id)
-
     context = get_recipes_context(request)
 
-    print(f"Edit mode: {context["edit"]}")
+    return render(
+        request,
+        "recipes/partials/recipes_content.html",
+        context,
+    )
+
+
+def get_recipe_filters(request):
+    params = request.GET if request.method == "GET" else request.POST
+
+    return {
+        "meal_name": params.get("meal_name", ""),
+        "meal_date": params.get("meal_date", ""),
+        "meal_id": params.get("meal_id", ""),
+        "edit": params.get("edit") == "1",
+        "search": params.get("search", "").strip(),
+        "selected_tags": params.getlist("tags"),
+        "favorites_only": params.get("favorites") == "1",
+        "sort": params.get("sort"),
+    }
+
+
+@require_POST
+@login_required
+def add_tag_to_recipe(request, recipe_id, tag_id):
+    recipe = get_object_or_404(
+        Recipe.objects.prefetch_related("tags"),
+        id=recipe_id,
+        user=request.user,
+    )
+
+    tag = get_object_or_404(
+        recipe.available_tags(),
+        id=tag_id,
+    )
+    recipe.tags.add(tag)
+
+    context = get_recipes_context(request)
 
     return render(
         request,
@@ -161,17 +197,13 @@ def toggle_favorite(request, recipe_id):
     recipe.is_favorite = not recipe.is_favorite
     recipe.save(update_fields=["is_favorite"])
 
-    response = render(
+    context = get_recipes_context(request)
+
+    return render(
         request,
-        "recipes/partials/recipe_card_favorite_button.html",
-        {
-            "recipe": recipe,
-        },
+        "recipes/partials/recipes_content.html",
+        context,
     )
-
-    response["HX-Trigger"] = "change"
-
-    return response
 
 
 @login_required
@@ -195,197 +227,79 @@ def toggle_pin(request, recipe_id):
     )
 
 
-def get_recipes_context(
-    request,
-    search="",
-    selected_tags=None,
-    sort=None,
-    favorites_only=False,
-):
-
-    selected_tags = selected_tags or []
-
+def get_recipes_context(request):
     user_preferences = request.user.preferences
+    filters = get_recipe_filters(request)
+    selected_tags = filters["selected_tags"] or []
 
-    if sort is None:
-        sort = user_preferences.recipe_sort
+    if filters["sort"] is None:
+        filters["sort"] = user_preferences.recipe_sort
+    elif filters["sort"] != user_preferences.recipe_sort:
+        user_preferences.update_recipe_sort(filters["sort"])
 
+    recipes = Recipe.objects.filter(user=request.user)
 
-    recipes = Recipe.objects.filter(
-        user=request.user
-    )
+    if filters["favorites_only"]:
+        recipes = recipes.filter(is_favorite=True)
 
-    if favorites_only:
-        recipes = recipes.filter(
-            is_favorite=True
-        )
-
-    if search:
-        recipes = recipes.filter(
-            name__icontains=search
-        )
-
+    if filters["search"]:
+        recipes = recipes.filter(name__icontains=filters["search"])
 
     if selected_tags:
-
         recipes = (
             recipes
-            .filter(
-                tags__id__in=selected_tags
-            )
+            .filter(tags__id__in=selected_tags)
             .annotate(
                 matched_tags=Count(
                     "tags",
-                    filter=Q(
-                        tags__id__in=selected_tags
-                    )
+                    filter=Q(tags__id__in=selected_tags)
                 )
             )
-            .filter(
-                matched_tags=len(selected_tags)
-            )
+            .filter(matched_tags=len(selected_tags))
         )
-
 
     recipes = recipes.annotate(
         pinned_order=Case(
-            When(
-                is_pinned=True,
-                then=0
-            ),
+            When(is_pinned=True, then=0),
             default=1,
             output_field=IntegerField(),
         )
     )
 
-
     ordering = {
-        "last_used": [
-            "pinned_order",
-            "-last_used_at",
-        ],
-
-        "created": [
-            "pinned_order",
-            "-created_at",
-        ],
-
-        "updated": [
-            "pinned_order",
-            "-updated_at",
-        ],
-
-        "name": [
-            "pinned_order",
-            "name",
-        ],
+        "last_used": ["pinned_order", "-last_used_at"],
+        "created": ["pinned_order", "-created_at"],
+        "updated": ["pinned_order", "-updated_at"],
+        "name": ["pinned_order", "name"],
     }
 
-
-    recipes = (
-        recipes
-        .distinct()
-        .order_by(
-            *ordering[sort]
-        )
-        .prefetch_related(
-            "ingredients__food"
-        )
-    )
-
-
-    return {
-        "recipes": recipes,
-
-        "tags": RecipeTag.objects.filter(
-            user=request.user
+    context = {
+        "recipes": (
+            recipes
+            .distinct()
+            .order_by(*ordering[filters["sort"]])
+            .prefetch_related("ingredients__food")
         ),
-
-        "selected_tags": [
-            int(tag)
-            for tag in selected_tags
-        ],
-
-        "search": search,
-
-        "sort": sort,
-
-        "favorites_only": favorites_only,
-        "sort_choices": user_preferences
-            ._meta
-            .get_field("recipe_sort")
-            .choices,
+        "tags": RecipeTag.objects.filter(user=request.user),
+        "selected_tags": [int(tag) for tag in selected_tags],
+        "sort_choices": user_preferences._meta.get_field("recipe_sort").choices,
+        **filters,
     }
+
+    return context
 
 
 @login_required
 def recipes(request):
-    meal_name = request.GET.get("meal_name", "")
-    meal_date = request.GET.get("meal_date", "")
-    meal_id = request.GET.get("meal_id", "")
-    edit = request.GET.get("edit") == "1"
-    search = request.GET.get("search", "").strip()
-    selected_tags = request.GET.getlist("tags")
-    favorites_only = request.GET.get("favorites") == "1"
 
-    valid_sorts = {
-        choice[0]
-        for choice in request.user.preferences._meta.get_field(
-            "recipe_sort"
-        ).choices
-    }
-
-    sort = request.GET.get("sort")
-
-    # If a valid sort was provided, use it and save preference
-    if sort in valid_sorts:
-
-        if sort != request.user.preferences.recipe_sort:
-            request.user.preferences.recipe_sort = sort
-            request.user.preferences.save(
-                update_fields=["recipe_sort"]
-            )
-
-    # If no sort was provided, use saved preference
-    elif sort is None:
-
-        sort = request.user.preferences.recipe_sort
-
-    else:
-        raise ValueError(
-            f"Invalid sorting type {sort}"
-        )
-
-    context = get_recipes_context(
-        request,
-        search=search,
-        selected_tags=selected_tags,
-        sort=sort,
-        favorites_only=favorites_only,
-    )
-
-    context.update(
-        {
-            "meal_id": meal_id,
-            "meal_name": meal_name,
-            "meal_date": meal_date,
-            "favorites_only": favorites_only,
-            "edit": edit,
-        }
-    )
+    context = get_recipes_context(request)
 
     if request.headers.get("HX-Request"):
         return render(
-            request,
-            "recipes/partials/recipes_content.html",
-            context,
+            request, "recipes/partials/recipes_content.html", context
         )
 
-    return render(
-        request,
-        "recipes/recipes.html",
-        context,
-    )
+    return render(request, "recipes/recipes.html", context)
 
 
 @login_required
@@ -426,7 +340,6 @@ def recipe_copy(request, recipe_id):
         request,
         search=search,
         selected_tags=selected_tags,
-        sort=sort,
     )
 
     response = render(
@@ -593,13 +506,13 @@ def get_recipe_context(recipe, form, user):
 
     ingredients = list(recipe.ingredients.select_related("food"))
 
-    # Fetch all nutrient values for all foods in one query
     food_ids = [i.food_id for i in ingredients]
 
     nutrients_by_food = defaultdict(dict)
 
     for fn in FoodNutrient.objects.filter(
-        food_id__in=food_ids, nutrient_id__in=visible_ids
+        food_id__in=food_ids,
+        nutrient_id__in=visible_ids,
     ).select_related("nutrient"):
         nutrients_by_food[fn.food_id][fn.nutrient_id] = float(fn.amount)
 
@@ -611,6 +524,8 @@ def get_recipe_context(recipe, form, user):
         for nutrient in visible_nutrients:
             amount = food_values.get(nutrient.id, 0) * ingredient.default_servings
             ingredient.nutrients.append(int(amount))
+
+    print(f"recipe tags{recipe.available_tags}")
 
     return {
         "recipe": recipe,

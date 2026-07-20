@@ -19,7 +19,6 @@
                 {% if tag.id in selected_tags %}checked{% endif %}
                 hx-get="{% url 'recipes' %}"
                 hx-include="#filterForm"
-                hx-trigger="change"
                 hx-target="#recipesContent"
                 hx-swap="outerHTML"
                 hx-push-url="true">
