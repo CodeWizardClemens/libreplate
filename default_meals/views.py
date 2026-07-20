@@ -8,6 +8,7 @@ from .forms import DefaultMealForm
 from django.shortcuts import get_object_or_404, redirect, render
 from django.http import JsonResponse
 
+
 @login_required
 def default_meals(request):
     default_meals = DefaultMeal.objects.filter(user=request.user)
@@ -34,7 +35,7 @@ def create_default_meal(request):
         "settings/default_meals/default_meal_form.html",
         {
             "form": form,
-        }
+        },
     )
 
 
@@ -60,7 +61,7 @@ def edit_default_meal(request, pk):
         "settings/default_meals/default_meal_form.html",
         {
             "form": form,
-        }
+        },
     )
 
 

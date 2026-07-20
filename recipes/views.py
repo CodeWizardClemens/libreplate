@@ -102,10 +102,7 @@ def get_recipe_filters(request):
         "meal_id": params.get("meal_id", ""),
         "edit": params.get("edit") == "1",
         "search": params.get("search", "").strip(),
-        "selected_tags": list({
-            int(tag_id)
-            for tag_id in params.getlist("tags")
-        }),
+        "selected_tags": list({int(tag_id) for tag_id in params.getlist("tags")}),
         "favorites_only": params.get("favorites") == "1",
         "sort": params.get("sort"),
     }
@@ -250,14 +247,8 @@ def get_recipes_context(request):
 
     if selected_tags:
         recipes = (
-            recipes
-            .filter(tags__id__in=selected_tags)
-            .annotate(
-                matched_tags=Count(
-                    "tags",
-                    filter=Q(tags__id__in=selected_tags)
-                )
-            )
+            recipes.filter(tags__id__in=selected_tags)
+            .annotate(matched_tags=Count("tags", filter=Q(tags__id__in=selected_tags)))
             .filter(matched_tags=len(selected_tags))
         )
 
@@ -279,8 +270,7 @@ def get_recipes_context(request):
     context = {
         **filters,
         "recipes": (
-            recipes
-            .distinct()
+            recipes.distinct()
             .order_by(*ordering[filters["sort"]])
             .prefetch_related("ingredients__food")
         ),
@@ -297,9 +287,7 @@ def recipes(request):
     context = get_recipes_context(request)
 
     if request.headers.get("HX-Request"):
-        return render(
-            request, "recipes/partials/recipes_content.html", context
-        )
+        return render(request, "recipes/partials/recipes_content.html", context)
 
     return render(request, "recipes/recipes.html", context)
 
@@ -310,10 +298,7 @@ def recipe_copy(request, recipe_id):
 
     recipe = get_recipe(request.user, recipe_id)
 
-    data = {
-        field: getattr(recipe, field)
-        for field in RecipeForm.Meta.fields
-    }
+    data = {field: getattr(recipe, field) for field in RecipeForm.Meta.fields}
     data["user"] = request.user
     data["name"] = f"{recipe.name} Copy"
 
@@ -382,7 +367,6 @@ def add_recipes_to_meal_direct(request, meal_id, meal_name, meal_date):
             )
         recipe.last_used_at = timezone.now()
         recipe.save()
-
 
         # Collect recipe instructions
         notes.append(f"Recipe: {recipe.name}")
@@ -515,7 +499,6 @@ def handle_recipe_edit_post(request, recipe):
     recipe.last_used_at = timezone.now()
     recipe.save()
 
-
     if "add_food" in request.POST:
         return (
             form,
@@ -536,33 +519,19 @@ def get_recipes_context(request):
     elif filters["sort"] != user_preferences.recipe_sort:
         user_preferences.update_recipe_sort(filters["sort"])
 
-    recipes = Recipe.objects.filter(
-        user=request.user
-    )
+    recipes = Recipe.objects.filter(user=request.user)
 
     if filters["favorites_only"]:
-        recipes = recipes.filter(
-            is_favorite=True
-        )
+        recipes = recipes.filter(is_favorite=True)
 
     if filters["search"]:
-        recipes = recipes.filter(
-            name__icontains=filters["search"]
-        )
+        recipes = recipes.filter(name__icontains=filters["search"])
 
     if selected_tags:
         recipes = (
-            recipes
-            .filter(tags__id__in=selected_tags)
-            .annotate(
-                matched_tags=Count(
-                    "tags",
-                    filter=Q(tags__id__in=selected_tags)
-                )
-            )
-            .filter(
-                matched_tags=len(selected_tags)
-            )
+            recipes.filter(tags__id__in=selected_tags)
+            .annotate(matched_tags=Count("tags", filter=Q(tags__id__in=selected_tags)))
+            .filter(matched_tags=len(selected_tags))
         )
 
     recipes = recipes.annotate(
@@ -593,46 +562,28 @@ def get_recipes_context(request):
     }
 
     recipes = list(
-        recipes
-        .distinct()
-        .order_by(
-            *ordering[filters["sort"]]
-        )
+        recipes.distinct()
+        .order_by(*ordering[filters["sort"]])
         .prefetch_related(
             "ingredients__food",
             "ingredients__food__food_nutrients__nutrient",
         )
     )
 
-    recipe_nutrients = list(
-        Nutrient.objects.filter(
-            show_in_recipes=True
-        )
-    )
+    recipe_nutrients = list(Nutrient.objects.filter(show_in_recipes=True))
 
     print(recipe_nutrients)
 
     # Calculate recipe nutrient values once
-    recipe_nutrient_values = {
-        recipe.id: recipe.get_nutrients()
-        for recipe in recipes
-    }
+    recipe_nutrient_values = {recipe.id: recipe.get_nutrients() for recipe in recipes}
 
     context = {
         **filters,
         "recipes": recipes,
         "recipe_nutrients": recipe_nutrients,
         "recipe_nutrient_values": recipe_nutrient_values,
-        "tags": RecipeTag.objects.filter(
-            user=request.user
-        ),
-
-        "sort_choices": (
-            user_preferences
-            ._meta
-            .get_field("recipe_sort")
-            .choices
-        ),
+        "tags": RecipeTag.objects.filter(user=request.user),
+        "sort_choices": (user_preferences._meta.get_field("recipe_sort").choices),
     }
 
     return context
@@ -681,7 +632,7 @@ def recipe_delete(request, recipe_id):
         )
         response["HX-Trigger"] = "change"
         return response
-    
+
     return redirect("recipes")
 
 

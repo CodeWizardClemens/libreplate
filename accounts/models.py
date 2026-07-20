@@ -12,8 +12,7 @@ class UserPreferences(models.Model):
 
     def update_recipe_sort(self, recipe_sort):
         valid_sorts = {
-            choice[0]
-            for choice in self._meta.get_field("recipe_sort").choices
+            choice[0] for choice in self._meta.get_field("recipe_sort").choices
         }
 
         if recipe_sort not in valid_sorts:
@@ -29,15 +28,10 @@ class UserPreferences(models.Model):
         if len(hex_color) != 6:
             return "13,110,253"
 
-        return ",".join(
-            str(int(hex_color[i:i+2], 16))
-            for i in (0, 2, 4)
-        )
+        return ",".join(str(int(hex_color[i : i + 2], 16)) for i in (0, 2, 4))
 
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="preferences"
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="preferences"
     )
 
     dark_mode = models.BooleanField(default=False)
@@ -46,12 +40,7 @@ class UserPreferences(models.Model):
         max_length=50, choices=SORT_CHOICES, default="-created_at"
     )
 
-    theme_color = models.CharField(
-        max_length=7,
-        default="#0d6efd"
-    )
-
-
+    theme_color = models.CharField(max_length=7, default="#0d6efd")
 
     RECIPE_SORT_CHOICES = [
         ("last_used", "Last used"),

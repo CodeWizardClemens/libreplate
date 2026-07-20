@@ -58,8 +58,7 @@ class RecipeViewTests(TestCase):
         self.assertRedirects(response, reverse("recipes"))
 
         recipe = (
-            Recipe.objects
-            .filter(user=self.user, name="Chicken pasta")
+            Recipe.objects.filter(user=self.user, name="Chicken pasta")
             .order_by("-id")
             .first()
         )
@@ -69,11 +68,13 @@ class RecipeViewTests(TestCase):
         self.assertEqual(recipe.user, self.user)
         self.assertEqual(recipe.summary, "The best chicken pasta")
         self.assertEqual(recipe.description, "Bla bla long text")
-        self.assertEqual(recipe.instructions, "step1: boil pasta, step2: bake chicken etc.")
+        self.assertEqual(
+            recipe.instructions, "step1: boil pasta, step2: bake chicken etc."
+        )
         self.assertEqual(recipe.portions, 1)
 
     def test_recipe_copy(self):
-        
+
         before_count = Recipe.objects.count()
 
         response = self.client.post(
@@ -114,6 +115,4 @@ class RecipeViewTests(TestCase):
 
         self.assertRedirects(response, reverse("recipes"))
 
-        self.assertFalse(
-            Recipe.objects.filter(pk=self.recipe.pk).exists()
-        )
+        self.assertFalse(Recipe.objects.filter(pk=self.recipe.pk).exists())

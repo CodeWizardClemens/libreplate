@@ -55,27 +55,31 @@ def meal_plan_edit(request, meal_plan_id):
     # Group existing entries by "meal_id-day" string keys
     cell_contents = {}
 
-    food_entries = MealPlanFood.objects.filter(
-        meal_plan=meal_plan
-    ).select_related("food", "meal")
+    food_entries = MealPlanFood.objects.filter(meal_plan=meal_plan).select_related(
+        "food", "meal"
+    )
     for entry in food_entries:
         key = f"{entry.meal_id}-{entry.day}"
-        cell_contents.setdefault(key, []).append({
-            "name": entry.food.name,
-            "type": "food",
-            "id": entry.id,
-        })
+        cell_contents.setdefault(key, []).append(
+            {
+                "name": entry.food.name,
+                "type": "food",
+                "id": entry.id,
+            }
+        )
 
-    recipe_entries = MealPlanRecipe.objects.filter(
-        meal_plan=meal_plan
-    ).select_related("recipe", "meal")
+    recipe_entries = MealPlanRecipe.objects.filter(meal_plan=meal_plan).select_related(
+        "recipe", "meal"
+    )
     for entry in recipe_entries:
         key = f"{entry.meal_id}-{entry.day}"
-        cell_contents.setdefault(key, []).append({
-            "name": entry.recipe.name,
-            "type": "recipe",
-            "id": entry.id,
-        })
+        cell_contents.setdefault(key, []).append(
+            {
+                "name": entry.recipe.name,
+                "type": "recipe",
+                "id": entry.id,
+            }
+        )
 
     return render(
         request,
@@ -190,7 +194,9 @@ def cell_menu(request, meal_plan_id, meal_id, day):
     foods = Food.objects.filter(user=request.user).order_by("name")
     recipes = Recipe.objects.filter(user=request.user).order_by("name")
 
-    logger.info(f"User '{request.user}' opened cell menu for meal '{meal}' on '{WeekDay(int(day)).label}'.")
+    logger.info(
+        f"User '{request.user}' opened cell menu for meal '{meal}' on '{WeekDay(int(day)).label}'."
+    )
 
     return render(
         request,
@@ -216,12 +222,8 @@ def _render_cell(request, meal_plan, meal_id, day):
     ).select_related("recipe")
 
     cell_items = [
-        {"name": e.food.name, "type": "food", "id": e.id}
-        for e in food_entries
-    ] + [
-        {"name": e.recipe.name, "type": "recipe", "id": e.id}
-        for e in recipe_entries
-    ]
+        {"name": e.food.name, "type": "food", "id": e.id} for e in food_entries
+    ] + [{"name": e.recipe.name, "type": "recipe", "id": e.id} for e in recipe_entries]
 
     return render(
         request,
@@ -247,7 +249,7 @@ def cell_remove_food(request, meal_plan_id, meal_plan_food_id):
         id=meal_plan_food_id,
         meal_plan=meal_plan,
     ).first()
-    
+
     if entry:
         entry.delete()
 
@@ -266,7 +268,7 @@ def cell_remove_recipe(request, meal_plan_id, meal_plan_recipe_id):
         id=meal_plan_recipe_id,
         meal_plan=meal_plan,
     ).first()
-    
+
     if entry:
         entry.delete()
 

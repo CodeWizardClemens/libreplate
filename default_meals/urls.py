@@ -4,9 +4,7 @@ from . import views
 
 urlpatterns = [
     path("", views.default_meals, name="default_meals"),
-    path(
-        "create/", views.create_default_meal, name="create_default_meal"
-    ),
+    path("create/", views.create_default_meal, name="create_default_meal"),
     path(
         "<int:pk>/edit/",
         views.edit_default_meal,

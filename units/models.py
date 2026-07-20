@@ -106,10 +106,14 @@ class Unit(models.Model):
         if self.scope.user is None:
             return
 
-        if Unit.objects.filter(
-            scope__user__isnull=True,
-            name=self.name,
-        ).exclude(pk=self.pk).exists():
+        if (
+            Unit.objects.filter(
+                scope__user__isnull=True,
+                name=self.name,
+            )
+            .exclude(pk=self.pk)
+            .exists()
+        ):
             raise ValidationError(
                 {
                     "name": (
@@ -134,6 +138,7 @@ class HiddenUnit(models.Model):
     Each record represents a single (user, unit) combination. If no
     HiddenUnit exists for a pair, the unit is considered visible.
     """
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

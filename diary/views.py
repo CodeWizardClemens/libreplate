@@ -160,7 +160,7 @@ def diary_day(request, date=None):
 
     if date:
         formats = [
-            "%Y-%m-%d",   # 2026-07-18
+            "%Y-%m-%d",  # 2026-07-18
             "%B %d, %Y",  # July 18, 2026
         ]
 
@@ -388,16 +388,14 @@ def update_meal_food(request):
     day_totals = calculate_day_totals(all_meals)
 
     return JsonResponse(
-    {
-        "ok": True,
-        "meal_id": meal.id,
-        "meal_food": {
-            str(meal_food.id): to_int_dict(meal_food_totals)
-        },
-        "meal": to_int_dict(meal_totals),
-        "day": day_totals,
-    }
-)
+        {
+            "ok": True,
+            "meal_id": meal.id,
+            "meal_food": {str(meal_food.id): to_int_dict(meal_food_totals)},
+            "meal": to_int_dict(meal_totals),
+            "day": day_totals,
+        }
+    )
 
 
 @require_POST

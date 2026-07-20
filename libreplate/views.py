@@ -14,6 +14,7 @@ def profile(request):
         },
     )
 
+
 @login_required
 def default_page(request):
     return redirect("diary_today")

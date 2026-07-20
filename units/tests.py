@@ -33,9 +33,7 @@ class UnitModelTests(TestCase):
         self.scope = UnitScope.objects.get(user=None)
 
     def test_default_units_are_created_by_migration(self):
-        self.assertTrue(
-            Unit.objects.filter(scope=self.scope, name="Gram").exists()
-        )
+        self.assertTrue(Unit.objects.filter(scope=self.scope, name="Gram").exists())
         self.assertTrue(
             Unit.objects.filter(scope=self.scope, name="Mililiter").exists()
         )
@@ -44,7 +42,7 @@ class UnitModelTests(TestCase):
         with self.assertRaises(ValidationError):
             Unit.objects.create(
                 scope=self.scope,
-                name="Gram", # Already created by the migration.
+                name="Gram",  # Already created by the migration.
             )
 
     def test_user_cannot_create_unit_with_same_name_as_global_unit(self):
@@ -57,8 +55,9 @@ class UnitModelTests(TestCase):
         with self.assertRaises(ValidationError):
             Unit.objects.create(
                 scope=user_scope,
-                name="Gram", # Already exists in the global scope.
+                name="Gram",  # Already exists in the global scope.
             )
+
 
 class HiddenUnitModelTests(TestCase):
     def setUp(self):

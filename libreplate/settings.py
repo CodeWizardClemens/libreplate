@@ -35,10 +35,7 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: Don't run debug in production!
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = env.list(
-    "ALLOWED_HOSTS",
-    default=[]
-)
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 
 # Application definition
 
@@ -105,9 +102,7 @@ WSGI_APPLICATION = "libreplate.wsgi.application"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    "default": env.db(
-        default="postgres://postgres:password@localhost:5432/libreplate"
-    )
+    "default": env.db(default="postgres://postgres:password@localhost:5432/libreplate")
 }
 
 # Password validation
@@ -154,12 +149,7 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-STATIC_ROOT = Path(
-    env(
-        "STATIC_ROOT",
-        default=BASE_DIR / "staticfiles"
-    )
-)
+STATIC_ROOT = Path(env("STATIC_ROOT", default=BASE_DIR / "staticfiles"))
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -169,18 +159,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
         },
     },
-
     "root": {
         "handlers": ["console"],
         "level": "INFO",
     },
-
     "loggers": {
         "django": {
             "handlers": ["console"],

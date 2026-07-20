@@ -36,7 +36,7 @@ def create_body_metric(request):
         "body_metrics/body_metric_form.html",
         {
             "form": form,
-        }
+        },
     )
 
 
@@ -62,7 +62,7 @@ def edit_body_metric(request, pk):
         "body_metrics/body_metric_form.html",
         {
             "form": form,
-        }
+        },
     )
 
 

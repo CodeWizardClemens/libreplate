@@ -2,6 +2,7 @@
 
 from pydantic import BaseModel
 
+
 class BodyMetricSchema(BaseModel):
     name: str
     description: str = ""

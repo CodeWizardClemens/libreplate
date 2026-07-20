@@ -4,6 +4,7 @@ from common.food_selection import get_user_foods
 
 from .models import Recipe, RecipeIngredient
 
+
 class RecipeForm(forms.ModelForm):
     class Meta:
         model = Recipe

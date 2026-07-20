@@ -4,6 +4,7 @@ from django.utils import timezone
 from nutrients.models import Nutrient
 from decimal import Decimal
 
+
 class Recipe(models.Model):
 
     def get_nutrients(self, per_portion=True):
@@ -12,9 +13,7 @@ class Recipe(models.Model):
 
         totals = defaultdict(lambda: Decimal("0"))
 
-        ingredients = self.ingredients.select_related(
-            "food"
-        ).prefetch_related(
+        ingredients = self.ingredients.select_related("food").prefetch_related(
             "food__food_nutrients__nutrient"
         )
 
@@ -22,26 +21,16 @@ class Recipe(models.Model):
             multiplier = Decimal(str(ingredient.serving_amount))
 
             for food_nutrient in ingredient.food.food_nutrients.all():
-                totals[food_nutrient.nutrient] += (
-                    food_nutrient.amount * multiplier
-                )
+                totals[food_nutrient.nutrient] += food_nutrient.amount * multiplier
 
         if per_portion and self.portions:
             divisor = Decimal(str(self.portions))
-            totals = {
-                nutrient: amount / divisor
-                for nutrient, amount in totals.items()
-            }
+            totals = {nutrient: amount / divisor for nutrient, amount in totals.items()}
 
         return totals
 
-
     def available_tags(self):
-        return RecipeTag.objects.filter(
-            user=self.user
-        ).exclude(
-            recipes=self
-        )
+        return RecipeTag.objects.filter(user=self.user).exclude(recipes=self)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recipes")
     name = models.CharField(max_length=255)

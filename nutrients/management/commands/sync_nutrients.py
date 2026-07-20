@@ -23,5 +23,7 @@ class Command(BaseCommand):
             )
         else:
             self.stdout.write(
-                self.style.SUCCESS("Nutrients synced without overwriting existing data.")
+                self.style.SUCCESS(
+                    "Nutrients synced without overwriting existing data."
+                )
             )

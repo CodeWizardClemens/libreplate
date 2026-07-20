@@ -8,8 +8,8 @@ urlpatterns = [
     path("<uuid:pk>/edit/", views.graph_edit, name="graph_edit"),
     path("<uuid:pk>/delete/", views.graph_delete, name="graph_delete"),
     path(
-    "<uuid:pk>/data/",
-    views.graph_data,
-    name="graph_data",
-),
+        "<uuid:pk>/data/",
+        views.graph_data,
+        name="graph_data",
+    ),
 ]

@@ -10,7 +10,6 @@ urlpatterns = [
     path("<int:pk>/edit/", views.food_edit, name="food_edit"),
     path("<int:food_id>/delete/", views.food_delete, name="food_delete"),
     path("<int:food_id>/favorite/", views.toggle_favorite, name="food_toggle_favorite"),
-
     path(
         "usda/<int:fdc_id>/import/",
         views.import_usda_food_view,

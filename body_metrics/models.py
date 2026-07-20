@@ -2,13 +2,14 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
 
+
 class BodyMetric(models.Model):
 
     name = models.CharField(max_length=50)
     description = models.TextField(blank=True, null=True)
 
     show_in_diary_total = models.BooleanField(
-        default=True, 
+        default=True,
     )
     show_in_goal_edit = models.BooleanField(
         default=True,

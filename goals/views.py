@@ -16,7 +16,7 @@ def goals_page(request):
         "goals/goals.html",
         {
             "goal_groups": goal_groups,
-        }
+        },
     )
 
 

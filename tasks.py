@@ -58,9 +58,7 @@ def check_python(c):
     print(f"Python version: {version[0]}.{version[1]}")
 
     if version < PYTHON_REQUIRED:
-        fail(
-            f"Python {PYTHON_REQUIRED[0]}.{PYTHON_REQUIRED[1]}+ required"
-        )
+        fail(f"Python {PYTHON_REQUIRED[0]}.{PYTHON_REQUIRED[1]}+ required")
 
     print("Python version OK")
 
@@ -121,7 +119,8 @@ def install_dependencies(c):
         fail("requirements.txt not found")
 
     lines = [
-        l for l in requirements.read_text().splitlines()
+        l
+        for l in requirements.read_text().splitlines()
         if l.strip() and not l.startswith("#")
     ]
 
@@ -160,6 +159,7 @@ def collectstatic(c):
     python = str(venv_python())
     log("Collecting static")
     run([python, "manage.py", "collectstatic", "--noinput"])
+
 
 @task
 def update(c):
@@ -206,7 +206,7 @@ def sync_default_data(c):
 
     log("Syncing default data")
     load_env()
-    for sync_command in ['sync_nutrients', 'sync_units', 'sync_body_metrics']:
+    for sync_command in ["sync_nutrients", "sync_units", "sync_body_metrics"]:
         c.run(f"{str(venv_python())} manage.py {sync_command}")
 
 
@@ -236,7 +236,15 @@ def add_user(c, username, first_name, last_name, email, password):
             print("User created")
     """)
 
-    run([str(venv_python()), "manage.py", "shell", "-c", script,])
+    run(
+        [
+            str(venv_python()),
+            "manage.py",
+            "shell",
+            "-c",
+            script,
+        ]
+    )
 
 
 @task
@@ -285,8 +293,15 @@ def add_usda_api_key(c, key):
         USDAAPISettings.objects.create(key={key!r})
     """)
 
-
-    run([str(venv_python()), "manage.py", "shell", "-c", script,])
+    run(
+        [
+            str(venv_python()),
+            "manage.py",
+            "shell",
+            "-c",
+            script,
+        ]
+    )
 
 
 @task
@@ -347,8 +362,7 @@ def install(c):
     collectstatic(c)
     sync_default_data(c)
 
-    print(
-        f"""
+    print(f"""
 
 Installation complete.
 
@@ -359,5 +373,4 @@ Activate:
 Start:
 
     gunicorn libreplate.wsgi:application
-"""
-    )
+""")

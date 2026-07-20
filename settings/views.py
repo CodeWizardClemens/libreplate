@@ -12,6 +12,7 @@ def settings_page(request):
         "settings/settings.html",
     )
 
+
 @login_required
 def appearance(request):
     return render(

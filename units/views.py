@@ -13,11 +13,7 @@ def units(request):
         "units_global": Unit.objects.filter(scope=global_scope),
         "units_user": Unit.objects.filter(scope=user_scope),
     }
-    return render(
-        request,
-        "units/units.html",
-        context
-    )
+    return render(request, "units/units.html", context)
 
 
 @login_required
@@ -48,11 +44,12 @@ def unit_form(request, pk=None):
             scope=request.user.unit_scope,
         )
     return render(
-        request, "units/unit_form.html",
+        request,
+        "units/unit_form.html",
         {
             "form": form,
             "unit": unit,
-        }
+        },
     )
 
 

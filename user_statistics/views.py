@@ -18,8 +18,10 @@ from django.http import JsonResponse
 from django.utils import timezone
 
 from body_metrics.models import BodyMetricLog
+
 # TODO move MealFood to a meal app, allong with default meals.
 from diary.models import MealFood
+
 
 @login_required
 def graph_data(request, pk):
@@ -124,10 +126,7 @@ def graph_data(request, pk):
         chart_data.append(
             {
                 "label": ds["label"],
-                "data": [
-                    ds["values"].get(label)
-                    for label in labels
-                ],
+                "data": [ds["values"].get(label) for label in labels],
             }
         )
 
@@ -138,6 +137,7 @@ def graph_data(request, pk):
             "type": graph.graph_type,
         }
     )
+
 
 def get_graph_date_range(graph):
     if graph.period_end_mode == Graph.PeriodEndMode.NOW:
@@ -200,6 +200,7 @@ def get_graph_date_range(graph):
 
     return start, end
 
+
 def get_graph_line_choices():
     return [
         (
@@ -235,9 +236,7 @@ def create_graph_lines(graph, request):
     units = request.POST.getlist("moving_average_unit")
     amounts = request.POST.getlist("moving_average_amount")
 
-    for choice, custom_name, unit, amount in zip(
-        choices, names, units, amounts
-    ):
+    for choice, custom_name, unit, amount in zip(choices, names, units, amounts):
         if not choice:
             continue
 

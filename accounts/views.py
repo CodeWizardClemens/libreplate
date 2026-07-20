@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.http import JsonResponse
 
+
 @login_required
 def toggle_dark_mode(request):
     preferences = request.user.preferences

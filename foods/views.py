@@ -23,6 +23,7 @@ from recipes.models import Recipe, RecipeIngredient
 # Helpers
 # =============================================================================
 
+
 def tags_modal(request, food_id):
     # TODO
     pass
@@ -57,14 +58,12 @@ def toggle_favorite(request, food_id):
 
     return response
 
+
 def get_food_queryset(user, sort):
-    foods = (
-        Food.objects.filter(user=user)
-        .prefetch_related(
-            Prefetch(
-                "food_nutrients",
-                queryset=FoodNutrient.objects.select_related("nutrient"),
-            )
+    foods = Food.objects.filter(user=user).prefetch_related(
+        Prefetch(
+            "food_nutrients",
+            queryset=FoodNutrient.objects.select_related("nutrient"),
         )
     )
 
@@ -454,7 +453,7 @@ def food_delete(request, food_id):
         )
         response["HX-Trigger"] = "foodsChanged"
         return response
-    
+
     return redirect("foods")
 
 
