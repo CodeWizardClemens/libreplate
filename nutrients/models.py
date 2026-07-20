@@ -1,5 +1,4 @@
 # nutrients/models
-from django.contrib.auth.models import User
 from django.db import models
 
 # TODO add way so user can make his own nutrients.

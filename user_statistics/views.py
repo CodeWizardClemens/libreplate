@@ -8,7 +8,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
 from body_metrics.models import BodyMetric, BodyMetricLog
-# TODO move MealFood to a meal app, allong with default meals.
 from diary.models import MealFood
 from nutrients.models import Nutrient
 

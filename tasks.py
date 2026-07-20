@@ -19,18 +19,26 @@ PYTHON_REQUIRED = (3, 10)
 POSTGRES_REQUIRED = 13
 
 
-def check_linters(c):
-
-    c.run("black --check")
-
-
-
 def log(message: str):
     print(f"\n==> {message}")
 
 
 def fail(message: str):
     raise SystemExit(f"\nERROR: {message}")
+
+
+@task
+def check_code_quality(c):
+    c.run(f"isort {BASE_DIR} --check-only")
+    c.run(f"black {BASE_DIR} --check")
+    c.run(f"ruff check {BASE_DIR}")
+
+
+@task
+def format_code(c):
+    c.run(f"isort {BASE_DIR}")
+    c.run(f"black {BASE_DIR}")
+    c.run(f"ruff check . --fix {BASE_DIR}")
 
 
 # TODO replace run command with default c.run, but add fail message to all

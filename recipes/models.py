@@ -4,14 +4,11 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 
-from nutrients.models import Nutrient
-
 
 class Recipe(models.Model):
 
     def get_nutrients(self, per_portion=True):
         from collections import defaultdict
-        from decimal import Decimal
 
         totals = defaultdict(lambda: Decimal("0"))
 
