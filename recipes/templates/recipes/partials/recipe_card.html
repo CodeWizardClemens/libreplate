@@ -26,9 +26,11 @@
                         {{ recipe.name }}
                     </h5>
 
-                    <p class="text-body-secondary mb-0 recipe-summary">
-                        {{ recipe.summary|default:"" }}
-                    </p>
+                    {% if recipe.summary %}
+                        <p class="text-body-secondary mb-0 recipe-summary">
+                            {{ recipe.summary }}
+                        </p>
+                    {%endif%}
 
                     <div id="recipe-card-tags">
                         {% include "recipes/partials/recipe_card/nutrients.html" %}

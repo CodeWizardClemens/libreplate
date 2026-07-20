@@ -11,9 +11,9 @@ class NutrientSchema(BaseModel):
     show_in_diary_meal: bool = False
     show_in_food_edit: bool = False
     show_in_recipe: bool = False
+    show_in_recipes: bool = False
     show_in_foods: bool = False
     show_in_goal_edit: bool = False
-
     usda_nutrient_number: Optional[str] = None
     order: int = 0
 
@@ -24,6 +24,7 @@ def nutrient_everywhere(**kwargs):
         show_in_diary_meal=True,
         show_in_food_edit=True,
         show_in_recipe=True,
+        show_in_recipes=True,
         show_in_foods=True,
         show_in_goal_edit=True,
         **kwargs,

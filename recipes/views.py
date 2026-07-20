@@ -96,8 +96,6 @@ def delete_tag_from_recipe(request, recipe_id, tag_id):
 def get_recipe_filters(request):
     params = request.GET if request.method == "GET" else request.POST
 
-    print("RAW TAGS:", params.getlist("tags"))
-
     return {
         "meal_name": params.get("meal_name", ""),
         "meal_date": params.get("meal_date", ""),
@@ -417,6 +415,43 @@ def add_recipes_to_meal_direct(request, meal_id, meal_name, meal_date):
     )
 
 
+def get_recipe_context(recipe, form, user):
+    visible_nutrients = list(
+        Nutrient.objects.filter(show_in_recipe=True).order_by("order")
+    )
+
+    visible_ids = {n.id for n in visible_nutrients}
+
+    ingredients = list(recipe.ingredients.select_related("food"))
+
+    # Fetch all nutrient values for all foods in one query
+    food_ids = [i.food_id for i in ingredients]
+
+    nutrients_by_food = defaultdict(dict)
+
+    for fn in FoodNutrient.objects.filter(
+        food_id__in=food_ids, nutrient_id__in=visible_ids
+    ).select_related("nutrient"):
+        nutrients_by_food[fn.food_id][fn.nutrient_id] = float(fn.amount)
+
+    for ingredient in ingredients:
+        ingredient.nutrients = []
+
+        food_values = nutrients_by_food.get(ingredient.food_id, {})
+
+        for nutrient in visible_nutrients:
+            amount = food_values.get(nutrient.id, 0) * ingredient.default_servings
+            ingredient.nutrients.append(int(amount))
+
+    return {
+        "recipe": recipe,
+        "form": form,
+        "ingredients": ingredients,
+        "ingredient_form": RecipeIngredientForm(user=user),
+        "visible_nutrients": visible_nutrients,
+    }
+
+
 @login_required
 def recipe_create(request):
 
@@ -501,43 +536,117 @@ def handle_recipe_edit_post(request, recipe):
     return form, redirect("recipes")
 
 
-def get_recipe_context(recipe, form, user):
-    visible_nutrients = list(
-        Nutrient.objects.filter(show_in_recipe=True).order_by("order")
+def get_recipes_context(request):
+    user_preferences = request.user.preferences
+    filters = get_recipe_filters(request)
+    selected_tags = filters["selected_tags"] or []
+
+    if filters["sort"] is None:
+        filters["sort"] = user_preferences.recipe_sort
+
+    elif filters["sort"] != user_preferences.recipe_sort:
+        user_preferences.update_recipe_sort(filters["sort"])
+
+    recipes = Recipe.objects.filter(
+        user=request.user
     )
 
-    visible_ids = {n.id for n in visible_nutrients}
+    if filters["favorites_only"]:
+        recipes = recipes.filter(
+            is_favorite=True
+        )
 
-    ingredients = list(recipe.ingredients.select_related("food"))
+    if filters["search"]:
+        recipes = recipes.filter(
+            name__icontains=filters["search"]
+        )
 
-    food_ids = [i.food_id for i in ingredients]
+    if selected_tags:
+        recipes = (
+            recipes
+            .filter(tags__id__in=selected_tags)
+            .annotate(
+                matched_tags=Count(
+                    "tags",
+                    filter=Q(tags__id__in=selected_tags)
+                )
+            )
+            .filter(
+                matched_tags=len(selected_tags)
+            )
+        )
 
-    nutrients_by_food = defaultdict(dict)
+    recipes = recipes.annotate(
+        pinned_order=Case(
+            When(is_pinned=True, then=0),
+            default=1,
+            output_field=IntegerField(),
+        )
+    )
 
-    for fn in FoodNutrient.objects.filter(
-        food_id__in=food_ids,
-        nutrient_id__in=visible_ids,
-    ).select_related("nutrient"):
-        nutrients_by_food[fn.food_id][fn.nutrient_id] = float(fn.amount)
-
-    for ingredient in ingredients:
-        ingredient.nutrients = []
-
-        food_values = nutrients_by_food.get(ingredient.food_id, {})
-
-        for nutrient in visible_nutrients:
-            amount = food_values.get(nutrient.id, 0) * ingredient.default_servings
-            ingredient.nutrients.append(int(amount))
-
-    print(f"recipe tags{recipe.available_tags}")
-
-    return {
-        "recipe": recipe,
-        "form": form,
-        "ingredients": ingredients,
-        "ingredient_form": RecipeIngredientForm(user=user),
-        "visible_nutrients": visible_nutrients,
+    ordering = {
+        "last_used": [
+            "pinned_order",
+            "-last_used_at",
+        ],
+        "created": [
+            "pinned_order",
+            "-created_at",
+        ],
+        "updated": [
+            "pinned_order",
+            "-updated_at",
+        ],
+        "name": [
+            "pinned_order",
+            "name",
+        ],
     }
+
+    recipes = list(
+        recipes
+        .distinct()
+        .order_by(
+            *ordering[filters["sort"]]
+        )
+        .prefetch_related(
+            "ingredients__food",
+            "ingredients__food__food_nutrients__nutrient",
+        )
+    )
+
+    recipe_nutrients = list(
+        Nutrient.objects.filter(
+            show_in_recipes=True
+        )
+    )
+
+    print(recipe_nutrients)
+
+    # Calculate recipe nutrient values once
+    recipe_nutrient_values = {
+        recipe.id: recipe.get_nutrients()
+        for recipe in recipes
+    }
+
+    context = {
+        **filters,
+        "recipes": recipes,
+        "recipe_nutrients": recipe_nutrients,
+        "recipe_nutrient_values": recipe_nutrient_values,
+        "tags": RecipeTag.objects.filter(
+            user=request.user
+        ),
+
+        "sort_choices": (
+            user_preferences
+            ._meta
+            .get_field("recipe_sort")
+            .choices
+        ),
+    }
+
+    return context
 
 
 @login_required
@@ -633,7 +742,7 @@ def recipe_nutrition_ajax(request, recipe_id):
         user=request.user,
     )
 
-    visible = Nutrient.objects.filter(show_in_recipe=True)
+    visible = Nutrient.objects.filter(show_in_recipes=True)
 
     totals = {nutrient.id: 0 for nutrient in visible}
 

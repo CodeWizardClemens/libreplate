@@ -30,6 +30,12 @@ class Nutrient(models.Model):
     show_in_recipe = models.BooleanField(
         null=True,
         blank=True,
+        help_text="Show this nutrient a recipe.",
+    )
+
+    show_in_recipes = models.BooleanField(
+        null=True,
+        blank=True,
         help_text="Show this nutrient in recipes.",
     )
 

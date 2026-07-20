@@ -1,32 +1,17 @@
-{% with nutrients=recipe.get_nutrients %}
+{% load recipe_tags %}
 
 <div class="d-flex flex-wrap gap-1 mt-2">
-    
-    {% for nutrient, amount in nutrients.items %}
 
-        {% with name=nutrient.name|lower %}
+    {% for nutrient in recipe_nutrients %}
 
-            {% if name == "energy" or name == "calories" or name == "protein" or name == "carbohydrate" or name == "carbohydrates" or name == "fat" %}
+        <span class="badge text-bg-light border">
 
-                <span class="badge text-bg-light border">
-                    {% if name == "energy" or name == "calories" %}
-                        {{ amount|floatformat:0 }} kcal
-                    {% elif name == "protein" %}
-                        Protein {{ amount|floatformat:0 }}
-                    {% elif name == "carbohydrate" or name == "carbohydrates" %}
-                        Carbs {{ amount|floatformat:0 }}
-                    {% elif name == "fat" %}
-                        Fats {{ amount|floatformat:0 }}
-                    {% endif %}
+            {{ nutrient.abbreviation|default:nutrient.name }}
 
-                </span>
+            {{ recipe_nutrient_values|get_nested:recipe.id|get_nutrient:nutrient|floatformat:0 }}
 
-            {% endif %}
-
-        {% endwith %}
+        </span>
 
     {% endfor %}
 
 </div>
-
-{% endwith %}
