@@ -44,24 +44,20 @@ def recipe_tag_create(request):
 @login_required
 @require_POST
 def recipe_tag_delete(request, tag_id):
-    tag = get_object_or_404(RecipeTag, id=tag_id, user=request.user)
-
-    recipe = get_object_or_404(
-        Recipe,
-        id=request.POST["recipe_id"],
+    tag = get_object_or_404(
+        RecipeTag,
+        id=tag_id,
         user=request.user,
     )
 
     tag.delete()
 
+    context = get_recipes_context(request)
+
     return render(
         request,
-        "recipes/partials/tag_list.html",
-        {
-            "recipe": recipe,
-            "tags": RecipeTag.objects.filter(user=request.user),
-            "selected_tags": recipe.tags.values_list("id", flat=True),
-        },
+        "recipes/partials/recipes_content.html",
+        context,
     )
 
 
