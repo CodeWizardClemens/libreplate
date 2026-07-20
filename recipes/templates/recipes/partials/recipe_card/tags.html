@@ -29,7 +29,7 @@
 
                 </form>
             {% else %}
-                <span class="badge rounded-pill text-bg-primary">
+                <span class="badge rounded-pill text-bg-primary recipe-tag-badge">
                     {{ tag.name }}
                 </span>
             {% endif %}
@@ -46,3 +46,9 @@
     {% endif %}
 
 </div>
+
+<style>
+.recipe-tag-badge {
+    padding: 0.43rem 0.5rem;
+}
+</style>
