@@ -9,10 +9,10 @@ from django.views.decorators.http import require_POST
 
 from body_metrics.models import BodyMetric, BodyMetricLog
 from common.food_selection import get_user_foods
+from default_meals.models import DefaultMeal
 from foods.models import Food
 from goals.models import GoalGroup, GoalNutrient
 from nutrients.models import Nutrient
-from default_meals.models import DefaultMeal
 
 from .forms import AddMealFoodForm, MealFoodForm, MealForm
 from .models import Meal, MealFood

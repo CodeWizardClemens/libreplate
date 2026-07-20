@@ -1,8 +1,10 @@
+from decimal import Decimal
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+
 from nutrients.models import Nutrient
-from decimal import Decimal
 
 
 class Recipe(models.Model):

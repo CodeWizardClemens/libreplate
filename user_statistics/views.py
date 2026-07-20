@@ -1,26 +1,19 @@
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from datetime import timedelta
 
-from body_metrics.models import BodyMetric
+from django.contrib.auth.decorators import login_required
+from django.db.models import F, Sum
+from django.db.models.functions import TruncDate
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+
+from body_metrics.models import BodyMetric, BodyMetricLog
+# TODO move MealFood to a meal app, allong with default meals.
+from diary.models import MealFood
 from nutrients.models import Nutrient
 
 from .forms import GraphForm
 from .models import Graph, GraphLine, GraphLineBodyMetric, GraphLineNutrient
-
-from django.http import JsonResponse
-from django.utils import timezone
-from datetime import timedelta
-
-from django.db.models import Sum, F
-from django.db.models.functions import TruncDate
-from django.http import JsonResponse
-from django.utils import timezone
-
-from body_metrics.models import BodyMetricLog
-
-# TODO move MealFood to a meal app, allong with default meals.
-from diary.models import MealFood
 
 
 @login_required

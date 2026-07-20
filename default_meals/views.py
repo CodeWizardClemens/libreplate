@@ -1,12 +1,12 @@
 import json
 
-from django.shortcuts import render
-from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
-from .models import DefaultMeal
-from .forms import DefaultMealForm
-from django.shortcuts import get_object_or_404, redirect, render
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
+
+from .forms import DefaultMealForm
+from .models import DefaultMeal
 
 
 @login_required

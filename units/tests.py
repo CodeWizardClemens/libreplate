@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.test import TestCase
 
-from units.models import Unit, UnitScope, HiddenUnit
+from units.models import HiddenUnit, Unit, UnitScope
 
 User = get_user_model()
 

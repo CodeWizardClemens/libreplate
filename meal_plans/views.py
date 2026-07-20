@@ -1,14 +1,15 @@
+import logging
+
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import MealPlanForm
-from .models import MealPlan, MealPlanFood, MealPlanRecipe, WeekDay
-
 from default_meals.models import DefaultMeal
 from foods.models import Food
 from recipes.models import Recipe
-import logging
+
+from .forms import MealPlanForm
+from .models import MealPlan, MealPlanFood, MealPlanRecipe, WeekDay
 
 logger = logging.getLogger(__name__)
 

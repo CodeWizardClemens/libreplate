@@ -4,9 +4,9 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from textwrap import dedent
 
 from invoke import task
-from textwrap import dedent
 
 APP_NAME = "libreplate"
 
@@ -17,6 +17,12 @@ ENV_FILE = BASE_DIR / ".env"
 PYTHON = sys.executable
 PYTHON_REQUIRED = (3, 10)
 POSTGRES_REQUIRED = 13
+
+
+def check_linters(c):
+
+    c.run("black --check")
+
 
 
 def log(message: str):
