@@ -1,6 +1,6 @@
 .search-bar-form {
     flex: 1 1 auto;
-    min-width: 0;
+    min-width: 1;
 }
 
 .search-bar {
