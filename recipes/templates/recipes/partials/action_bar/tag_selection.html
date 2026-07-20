@@ -1,14 +1,8 @@
-<!-- tag_selection -->
-
 <div class="d-flex align-items-center gap-2">
     <span class="text-muted flex-shrink-0">Tags:</span>
 
-    <div
-        id="searchbar-tags"
-        class="d-flex flex-nowrap gap-1 overflow-auto py-2"
-    >
+    <div id="searchbar-tags" class="d-flex flex-nowrap gap-1 overflow-auto py-2">
         {% for tag in tags %}
-
             <input
                 class="btn-check"
                 type="checkbox"
@@ -21,35 +15,37 @@
                 hx-include="#filterForm"
                 hx-target="#recipesContent"
                 hx-swap="outerHTML"
-                hx-push-url="true">
+                hx-push-url="true"
+            >
 
             <label
                 class="btn btn-link btn-sm text-decoration-none flex-shrink-0 tag-btn"
-                for="search-tag-{{ tag.id }}">
+                for="search-tag-{{ tag.id }}"
+            >
                 {{ tag.name }}
             </label>
-
-        {% empty %}
-
-            <div class="text-muted flex-shrink-0">
-                No tags available
-            </div>
-
         {% endfor %}
     </div>
 </div>
 
 <style>
-    #searchbar-tags .tag-btn {
-        border-radius: 0;
-        border-bottom: 2px solid transparent;
-        color: var(--bs-body-color);
-        padding: 0.1rem 0.2rem;
-        text-decoration: none;
-    }
+#searchbar-tags .tag-btn {
+    border-radius: 0;
+    border-bottom: 2px solid transparent;
+    color: var(--bs-body-color);
+    padding: 0.1rem 0.2rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
 
-    #searchbar-tags .btn-check:checked + .tag-btn {
-        color: var(--bs-primary);
-        border-bottom-color: var(--bs-primary);
-    }
+#searchbar-tags .btn-check:checked + .tag-btn {
+    color: var(--bs-primary);
+    border-bottom-color: var(--bs-primary);
+    font-weight: 600;
+}
+
+#searchbar-tags .tag-btn:hover {
+    color: var(--bs-primary);
+}
 </style>

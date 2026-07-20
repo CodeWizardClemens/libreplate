@@ -96,13 +96,18 @@ def delete_tag_from_recipe(request, recipe_id, tag_id):
 def get_recipe_filters(request):
     params = request.GET if request.method == "GET" else request.POST
 
+    print("RAW TAGS:", params.getlist("tags"))
+
     return {
         "meal_name": params.get("meal_name", ""),
         "meal_date": params.get("meal_date", ""),
         "meal_id": params.get("meal_id", ""),
         "edit": params.get("edit") == "1",
         "search": params.get("search", "").strip(),
-        "selected_tags": params.getlist("tags"),
+        "selected_tags": list({
+            int(tag_id)
+            for tag_id in params.getlist("tags")
+        }),
         "favorites_only": params.get("favorites") == "1",
         "sort": params.get("sort"),
     }
@@ -274,6 +279,7 @@ def get_recipes_context(request):
     }
 
     context = {
+        **filters,
         "recipes": (
             recipes
             .distinct()
@@ -281,9 +287,7 @@ def get_recipes_context(request):
             .prefetch_related("ingredients__food")
         ),
         "tags": RecipeTag.objects.filter(user=request.user),
-        "selected_tags": [int(tag) for tag in selected_tags],
         "sort_choices": user_preferences._meta.get_field("recipe_sort").choices,
-        **filters,
     }
 
     return context

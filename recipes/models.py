@@ -5,6 +5,36 @@ from django.utils import timezone
 
 class Recipe(models.Model):
 
+    def get_nutrients(self, per_portion=True):
+        from collections import defaultdict
+        from decimal import Decimal
+
+        totals = defaultdict(lambda: Decimal("0"))
+
+        ingredients = self.ingredients.select_related(
+            "food"
+        ).prefetch_related(
+            "food__food_nutrients__nutrient"
+        )
+
+        for ingredient in ingredients:
+            multiplier = Decimal(str(ingredient.serving_amount))
+
+            for food_nutrient in ingredient.food.food_nutrients.all():
+                totals[food_nutrient.nutrient] += (
+                    food_nutrient.amount * multiplier
+                )
+
+        if per_portion and self.portions:
+            divisor = Decimal(str(self.portions))
+            totals = {
+                nutrient: amount / divisor
+                for nutrient, amount in totals.items()
+            }
+
+        return totals
+
+
     def available_tags(self):
         return RecipeTag.objects.filter(
             user=self.user
@@ -37,7 +67,6 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
-    
 
 
 class RecipePicture(models.Model):
@@ -87,15 +116,10 @@ class RecipeIngredient(models.Model):
 
     food = models.ForeignKey("foods.Food", on_delete=models.CASCADE)
 
-    # Current default amount used by recipe
     default_servings = models.FloatField(default=1)
-
     serving_amount = models.FloatField(default=1)
-    # Slider limits
     min_servings = models.FloatField(default=0)
-
     max_servings = models.FloatField(default=10)
-
     order = models.PositiveIntegerField(default=0)
 
     class Meta:

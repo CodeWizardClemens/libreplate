@@ -3,40 +3,36 @@
 <div class="recipe-card-tags d-flex flex-wrap gap-1 mt-2">
 
     {% if recipe.tags.exists %}
-
         {% for tag in recipe.tags.all %}
 
             <div
                 class="d-inline-flex"
                 onclick="event.stopPropagation();">
 
-                {% if edit %}
-                    <form
-                        hx-post="{% url 'delete_tag_from_recipe' recipe.id tag.id %}"
-                        hx-target="#recipesContent"
-                        hx-swap="innerHTML"
-                        hx-include="#filterForm"
-                        class="d-inline-flex">
+            {% if edit %}
+                <form
+                    hx-post="{% url 'delete_tag_from_recipe' recipe.id tag.id %}"
+                    hx-target="#recipesContent"
+                    hx-swap="innerHTML"
+                    hx-include="#filterForm"
+                    class="d-inline-flex">
 
-                        {% csrf_token %}
+                    {% csrf_token %}
 
-                        <button
-                            type="submit"
-                            class="badge rounded-pill text-bg-primary border-0 d-inline-flex align-items-center">
-                            {{ tag.name }}
-                            <span
-                                class="btn-close btn-close-white ms-2"
-                                style="font-size: .45rem;"
-                                aria-label="Remove tag">
-                            </span>
-                        </button>
+                    <button
+                        type="submit"
+                        class="badge rounded-pill text-bg-primary"
+                        style="border: none; padding: 0.25rem 0.5rem; cursor: pointer;">
+                        <span>{{ tag.name }}</span>
+                        <span class="btn-close btn-close-white ms-2" aria-label="Remove tag"></span>
+                    </button>
 
-                    </form>
-                {% else %}
-                    <span class="badge rounded-pill text-bg-primary">
-                        {{ tag.name }}
-                    </span>
-                {% endif %}
+                </form>
+            {% else %}
+                <span class="badge rounded-pill text-bg-primary">
+                    {{ tag.name }}
+                </span>
+            {% endif %}
 
             </div>
 

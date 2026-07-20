@@ -1,0 +1,32 @@
+{% with nutrients=recipe.get_nutrients %}
+
+<div class="d-flex flex-wrap gap-1 mt-2">
+    
+    {% for nutrient, amount in nutrients.items %}
+
+        {% with name=nutrient.name|lower %}
+
+            {% if name == "energy" or name == "calories" or name == "protein" or name == "carbohydrate" or name == "carbohydrates" or name == "fat" %}
+
+                <span class="badge text-bg-light border">
+                    {% if name == "energy" or name == "calories" %}
+                        {{ amount|floatformat:0 }} kcal
+                    {% elif name == "protein" %}
+                        Protein {{ amount|floatformat:0 }}
+                    {% elif name == "carbohydrate" or name == "carbohydrates" %}
+                        Carbs {{ amount|floatformat:0 }}
+                    {% elif name == "fat" %}
+                        Fats {{ amount|floatformat:0 }}
+                    {% endif %}
+
+                </span>
+
+            {% endif %}
+
+        {% endwith %}
+
+    {% endfor %}
+
+</div>
+
+{% endwith %}
