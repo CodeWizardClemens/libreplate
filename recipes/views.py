@@ -304,10 +304,9 @@ def recipes(request):
     return render(request, "recipes/recipes.html", context)
 
 
+@require_POST
 @login_required
 def recipe_copy(request, recipe_id):
-    if request.method != "POST":
-        return HttpResponseBadRequest()
 
     recipe = get_recipe(request.user, recipe_id)
 
@@ -334,25 +333,15 @@ def recipe_copy(request, recipe_id):
             **ingredient_data,
         )
 
-    search = request.POST.get("search", "").strip()
-    selected_tags = request.POST.getlist("tags")
-    sort = request.POST.get("sort") or request.user.preferences.recipe_sort
+    new_recipe.tags.set(recipe.tags.all())
 
-    context = get_recipes_context(
-        request,
-        search=search,
-        selected_tags=selected_tags,
-    )
+    context = get_recipes_context(request)
 
-    response = render(
+    return render(
         request,
-        "recipes/partials/recipe_list.html",
+        "recipes/partials/recipes_content.html",
         context,
     )
-
-    response["HX-Trigger"] = "recipeCopied"
-
-    return response
 
 
 @login_required

@@ -54,33 +54,12 @@
                 <div id="favorite-button">
                     {% include "recipes/partials/recipe_card_favorite_button.html" %}
                 </div>
+
+                <div id="recipe-card-copy-button">
+                    {% include "recipes/partials/recipe_card/copy_button.html" %}
+                </div>
+
                 {% if edit %}
-
-                    <form
-                        method="post"
-                        action="{% url 'recipe_copy' recipe.id %}"
-                        hx-post="{% url 'recipe_copy' recipe.id %}"
-                        hx-target="#recipesContainer"
-                        hx-swap="innerHTML">
-
-                        {% csrf_token %}
-
-                        <input type="hidden" name="search" value="{{ search }}">
-
-                        {% for tag in selected_tags %}
-                            <input type="hidden" name="tags" value="{{ tag }}">
-                        {% endfor %}
-
-                        <input type="hidden" name="sort" value="{{ sort }}">
-
-                        <button
-                            type="submit"
-                            class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-copy"></i>
-                            Copy
-                        </button>
-
-                    </form>
 
                     <form onclick="event.stopPropagation();">
 

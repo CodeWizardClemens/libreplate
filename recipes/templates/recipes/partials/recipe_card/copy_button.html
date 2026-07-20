@@ -1,0 +1,18 @@
+<form
+    method="post"
+    hx-post="{% url 'recipe_copy' recipe.id %}"
+    hx-target="#recipesContent"
+    hx-swap="innerHTML"
+    hx-include="#filterForm">
+
+    {% csrf_token %}
+
+    <input type="hidden" name="favorites" value="0">
+
+    <button
+        type="submit"
+        class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-copy"></i>
+        Copy
+    </button>
+</form>
