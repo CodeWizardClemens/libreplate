@@ -29,7 +29,7 @@
             type="search"
             class="form-control"
             name="search"
-            placeholder="Search recipes..."
+            placeholder="{% if number_of_recipes <= 1 %}Not much to search through...{% else %}Search {{ number_of_recipes }} recipes...{% endif %}"
             value="{{ search }}"
             hx-get="{% url 'recipes' %}"
             hx-trigger="keyup changed delay:300ms, search"

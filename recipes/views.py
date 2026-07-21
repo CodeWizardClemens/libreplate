@@ -211,64 +211,12 @@ def toggle_pin(request, recipe_id):
     )
 
 
-def get_recipes_context(request):
-    user_preferences = request.user.preferences
-    filters = get_recipe_filters(request)
-    selected_tags = filters["selected_tags"] or []
-
-    if filters["sort"] is None:
-        filters["sort"] = user_preferences.recipe_sort
-    elif filters["sort"] != user_preferences.recipe_sort:
-        user_preferences.update_recipe_sort(filters["sort"])
-
-    recipes = Recipe.objects.filter(user=request.user)
-
-    if filters["favorites_only"]:
-        recipes = recipes.filter(is_favorite=True)
-
-    if filters["search"]:
-        recipes = recipes.filter(name__icontains=filters["search"])
-
-    if selected_tags:
-        recipes = (
-            recipes.filter(tags__id__in=selected_tags)
-            .annotate(matched_tags=Count("tags", filter=Q(tags__id__in=selected_tags)))
-            .filter(matched_tags=len(selected_tags))
-        )
-
-    recipes = recipes.annotate(
-        pinned_order=Case(
-            When(is_pinned=True, then=0),
-            default=1,
-            output_field=IntegerField(),
-        )
-    )
-
-    ordering = {
-        "last_used": ["pinned_order", "-last_used_at"],
-        "created": ["pinned_order", "-created_at"],
-        "updated": ["pinned_order", "-updated_at"],
-        "name": ["pinned_order", "name"],
-    }
-
-    context = {
-        **filters,
-        "recipes": (
-            recipes.distinct()
-            .order_by(*ordering[filters["sort"]])
-            .prefetch_related("ingredients__food")
-        ),
-        "tags": RecipeTag.objects.filter(user=request.user),
-        "sort_choices": user_preferences._meta.get_field("recipe_sort").choices,
-    }
-
-    return context
-
-
 @login_required
 def recipes(request):
 
     context = get_recipes_context(request)
+    # Is always None
+    print(f"Number of recipes: {context.get("number_of_recipes")}")
 
     if request.headers.get("HX-Request"):
         return render(request, "recipes/partials/recipes_content.html", context)
@@ -566,6 +514,7 @@ def get_recipes_context(request):
         "recipe_nutrient_values": recipe_nutrient_values,
         "tags": RecipeTag.objects.filter(user=request.user),
         "sort_choices": (user_preferences._meta.get_field("recipe_sort").choices),
+        "number_of_recipes": len(recipes),
     }
 
     return context
