@@ -1,9 +1,7 @@
 """
 Invoke tasks for managing the LibrePlate application.
 
-Provides automation commands for installation, dependency management, code
-quality checks, database migrations, static asset handling, user management,
-testing, and local development workflows.
+Provides automation commands code quality checks, database migrations etc.
 
 Commands are executed through Invoke, for example:
 
@@ -20,394 +18,162 @@ For a complete list of available commands and options, run:
 from __future__ import annotations
 
 import os
-import subprocess
-import sys
+import shlex
 from pathlib import Path
-from textwrap import dedent
 
+from dotenv import load_dotenv
 from invoke import task
 
-APP_NAME = "libreplate"
+load_dotenv()
 
 BASE_DIR = Path(__file__).parent.resolve()
 VENV_DIR = BASE_DIR / ".venv"
-ENV_FILE = BASE_DIR / ".env"
-
-PYTHON = sys.executable
-PYTHON_REQUIRED = (3, 10)
-POSTGRES_REQUIRED = 13
+DJANGO_CMD = "uv run python manage.py"
 
 
 def log(message: str):
     print(f"\n==> {message}")
 
 
-def fail(message: str):
-    raise SystemExit(f"\nERROR: {message}")
+IS_RELEASE = (lambda v: {"True": True, "False": False}[v])(
+    os.getenv("RELEASE", "False")
+)
 
 
 @task
 def check_code_quality(c):
+    """
+    Run code quality checks like import sorting, formatting, and linting.
+    """
     # TODO linters for css/js/html files.
     c.run(f"isort {BASE_DIR} --check-only --skip {VENV_DIR}")
     c.run(f"black {BASE_DIR} --check --exclude '{VENV_DIR}'")
     c.run(f"ruff check {BASE_DIR} --exclude {VENV_DIR}")
-    # TODO needs more configiration
+    # TODO needs more configuration
     # c.run(f"bandit -r {BASE_DIR} -x {VENV_DIR}")
 
 
 @task
 def format_code(c):
+    """
+    Automatically format the codebase.
+    """
     # TODO formatters for css/js/html files.
     c.run(f"isort {BASE_DIR} --skip {VENV_DIR}")
     c.run(f"black {BASE_DIR} --exclude '{VENV_DIR}'")
-    c.run(f"ruff check {BASE_DIR} --fix --exclude {VENV_DIR}")
-
-
-# TODO replace run command with default c.run, but add fail message to all
-# invoke runs.
-def run(command, env=None):
-    try:
-        subprocess.run(command, check=True, env=env)
-    except subprocess.CalledProcessError as e:
-        cmd = " ".join(map(str, e.cmd))
-        fail(f"Command failed (exit code {e.returncode}):\n\n    {cmd}")
-
-
-def venv_python():
-    return VENV_DIR / "bin" / "python"
-
-
-def load_env():
-    if ENV_FILE.exists():
-        for line in ENV_FILE.read_text().splitlines():
-            if "=" in line and not line.startswith("#"):
-                k, v = line.split("=", 1)
-                os.environ.setdefault(k, v)
-
-
-@task
-def check_python(c):
-    log("Checking Python")
-
-    version = sys.version_info[:2]
-
-    print(f"Python version: {version[0]}.{version[1]}")
-
-    if version < PYTHON_REQUIRED:
-        fail(f"Python {PYTHON_REQUIRED[0]}.{PYTHON_REQUIRED[1]}+ required")
-
-    print("Python version OK")
-
-
-@task
-def check_postgresql(c):
-    log("Checking PostgreSQL")
-
-    try:
-        result = subprocess.run(
-            ["psql", "--version"],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-    except FileNotFoundError:
-        fail("psql not installed")
-
-    version = result.stdout.split()[2]
-    major = int(version.split(".")[0])
-
-    print(f"PostgreSQL version: {version}")
-
-    if major < POSTGRES_REQUIRED:
-        fail(f"PostgreSQL {POSTGRES_REQUIRED}+ required")
-
-    print("PostgreSQL version OK")
-
-
-@task
-def create_directories(c):
-    log("Creating directories")
-
-    for directory in ("uploads", "static", "logs"):
-        (BASE_DIR / directory).mkdir(parents=True, exist_ok=True)
-
-    print("Directories OK")
-
-
-@task
-def create_virtualenv(c):
-    log("Creating virtual environment")
-
-    if not VENV_DIR.exists():
-        run([PYTHON, "-m", "venv", str(VENV_DIR)])
-        print("Virtual environment created")
-    else:
-        print("Virtual environment already exists")
-
-
-@task(pre=[create_virtualenv])
-def install_dependencies(c):
-    log("Installing dependencies")
-
-    requirements = BASE_DIR / "requirements.txt"
-
-    if not requirements.exists():
-        fail("requirements.txt not found")
-
-    lines = [
-        l
-        for l in requirements.read_text().splitlines()
-        if l.strip() and not l.startswith("#")
-    ]
-
-    if not all("==" in line for line in lines):
-        fail("requirements.txt must contain pinned versions")
-
-    python = str(venv_python())
-
-    run([python, "-m", "pip", "install", "--upgrade", "pip", "setuptools", "wheel"])
-    run([python, "-m", "pip", "install", "-r", str(requirements)])
+    c.run(f"ruff format {BASE_DIR} --exclude {VENV_DIR}")
 
 
 @task
 def migrate(c):
-    if not (BASE_DIR / "manage.py").exists():
-        print("No Django project detected")
-        return
-
-    load_env()
-    log("Running migrations")
-    python = str(venv_python())
-    run([python, "manage.py", "makemigrations"])
-    run([python, "manage.py", "migrate", "--noinput"])
-    log("Collecting static")
-
-    run([python, "manage.py", "collectstatic", "--noinput"])
+    """
+    Create new Django migrations and apply pending database migrations.
+    """
+    log("Creating and applying migrations")
+    c.run(f"{DJANGO_CMD} makemigrations")
+    c.run(f"{DJANGO_CMD} migrate")
 
 
 @task
 def collectstatic(c):
-    if not (BASE_DIR / "manage.py").exists():
-        print("No Django project detected")
-        return
-
-    load_env()
-    python = str(venv_python())
-    log("Collecting static")
-    run([python, "manage.py", "collectstatic", "--noinput"])
+    """
+    Collect Django static files for deployment.
+    """
+    log("Collecting static files")
+    c.run(f"{DJANGO_CMD} collectstatic --noinput")
 
 
 @task
 def update(c):
+    """
+    Update LibrePlate dependencies, source code, and database state.
+    """
     log("Updating LibrePlate")
+    c.run("uv sync")
     c.run("git pull origin master")
     migrate(c)
     collectstatic(c)
 
 
 @task
-def create_admin(c, password):
-    if not password:
-        fail("--password is required")
-
-    if not (BASE_DIR / "manage.py").exists():
-        print("No Django project detected")
-        return
-
-    load_env()
-
-    log("Creating admin user")
-
-    env = os.environ.copy()
-    env["DJANGO_SUPERUSER_USERNAME"] = "admin"
-    env["DJANGO_SUPERUSER_EMAIL"] = ""
-    env["DJANGO_SUPERUSER_PASSWORD"] = password
-
-    try:
-        run(
-            [
-                str(venv_python()),
-                "manage.py",
-                "createsuperuser",
-                "--noinput",
-            ],
-            env=env,
-        )
-    except subprocess.CalledProcessError:
-        print("Admin user already exists")
-
-
-@task
 def sync_default_data(c):
-
+    """
+    Synchronize default application data.
+    """
     log("Syncing default data")
-    load_env()
+
     for sync_command in ["sync_nutrients", "sync_units", "sync_body_metrics"]:
-        c.run(f"{str(venv_python())} manage.py {sync_command}")
+        c.run(f"{DJANGO_CMD} {sync_command}")
 
 
 @task
 def add_user(c, username, first_name, last_name, email, password):
     """
-    Create a normal user.
+    Create a new LibrePlate user account.
     """
-
-    load_env()
-
-    script = dedent(f"""\
-        from django.contrib.auth import get_user_model
-
-        User = get_user_model()
-
-        if User.objects.filter(username={username!r}).exists():
-            print("User already exists")
-        else:
-            User.objects.create_user(
-                username={username!r},
-                email={email!r},
-                password={password!r},
-                first_name={first_name!r},
-                last_name={last_name!r},
-            )
-            print("User created")
-    """)
-
-    run(
-        [
-            str(venv_python()),
-            "manage.py",
-            "shell",
-            "-c",
-            script,
-        ]
+    log(f"Adding new user `{username}`")
+    c.run(
+        f"{DJANGO_CMD} add_user "
+        f"{shlex.quote(username)} "
+        f"{shlex.quote(first_name)} "
+        f"{shlex.quote(last_name)} "
+        f"{shlex.quote(email)} "
+        f"{shlex.quote(password)}"
     )
 
 
 @task
 def remove_user(c, username):
     """
-    Remove a user by username.
-
+    Remove an existing LibrePlate user account.
     """
-
-    load_env()
-
-    script = dedent(f"""\
-        from django.contrib.auth import get_user_model
-
-        User = get_user_model()
-
-        try:
-            user = User.objects.get(username={username!r})
-        except User.DoesNotExist:
-            print("User does not exist")
-        else:
-            user.delete()
-            print("User removed")
-    """)
-
-    run(
-        [
-            str(venv_python()),
-            "manage.py",
-            "shell",
-            "-c",
-            script,
-        ]
-    )
+    log(f"Removing user `{username}`")
+    c.run(f'{DJANGO_CMD} remove_user "{username}"')
 
 
 @task
 def add_usda_api_key(c, key):
     """
-    Add a USDA API key.
+    Configure the USDA API key used for food data integration.
+
+    Stores the provided API key so LibrePlate can access USDA food information.
     """
-
-    script = dedent(f"""\
-        from integrations.models import USDAAPISettings
-
-        USDAAPISettings.objects.create(key={key!r})
-    """)
-
-    run(
-        [
-            str(venv_python()),
-            "manage.py",
-            "shell",
-            "-c",
-            script,
-        ]
-    )
+    log("Add a USDA API key")
+    c.run(f"{DJANGO_CMD} add_usda_api_key {key}")
 
 
 @task
-def serve(c, host="127.0.0.1", port=8000):
+def serve(c):
     """
-    Run the application server for development.
+    Start the LibrePlate web server.
     """
-    load_env()
-    python = VENV_DIR / "bin" / "python"
-    run(
-        [
-            str(python),
-            "manage.py",
-            "runserver",
-        ]
-    )
+    log("Running server")
+    if IS_RELEASE():
+        c.run("uv run gunicorn libreplate.wsgi:application")
+    else:
+        c.run(f"{DJANGO_CMD} runserver")
 
 
 @task
-def test(c, app=None):
+def test(c):
     """
-    Run all tests, or tests for a specific app.
-
-    Examples:
-        inv test
-        inv test --app units
+    Run the LibrePlate automated test suite.
     """
-
-    load_env()
     log("Running tests")
-
-    if not (BASE_DIR / "manage.py").exists():
-        fail("No Django project detected")
-
-    command = [
-        str(venv_python()),
-        "manage.py",
-        "test",
-    ]
-
-    if app:
-        command.append(app)
-
-    run(command)
-
-    print("Tests passed")
+    c.run(f"{DJANGO_CMD} test")
 
 
 @task
-def install(c):
+def init(c):
+    """
+    Install and initialize LibrePlate.
+    """
 
-    check_python(c)
-    check_postgresql(c)
-    create_directories(c)
-    create_virtualenv(c)
-    install_dependencies(c)
+    log("Installing libreplate")
+
     migrate(c)
-    collectstatic(c)
+
+    if IS_RELEASE():
+        collectstatic(c)
+
     sync_default_data(c)
-
-    print(f"""
-
-Installation complete.
-
-Activate:
-
-    source {VENV_DIR}/bin/activate
-
-Start:
-
-    gunicorn libreplate.wsgi:application
-""")

@@ -1,0 +1,30 @@
+from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
+
+
+class Command(BaseCommand):
+    help = "Create a user."
+
+    def add_arguments(self, parser):
+        parser.add_argument("username")
+        parser.add_argument("first_name")
+        parser.add_argument("last_name")
+        parser.add_argument("email")
+        parser.add_argument("password")
+
+    def handle(self, *args, **options):
+        User = get_user_model()
+
+        if User.objects.filter(username=options["username"]).exists():
+            self.stdout.write("User already exists")
+            return
+
+        User.objects.create_user(
+            username=options["username"],
+            email=options["email"],
+            password=options["password"],
+            first_name=options["first_name"],
+            last_name=options["last_name"],
+        )
+
+        self.stdout.write(self.style.SUCCESS("User created"))
