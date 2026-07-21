@@ -24,10 +24,9 @@ def recipe_tag_create(request):
     if name:
         tag = RecipeTag.objects.get_or_create(name=name, user=request.user)
     else:
-        raise(ValueError)
+        raise (ValueError)
 
     context = get_recipes_context(request)
-
 
     return render(
         request,
@@ -444,10 +443,7 @@ def get_recipes_context(request):
 
     tags = RecipeTag.objects.filter(user=user)
 
-    tag_choices = [
-        (str(tag.id), tag.name)
-        for tag in tags
-    ]
+    tag_choices = [(str(tag.id), tag.name) for tag in tags]
 
     filter_form = RecipeFilterForm(
         request.GET,
@@ -481,10 +477,7 @@ def get_recipes_context(request):
     if filters["search"]:
         recipes = recipes.filter(name__icontains=filters["search"])
 
-    selected_tags = [
-        int(tag_id)
-        for tag_id in filters.get("tags", [])
-    ]
+    selected_tags = [int(tag_id) for tag_id in filters.get("tags", [])]
 
     if selected_tags:
         recipes = (
@@ -522,9 +515,7 @@ def get_recipes_context(request):
         )
     )
 
-    recipe_nutrients = list(
-        Nutrient.objects.filter(show_in_recipes=True)
-    )
+    recipe_nutrients = list(Nutrient.objects.filter(show_in_recipes=True))
 
     context = {
         **filters,
@@ -532,8 +523,7 @@ def get_recipes_context(request):
         "recipes": recipes,
         "recipe_nutrients": recipe_nutrients,
         "recipe_nutrient_values": {
-            recipe.id: recipe.get_nutrients()
-            for recipe in recipes
+            recipe.id: recipe.get_nutrients() for recipe in recipes
         },
         "tags": tags,
         "sort_choices": sort_choices,
