@@ -65,7 +65,7 @@
                                         <input
                                             class="btn-check"
                                             type="checkbox"
-                                            name="tags"
+                                            name="{{ filter_form.tags.html_name }}"
                                             value="{{ tag.id }}"
                                             id="search-tag-{{ tag.id }}"
                                             autocomplete="off"

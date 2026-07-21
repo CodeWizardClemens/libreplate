@@ -6,7 +6,7 @@
             <input
                 class="form-check-input"
                 type="checkbox"
-                name="tags"
+                name="{{ filter_form.tags.html_name }}"
                 value="{{ tag.id }}"
                 id="tag-{{ tag.id }}"
                 {% if tag.id in selected_tags %}checked{% endif %}

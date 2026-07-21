@@ -29,11 +29,6 @@ urlpatterns = [
         name="recipe_nutrition_ajax",
     ),
     path(
-        "<int:recipe_id>/add-to-diary/",
-        views.add_recipe_to_diary,
-        name="add_recipe_to_diary",
-    ),
-    path(
         "meal/<str:meal_id>/<str:meal_name>/<str:meal_date>/add/",
         views.add_recipes_to_meal_direct,
         name="add_recipes_to_meal_direct",

@@ -7,13 +7,13 @@
             <input
                 class="btn-check"
                 type="checkbox"
-                name="tags"
+                name="{{ filter_form.tags.html_name }}"
                 value="{{ tag.id }}"
                 id="search-tag-{{ tag.id }}"
                 autocomplete="off"
                 {% if tag.id in selected_tags %}checked{% endif %}
                 hx-get="{% url 'recipes' %}"
-                hx-include="#filterForm"
+                hx-include="#filterForm, #searchbar-tags"
                 hx-target="#recipesContent"
                 hx-swap="outerHTML"
                 hx-push-url="true"
