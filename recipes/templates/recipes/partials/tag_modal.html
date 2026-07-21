@@ -1,0 +1,121 @@
+<div id="recipeTags">
+
+    <div
+        class="modal fade"
+        id="tagsModal"
+        tabindex="-1"
+        aria-labelledby="tagsModalLabel"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5
+                        class="modal-title"
+                        id="tagsModalLabel"
+                    >
+                        Manage tags
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                    ></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        {% csrf_token %}
+
+                        <div class="input-group">
+                            <input
+                                type="text"
+                                name="name"
+                                class="form-control"
+                                placeholder="New tag"
+                                required
+                            >
+
+                            <button
+                                class="btn btn-primary"
+                                type="button"
+                                hx-post="{% url 'recipe_tag_create' %}"
+                                hx-include="#filterForm, input[name='name']"
+                                hx-target="#recipesContent"
+                                hx-swap="outerHTML"
+                            >
+                                Add
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="list-group list-group-flush">
+
+                        {% for tag in tags %}
+
+                            <div class="list-group-item px-0">
+
+                                <div class="d-flex justify-content-between align-items-center">
+
+                                    <div>
+
+                                        <input
+                                            class="btn-check"
+                                            type="checkbox"
+                                            name="tags"
+                                            value="{{ tag.id }}"
+                                            id="search-tag-{{ tag.id }}"
+                                            autocomplete="off"
+                                            {% if tag.id in selected_tags %}checked{% endif %}
+                                            hx-get="{% url 'recipes' %}"
+                                            hx-include="#filterForm"
+                                            hx-target="#recipesContent"
+                                            hx-swap="outerHTML"
+                                            hx-push-url="true"
+                                        >
+
+                                        <label
+                                            class="btn btn-outline-primary btn-sm"
+                                            for="search-tag-{{ tag.id }}"
+                                        >
+                                            {{ tag.name }}
+                                        </label>
+
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline-danger btn-sm"
+                                        hx-post="{% url 'recipe_tag_delete' tag.id %}"
+                                        hx-include="#filterForm"
+                                        hx-target="#recipesContent"
+                                        hx-swap="outerHTML"
+                                        hx-confirm="Delete '{{ tag.name }}'?"
+                                    >
+                                        Delete
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        {% empty %}
+
+                            <div class="text-muted">
+                                No tags yet.
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

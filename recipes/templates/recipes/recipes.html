@@ -27,12 +27,14 @@
     <input type="hidden" name="search" value="{{ search }}">
     <input type="hidden" name="sort" value="{{ sort }}">
 
-    {% include "recipes/partials/recipes_content.html" %}
-
 </form>
 
-<script src="{% static 'recipes/js/recipes.js' %}"></script>
+{% include "recipes/partials/recipes_content.html" %}
 
-<div id="recipe-tag-selector-modal"></div>
+<div id="tagsModalContainer" hx-swap-oob="outerHTML">
+    {% include "recipes/partials/tag_modal.html" %}
+</div>
+
+<script src="{% static 'recipes/js/recipes.js' %}"></script>
 
 {% endblock %}

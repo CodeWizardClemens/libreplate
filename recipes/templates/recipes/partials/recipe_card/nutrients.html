@@ -4,10 +4,9 @@
 
     {% for nutrient in recipe_nutrients %}
 
-        <span class="badge text-bg-light border">
+        <span class="badge bg-secondary">
 
             {{ nutrient.abbreviation|default:nutrient.name }}
-
             {{ recipe_nutrient_values|get_nested:recipe.id|get_nutrient:nutrient|floatformat:0 }}
 
         </span>

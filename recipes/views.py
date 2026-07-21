@@ -21,23 +21,19 @@ from .models import Recipe, RecipeIngredient, RecipeTag
 def recipe_tag_create(request):
     name = request.POST.get("name", "").strip()
 
+    print(request.POST)
     if name:
-        RecipeTag.objects.get_or_create(name=name, user=request.user)
+        tag = RecipeTag.objects.get_or_create(name=name, user=request.user)
+    else:
+        raise(ValueError)
 
-    recipe = get_object_or_404(
-        Recipe,
-        id=request.POST["recipe_id"],
-        user=request.user,
-    )
+    context = get_recipes_context(request)
+
 
     return render(
         request,
-        "recipes/partials/tag_list.html",
-        {
-            "recipe": recipe,
-            "tags": RecipeTag.objects.filter(user=request.user),
-            "selected_tags": recipe.tags.values_list("id", flat=True),
-        },
+        "recipes/partials/recipes_content.html",
+        context,
     )
 
 
