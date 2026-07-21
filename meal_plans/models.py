@@ -67,7 +67,7 @@ class MealPlanFood(models.Model):
     number_of_servings = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"{self.food.name} - " f"{self.get_day_display()} - " f"{self.meal.name}"
+        return f"{self.food.name} - {self.get_day_display()} - {self.meal.name}"
 
 
 class MealPlanRecipe(models.Model):
@@ -97,6 +97,4 @@ class MealPlanRecipe(models.Model):
     number_of_servings = models.DecimalField(max_digits=10, decimal_places=2, default=1)
 
     def __str__(self):
-        return (
-            f"{self.recipe.name} - " f"{self.get_day_display()} - " f"{self.meal.name}"
-        )
+        return f"{self.recipe.name} - {self.get_day_display()} - {self.meal.name}"

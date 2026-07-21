@@ -407,7 +407,6 @@ def get_recipe(user, recipe_id):
 
 def update_recipe_ingredients(recipe, post_data):
     for ingredient in recipe.ingredients.all():
-
         serving_amount = post_data.get(f"serving_amount_{ingredient.id}")
         default_servings = post_data.get(f"default_servings_{ingredient.id}")
 
@@ -449,9 +448,7 @@ def get_recipes_context(request):
     user = request.user
     preferences = user.preferences
 
-    keep_tags_modal_open = (
-        request.headers.get("X-Tags-Modal-Open") == "true"
-    )
+    keep_tags_modal_open = request.headers.get("X-Tags-Modal-Open") == "true"
 
     sort_choices = preferences._meta.get_field("recipe_sort").choices
 
@@ -495,10 +492,7 @@ def get_recipes_context(request):
     if filters["search"]:
         recipes = recipes.filter(name__icontains=filters["search"])
 
-    selected_tags = [
-        int(tag_id)
-        for tag_id in filters.get("tags", [])
-    ]
+    selected_tags = [int(tag_id) for tag_id in filters.get("tags", [])]
 
     if selected_tags:
         recipes = (
@@ -536,28 +530,21 @@ def get_recipes_context(request):
         )
     )
 
-    recipe_nutrients = list(
-        Nutrient.objects.filter(show_in_recipes=True)
-    )
+    recipe_nutrients = list(Nutrient.objects.filter(show_in_recipes=True))
 
     return {
         **filters,
-
         "filter_form": filter_form,
         "tag_form": tag_form,
-
         "recipes": recipes,
         "recipe_nutrients": recipe_nutrients,
         "recipe_nutrient_values": {
-            recipe.id: recipe.get_nutrients()
-            for recipe in recipes
+            recipe.id: recipe.get_nutrients() for recipe in recipes
         },
-
         "tags": tags,
         "sort_choices": sort_choices,
         "number_of_recipes": len(recipes),
         "selected_tags": selected_tags,
-
         "keep_tags_modal_open": keep_tags_modal_open,
     }
 
@@ -660,7 +647,6 @@ def recipe_nutrition_ajax(request, recipe_id):
     totals = {nutrient.id: 0 for nutrient in visible}
 
     for ingredient in recipe.ingredients.all():
-
         servings = float(
             request.GET.get(
                 f"food_{ingredient.food.id}",
@@ -669,7 +655,6 @@ def recipe_nutrition_ajax(request, recipe_id):
         )
 
         for fn in FoodNutrient.objects.filter(food=ingredient.food):
-
             if fn.nutrient_id in totals:
                 totals[fn.nutrient_id] += float(fn.amount) * servings
 

@@ -35,7 +35,6 @@ class RecipeIngredientForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if user:
-
             self.fields["food"].queryset = get_user_foods(user)
 
 

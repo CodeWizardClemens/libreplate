@@ -54,7 +54,6 @@ def import_usda_food(user, fdc_id):
         nutrient_lookup[str(nutrient.usda_nutrient_number)] = nutrient
 
     for nutrient in data["nutrients"]:
-
         number = str(nutrient.get("number", ""))
         local_nutrient = nutrient_lookup.get(number)
 

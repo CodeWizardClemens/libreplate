@@ -35,13 +35,11 @@ def graph_data(request, pk):
     labels = set()
 
     for line in graph.lines.all():
-
         #
         # BODY METRIC
         #
 
         if hasattr(line, "body_metric"):
-
             qs = BodyMetricLog.objects.filter(
                 user=request.user,
                 body_metric=line.body_metric.body_metric,
@@ -70,7 +68,6 @@ def graph_data(request, pk):
         #
 
         else:
-
             nutrient = line.nutrient.nutrient
 
             qs = (
@@ -114,7 +111,6 @@ def graph_data(request, pk):
     chart_data = []
 
     for ds in datasets:
-
         chart_data.append(
             {
                 "label": ds["label"],
@@ -142,9 +138,7 @@ def get_graph_date_range(graph):
         latest = None
 
         for line in graph.lines.all():
-
             if hasattr(line, "body_metric"):
-
                 d = (
                     BodyMetricLog.objects.filter(
                         user=graph.user,
@@ -158,7 +152,6 @@ def get_graph_date_range(graph):
                     latest = max(latest, d.date) if latest else d.date
 
             elif hasattr(line, "nutrient"):
-
                 d = (
                     MealFood.objects.filter(
                         meal__user=graph.user,

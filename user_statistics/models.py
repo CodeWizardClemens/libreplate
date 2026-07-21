@@ -5,7 +5,6 @@ from django.db import models
 
 
 class Graph(models.Model):
-
     class GraphType(models.TextChoices):
         LINE = "line", "Line Graph"
         BAR = "bar", "Bar Graph"
@@ -74,7 +73,6 @@ class Graph(models.Model):
 
 
 class GraphLine(models.Model):
-
     id = models.UUIDField(
         primary_key=True,
         default=uuid4,
@@ -121,7 +119,6 @@ class GraphLine(models.Model):
 
 
 class GraphLineBodyMetric(models.Model):
-
     id = models.UUIDField(
         primary_key=True,
         default=uuid4,
@@ -141,7 +138,6 @@ class GraphLineBodyMetric(models.Model):
 
 
 class GraphLineNutrient(models.Model):
-
     id = models.UUIDField(
         primary_key=True,
         default=uuid4,

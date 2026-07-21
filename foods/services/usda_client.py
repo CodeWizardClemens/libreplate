@@ -77,7 +77,6 @@ class USDAClient:
         nutrients = []
 
         for nutrient in data.get("foodNutrients", []):
-
             info = nutrient.get("nutrient", {})
             amount = nutrient.get("amount")
 

@@ -204,7 +204,6 @@ def diary_day(request, date=None):
     meals = []
 
     for dm in DefaultMeal.objects.filter(user=request.user).order_by("order"):
-
         if dm.name in meal_map:
             meal = meal_map[dm.name]
             meal.is_virtual = False
@@ -288,7 +287,6 @@ def add_food_to_meal(request, meal_id):
     meal = get_or_create_real_meal(meal_id, request.user, date=datetime.today().date())
 
     if request.method == "POST":
-
         form = MealFoodForm(request.POST)
 
         form.fields["food"].queryset = Food.objects.filter(user=request.user).order_by(

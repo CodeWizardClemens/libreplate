@@ -3,7 +3,6 @@ from django.db import models
 
 
 class UserPreferences(models.Model):
-
     SORT_CHOICES = [
         ("name", "Name"),
         ("-created_at", "Newest"),

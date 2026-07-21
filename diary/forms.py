@@ -4,7 +4,6 @@ from .models import Meal, MealFood
 
 
 class MealForm(forms.ModelForm):
-
     class Meta:
         model = Meal
         fields = [
@@ -13,7 +12,6 @@ class MealForm(forms.ModelForm):
 
 
 class MealFoodForm(forms.ModelForm):
-
     class Meta:
         model = MealFood
 
@@ -25,7 +23,6 @@ class MealFoodForm(forms.ModelForm):
 
 
 class AddMealFoodForm(forms.ModelForm):
-
     class Meta:
         model = MealFood
         fields = [

@@ -9,7 +9,6 @@ User = get_user_model()
 
 
 class UnitScopeModelTests(TestCase):
-
     def test_only_one_global_scope_can_exist(self):
         # Created by the data migration.
         self.assertEqual(UnitScope.objects.filter(user=None).count(), 1)

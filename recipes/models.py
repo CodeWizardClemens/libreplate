@@ -6,7 +6,6 @@ from django.utils import timezone
 
 
 class Recipe(models.Model):
-
     def get_nutrients(self, per_portion=True):
         from collections import defaultdict
 
@@ -81,7 +80,6 @@ class RecipePicture(models.Model):
 
 
 class RecipeTag(models.Model):
-
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -98,7 +96,6 @@ class RecipeTag(models.Model):
 
 
 class RecipeIngredient(models.Model):
-
     recipe = models.ForeignKey(
         Recipe, on_delete=models.CASCADE, related_name="ingredients"
     )
@@ -112,9 +109,8 @@ class RecipeIngredient(models.Model):
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
-
         ordering = ["order"]
 
     def __str__(self):
 
-        return f"{self.food.name} " f"in {self.recipe.name}"
+        return f"{self.food.name} in {self.recipe.name}"

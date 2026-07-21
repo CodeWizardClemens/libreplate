@@ -18,7 +18,6 @@ def generate_grocery_items(grocery_list):
     food_totals = defaultdict(float)
 
     for item in meal_foods:
-
         amount = item.serving_size * item.number_of_servings
 
         food_totals[item.food_id] += amount
@@ -26,7 +25,6 @@ def generate_grocery_items(grocery_list):
     from .models import GroceryListFood
 
     for food_id, amount in food_totals.items():
-
         GroceryListFood.objects.create(
             grocery_list=grocery_list, food_id=food_id, amount=amount
         )

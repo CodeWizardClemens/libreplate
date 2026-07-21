@@ -86,7 +86,6 @@ def build_local_food_data(foods, nutrients, query=""):
     results = []
 
     for food in foods:
-
         if query and query.lower() not in food.name.lower():
             continue
 
@@ -129,7 +128,6 @@ def build_usda_food_data(user, query, nutrients):
     results = []
 
     for food in client.search(query):
-
         # USDA nutrients are in food["nutrients"]
         usda_values = {n["number"]: n["value"] for n in food.get("nutrients", [])}
 
@@ -164,7 +162,6 @@ def selected_foods(user, ids):
     foods = []
 
     for value in ids:
-
         if value.startswith("usda_"):
             fdc_id = int(value.split("_", 1)[1])
             food = import_usda_food(user, fdc_id)
@@ -216,7 +213,6 @@ def save_food_form(form, user=None):
 
 
 class FoodView(LoginRequiredMixin, View):
-
     def get(self, request):
         context = self.get_page_context(request)
         print(context)

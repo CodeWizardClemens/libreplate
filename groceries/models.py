@@ -5,7 +5,6 @@ from foods.models import Food
 
 
 class GroceryList(models.Model):
-
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="grocery_lists"
     )
@@ -25,7 +24,6 @@ class GroceryList(models.Model):
 
 
 class GroceryListFood(models.Model):
-
     grocery_list = models.ForeignKey(
         GroceryList, on_delete=models.CASCADE, related_name="items"
     )

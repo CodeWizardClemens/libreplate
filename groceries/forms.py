@@ -7,9 +7,7 @@ from .models import GroceryList
 
 
 class GroceryListCreateForm(forms.ModelForm):
-
     class Meta:
-
         model = GroceryList
 
         fields = [
