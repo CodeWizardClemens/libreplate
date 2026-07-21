@@ -1,3 +1,22 @@
+"""
+Invoke tasks for managing the LibrePlate application.
+
+Provides automation commands for installation, dependency management, code
+quality checks, database migrations, static asset handling, user management,
+testing, and local development workflows.
+
+Commands are executed through Invoke, for example:
+
+    inv install
+    inv test
+    inv format-code
+    inv serve
+
+For a complete list of available commands and options, run:
+
+    invoke --list
+"""
+
 from __future__ import annotations
 
 import os
