@@ -30,17 +30,19 @@ def fail(message: str):
 @task
 def check_code_quality(c):
     # TODO linters for css/js/html files.
-    c.run(f"isort {BASE_DIR} --check-only")
-    c.run(f"black {BASE_DIR} --check")
-    c.run(f"ruff check {BASE_DIR}")
+    c.run(f"isort {BASE_DIR} --check-only --skip {VENV_DIR}")
+    c.run(f"black {BASE_DIR} --check --exclude '{VENV_DIR}'")
+    c.run(f"ruff check {BASE_DIR} --exclude {VENV_DIR}")
+    # TODO needs more configiration
+    # c.run(f"bandit -r {BASE_DIR} -x {VENV_DIR}")
 
 
 @task
 def format_code(c):
     # TODO formatters for css/js/html files.
-    c.run(f"isort {BASE_DIR}")
-    c.run(f"black {BASE_DIR}")
-    c.run(f"ruff check . --fix {BASE_DIR}")
+    c.run(f"isort {BASE_DIR} --skip {VENV_DIR}")
+    c.run(f"black {BASE_DIR} --exclude '{VENV_DIR}'")
+    c.run(f"ruff check {BASE_DIR} --fix --exclude {VENV_DIR}")
 
 
 # TODO replace run command with default c.run, but add fail message to all

@@ -12,21 +12,22 @@ from diary.models import Meal, MealFood
 from foods.models import FoodNutrient
 from nutrients.models import Nutrient
 
-from .forms import RecipeFilterForm, RecipeForm, RecipeIngredientForm
+from .forms import RecipeFilterForm, RecipeForm, RecipeIngredientForm, RecipeTagForm
 from .models import Recipe, RecipeIngredient, RecipeTag
 
 
 @login_required
 @require_POST
 def recipe_tag_create(request):
-    name = request.POST.get("name", "").strip()
+    form = RecipeTagForm(request.POST)
 
-    if name:
-        tag = RecipeTag.objects.get_or_create(name=name, user=request.user)
-    else:
-        raise (ValueError)
+    if form.is_valid():
+        tag = form.save(commit=False)
+        tag.user = request.user
+        tag.save()
 
     context = get_recipes_context(request)
+    context["tag_form"] = RecipeTagForm()
 
     return render(
         request,
@@ -213,10 +214,19 @@ def toggle_pin(request, recipe_id):
 def recipes(request):
 
     context = get_recipes_context(request)
-    if request.headers.get("HX-Request"):
-        return render(request, "recipes/partials/recipes_content.html", context)
 
-    return render(request, "recipes/recipes.html", context)
+    if request.headers.get("HX-Request"):
+        return render(
+            request,
+            "recipes/partials/recipes_content.html",
+            context,
+        )
+
+    return render(
+        request,
+        "recipes/recipes.html",
+        context,
+    )
 
 
 @require_POST
@@ -439,6 +449,10 @@ def get_recipes_context(request):
     user = request.user
     preferences = user.preferences
 
+    keep_tags_modal_open = (
+        request.headers.get("X-Tags-Modal-Open") == "true"
+    )
+
     sort_choices = preferences._meta.get_field("recipe_sort").choices
 
     tags = RecipeTag.objects.filter(user=user)
@@ -451,6 +465,8 @@ def get_recipes_context(request):
         tag_choices=tag_choices,
     )
 
+    tag_form = RecipeTagForm()
+
     filters = (
         filter_form.cleaned_data
         if filter_form.is_valid()
@@ -460,10 +476,12 @@ def get_recipes_context(request):
             "edit": False,
             "search": "",
             "sort": None,
+            "tags": [],
         }
     )
 
     sort = filters.get("sort") or preferences.recipe_sort
+
     if sort != preferences.recipe_sort:
         preferences.update_recipe_sort(sort)
 
@@ -477,7 +495,10 @@ def get_recipes_context(request):
     if filters["search"]:
         recipes = recipes.filter(name__icontains=filters["search"])
 
-    selected_tags = [int(tag_id) for tag_id in filters.get("tags", [])]
+    selected_tags = [
+        int(tag_id)
+        for tag_id in filters.get("tags", [])
+    ]
 
     if selected_tags:
         recipes = (
@@ -515,23 +536,30 @@ def get_recipes_context(request):
         )
     )
 
-    recipe_nutrients = list(Nutrient.objects.filter(show_in_recipes=True))
+    recipe_nutrients = list(
+        Nutrient.objects.filter(show_in_recipes=True)
+    )
 
-    context = {
+    return {
         **filters,
+
         "filter_form": filter_form,
+        "tag_form": tag_form,
+
         "recipes": recipes,
         "recipe_nutrients": recipe_nutrients,
         "recipe_nutrient_values": {
-            recipe.id: recipe.get_nutrients() for recipe in recipes
+            recipe.id: recipe.get_nutrients()
+            for recipe in recipes
         },
+
         "tags": tags,
         "sort_choices": sort_choices,
         "number_of_recipes": len(recipes),
         "selected_tags": selected_tags,
-    }
 
-    return context
+        "keep_tags_modal_open": keep_tags_modal_open,
+    }
 
 
 @login_required

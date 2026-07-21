@@ -47,19 +47,11 @@
                 class="d-flex gap-2 flex-wrap mt-2 mt-md-0"
                 onclick="event.stopPropagation();">
 
-                <div id="pin-button">
-                    {% include "recipes/partials/pin_button.html" %}
-                </div>
-
-                <div id="favorite-button">
-                    {% include "recipes/partials/recipe_card_favorite_button.html" %}
-                </div>
-
-                <div id="recipe-card-copy-button">
-                    {% include "recipes/partials/recipe_card/copy_button.html" %}
-                </div>
-
                 {% if edit %}
+
+                    <div id="recipe-card-copy-button">
+                        {% include "recipes/partials/recipe_card/copy_button.html" %}
+                    </div>
 
                     <form onclick="event.stopPropagation();">
 
@@ -77,7 +69,18 @@
                             Delete
                         </button>
                     </form>
+                {% else %}
+
+                    <div id="pin-button">
+                        {% include "recipes/partials/pin_button.html" %}
+                    </div>
+
+                    <div id="favorite-button">
+                        {% include "recipes/partials/recipe_card_favorite_button.html" %}
+                    </div>
+
                 {% endif %}
+
 
             </div>
 

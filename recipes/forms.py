@@ -2,7 +2,7 @@ from django import forms
 
 from common.food_selection import get_user_foods
 
-from .models import Recipe, RecipeIngredient
+from .models import Recipe, RecipeIngredient, RecipeTag
 
 
 class RecipeForm(forms.ModelForm):
@@ -80,3 +80,17 @@ class RecipeFilterForm(forms.Form):
 
         if tag_choices:
             self.fields["tags"].choices = tag_choices
+
+
+class RecipeTagForm(forms.ModelForm):
+    class Meta:
+        model = RecipeTag
+        fields = ["name"]
+        widgets = {
+            "name": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "New tag",
+                }
+            )
+        }

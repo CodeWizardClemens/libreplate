@@ -1,8 +1,9 @@
-<div id="recipeTags">
+<div id="tagsModalContainer">
 
     <div
         class="modal fade"
         id="tagsModal"
+        data-keep-open="{% if keep_tags_modal_open %}true{% endif %}"
         tabindex="-1"
         aria-labelledby="tagsModalLabel"
         aria-hidden="true"
@@ -28,28 +29,31 @@
                 <div class="modal-body">
 
                     <div class="mb-3">
-                        {% csrf_token %}
 
-                        <div class="input-group">
-                            <input
-                                type="text"
-                                name="name"
-                                class="form-control"
-                                placeholder="New tag"
-                                required
-                            >
+                        <form id="tagForm">
 
-                            <button
-                                class="btn btn-primary"
-                                type="button"
-                                hx-post="{% url 'recipe_tag_create' %}"
-                                hx-include="#filterForm, input[name='name']"
-                                hx-target="#recipesContent"
-                                hx-swap="outerHTML"
-                            >
-                                Add
-                            </button>
-                        </div>
+                            {% csrf_token %}
+
+                            <div class="input-group">
+
+                                {{ tag_form.name }}
+
+                                <button
+                                    class="btn btn-primary"
+                                    type="button"
+                                    hx-post="{% url 'recipe_tag_create' %}"
+                                    hx-include="#tagForm"
+                                    hx-headers='{"X-Tags-Modal-Open": "true"}'
+                                    hx-target="#recipesContent"
+                                    hx-swap="outerHTML"
+                                >
+                                    Add
+                                </button>
+
+                            </div>
+
+                        </form>
+
                     </div>
 
                     <div class="list-group list-group-flush">
@@ -91,6 +95,7 @@
                                         class="btn btn-outline-danger btn-sm"
                                         hx-post="{% url 'recipe_tag_delete' tag.id %}"
                                         hx-include="#filterForm"
+                                        hx-headers='{"X-Tags-Modal-Open": "true"}'
                                         hx-target="#recipesContent"
                                         hx-swap="outerHTML"
                                         hx-confirm="Delete '{{ tag.name }}'?"
