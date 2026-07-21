@@ -1,5 +1,5 @@
 <button
-    class="btn btn-sm btn-outline-primary"
+    class="btn btn-sm {% if recipe.is_favorite %}btn-primary{% else %}btn-outline-secondary{% endif %}"
     hx-post="{% url 'toggle_favorite' recipe.id %}"
     hx-target="#recipesContent"
     hx-swap="innerHTML"

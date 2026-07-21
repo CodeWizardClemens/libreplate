@@ -14,6 +14,7 @@
 
 {% block content %}
 
+<!-- TODO replace with django form. -->
 <form id="filterForm">
 
     {% if meal_name %}
@@ -26,10 +27,10 @@
     <input type="hidden" name="edit" value="{{ edit|yesno:'1,0' }}">
     <input type="hidden" name="search" value="{{ search }}">
     <input type="hidden" name="sort" value="{{ sort }}">
+{% include "recipes/partials/recipes_content.html" %}
 
 </form>
 
-{% include "recipes/partials/recipes_content.html" %}
 
 <div id="tagsModalContainer" hx-swap-oob="outerHTML">
     {% include "recipes/partials/tag_modal.html" %}

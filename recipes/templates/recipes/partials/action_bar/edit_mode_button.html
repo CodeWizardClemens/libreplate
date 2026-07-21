@@ -1,6 +1,6 @@
 <button
     type="button"
-    class="{% if edit %}btn btn-outline-primary{% else %}form-control text-start{% endif %}"
+    class="{% if edit %}btn btn-primary{% else %}form-control text-start{% endif %}"
     onclick="toggleFilter('edit')"
     hx-get="{% url 'recipes' %}"
     hx-include="#filterForm"
