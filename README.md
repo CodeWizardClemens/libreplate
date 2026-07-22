@@ -49,3 +49,8 @@ Run:
 ```
 uv run invoke serve
 ```
+
+Run dev for React:
+```
+npm run dev
+```
