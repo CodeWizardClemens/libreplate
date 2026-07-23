@@ -8,6 +8,7 @@ import AppLayout from "./AppLayout";
 import LoginPage from "../features/auth/pages/LoginPage";
 import GroceriesPage from "../features/groceries/pages/GroceriesPage";
 import RecipesPage from "../features/recipes/RecipePage";
+import RecipeEditPage from "../features/recipes/RecipeEditPage";
 
 function Placeholder({ title }: { title: string }) {
     return (
@@ -44,7 +45,15 @@ const router = createBrowserRouter([
                 path: "recipes",
                 element: <RecipesPage />,
                 handle: {
-                    title: "Recipes",
+                    title: "My Recipes",
+                },
+            },
+
+            {
+                path: "recipes/:id/edit",
+                element: <RecipeEditPage />,
+                handle: {
+                    title: "Edit Recipe",
                 },
             },
 

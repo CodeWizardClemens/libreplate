@@ -1,23 +1,40 @@
 import { useRef } from "react";
 
-import { useRecipePicture, useUploadRecipePicture } from "../api";
+import { useRecipePicture, useUploadRecipePicture } from "../../api";
 
 interface Props {
   recipeId: number;
+  width?: number;
+  height?: number;
 }
 
-export default function RecipeCardPicture({ recipeId }: Props) {
+export default function RecipeCardPicture({
+  recipeId,
+  width,
+  height,
+}: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: picture } = useRecipePicture(recipeId);
 
   const uploadPicture = useUploadRecipePicture();
 
-  function handleEditClick() {
+  function stopCardClick(event: React.MouseEvent) {
+    event.stopPropagation();
+  }
+
+  function handleEditClick(
+    event: React.MouseEvent<HTMLButtonElement>
+  ) {
+    event.stopPropagation();
     fileInputRef.current?.click();
   }
 
-  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileChange(
+    event: React.ChangeEvent<HTMLInputElement>
+  ) {
+    event.stopPropagation();
+
     const file = event.target.files?.[0];
 
     if (!file) {
@@ -37,10 +54,12 @@ export default function RecipeCardPicture({ recipeId }: Props) {
       className="
         position-relative
         flex-shrink-0
+        recipe-picture
       "
+      onClick={stopCardClick}
       style={{
-        width: "160px",
-        height: "160px",
+        width: `${width}px`,
+        height: `${height}px`,
       }}
     >
       {picture?.image ? (
@@ -82,11 +101,15 @@ export default function RecipeCardPicture({ recipeId }: Props) {
           end-0
           m-2
           shadow-sm
+          recipe-picture-edit
         "
         onClick={handleEditClick}
         title="Change picture"
       >
-        <i className="bi bi-pencil" aria-hidden="true" />
+        <i
+          className="bi bi-pencil"
+          aria-hidden="true"
+        />
       </button>
 
       <input
@@ -94,8 +117,24 @@ export default function RecipeCardPicture({ recipeId }: Props) {
         type="file"
         accept="image/*"
         className="d-none"
+        onClick={stopCardClick}
         onChange={handleFileChange}
       />
+
+      <style>
+        {`
+          .recipe-picture-edit {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease-in-out;
+          }
+
+          .recipe-picture:hover .recipe-picture-edit {
+            opacity: 1;
+            pointer-events: auto;
+          }
+        `}
+      </style>
     </div>
   );
 }

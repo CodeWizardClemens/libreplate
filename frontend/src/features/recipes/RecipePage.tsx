@@ -1,8 +1,8 @@
 import { useState } from "react";
 
-import RecipeList from "./components/RecipeList";
-import TagSelector from "./components/TagSelector";
-import TagModal from "./components/TagModal";
+import RecipeList from "./components/recipes/RecipeList";
+import TagSelector from "./components/recipes/TagSelector";
+import TagModal from "./components/recipes/TagModal";
 
 import {
   useCopyRecipe,
@@ -58,7 +58,9 @@ export default function RecipePage() {
 
       const matchesTags =
         selectedTags.length === 0 ||
-        selectedTags.every((tagId) => recipe.tags.some((tag) => tag.id === tagId));
+        selectedTags.every((tagId) =>
+          recipe.tags.some((tag) => tag.id === tagId)
+        );
 
       return matchesSearch && matchesFavorite && matchesTags;
     })
@@ -76,10 +78,16 @@ export default function RecipePage() {
           return a.name.localeCompare(b.name);
 
         case "created_at":
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          return (
+            new Date(b.created_at).getTime() -
+            new Date(a.created_at).getTime()
+          );
 
         case "updated_at":
-          return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+          return (
+            new Date(b.updated_at).getTime() -
+            new Date(a.updated_at).getTime()
+          );
 
         case "last_used_at":
           if (!a.last_used_at) {
@@ -90,7 +98,10 @@ export default function RecipePage() {
             return -1;
           }
 
-          return new Date(b.last_used_at).getTime() - new Date(a.last_used_at).getTime();
+          return (
+            new Date(b.last_used_at).getTime() -
+            new Date(a.last_used_at).getTime()
+          );
 
         default:
           return 0;
@@ -102,7 +113,11 @@ export default function RecipePage() {
       {/* Main controls */}
       <div className="row g-2 align-items-center">
         <div className="col-auto d-none d-md-block">
-          <a href="#" className="btn btn-primary" onClick={(e) => e.preventDefault()}>
+          <a
+            href="#"
+            className="btn btn-primary"
+            onClick={(e) => e.preventDefault()}
+          >
             New recipe
           </a>
         </div>
@@ -117,11 +132,19 @@ export default function RecipePage() {
             />
 
             <button
-              className="btn btn-outline-secondary"
+              className={`btn ${
+                showFavorites ? "btn-primary" : "btn-outline-secondary"
+              }`}
               onClick={() => setShowFavorites(!showFavorites)}
               title="Show favorites"
             >
-              <i className={showFavorites ? "bi bi-star-fill" : "bi bi-star"} />
+              <i
+                className={
+                  showFavorites
+                    ? "bi bi-heart-fill"
+                    : "bi bi-heart"
+                }
+              />
             </button>
           </div>
         </div>
@@ -133,11 +156,8 @@ export default function RecipePage() {
             className="form-select"
           >
             <option value="created_at">Created at</option>
-
             <option value="updated_at">Updated at</option>
-
             <option value="name">Name</option>
-
             <option value="last_used_at">Last used at</option>
           </select>
         </div>
@@ -146,7 +166,10 @@ export default function RecipePage() {
       {/* Tags */}
       <div className="row g-2 align-items-center mt-1">
         <div className="col-auto">
-          <button className="btn btn-outline-secondary" onClick={() => setShowTagModal(true)}>
+          <button
+            className="btn btn-outline-secondary"
+            onClick={() => setShowTagModal(true)}
+          >
             Tags
           </button>
         </div>
@@ -168,13 +191,9 @@ export default function RecipePage() {
       <div className="mt-2">
         <RecipeList
           recipes={filteredRecipes}
-
           onDelete={(id) => deleteRecipe.mutate(id)}
-
           onToggleFavorite={(id) => toggleFavorite.mutate(id)}
-
           onTogglePinned={(id) => togglePin.mutate(id)}
-
           onCopy={(id, name) =>
             copyRecipe.mutate({
               id,

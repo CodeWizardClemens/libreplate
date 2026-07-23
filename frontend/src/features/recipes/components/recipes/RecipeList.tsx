@@ -1,6 +1,6 @@
 import RecipeCard from "./RecipeCard";
 
-import type { Recipe } from "../types";
+import type { Recipe } from "../../types";
 
 interface Props {
   recipes: Recipe[];

@@ -1,4 +1,4 @@
-import type { RecipeTag } from "../types";
+import type { RecipeTag } from "../../types";
 
 interface Props {
   tags: RecipeTag[];
@@ -16,15 +16,7 @@ export default function TagSelector({ tags, selectedTags, onChange }: Props) {
   }
 
   return (
-    <div
-      className="
-                flex
-                flex-wrap
-                gap-2
-                p-3
-                border-t
-            "
-    >
+    <div className="d-flex flex-wrap gap-3">
       {tags.map((tag) => {
         const isSelected = selectedTags.includes(tag.id);
 
@@ -34,20 +26,22 @@ export default function TagSelector({ tags, selectedTags, onChange }: Props) {
             type="button"
             onClick={() => toggleTag(tag.id)}
             className={`
-                            border
-                            rounded
-                            px-3
-                            py-1
-                            text-sm
-                            transition
-                            ${
-                              isSelected
-                                ? "bg-blue-500 text-white border-blue-500"
-                                : "bg-white text-gray-700"
-                            }
-                        `}
+              btn btn-link p-0 text-decoration-none
+              position-relative
+              ${isSelected ? "text-primary fw-semibold" : "text-body"}
+            `}
+            style={{
+              border: "none",
+              background: "transparent",
+            }}
           >
             {tag.name}
+            {isSelected && (
+              <span
+                className="position-absolute start-0 bottom-0 w-100 bg-primary"
+                style={{ height: "2px" }}
+              />
+            )}
           </button>
         );
       })}
