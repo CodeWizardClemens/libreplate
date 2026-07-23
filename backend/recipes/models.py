@@ -35,7 +35,7 @@ class Recipe(models.Model):
     is_favorite = models.BooleanField(default=False)
     is_pinned = models.BooleanField(default=False)
 
-    summary = models.CharField(max_length=50, blank=True, null=True)
+    summary = models.CharField(max_length=70, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     instructions = models.TextField(blank=True, null=True)
     cooking_time = models.CharField(max_length=20, blank=True, null=True)

@@ -4,15 +4,9 @@ import type {
 
 
 interface Props {
-
     tags: RecipeTag[];
-
     selectedTags: number[];
-
-    onChange: (
-        tags: number[]
-    ) => void;
-
+    onChange: (tags: number[]) => void;
 }
 
 
@@ -22,32 +16,20 @@ export default function TagSelector({
     onChange,
 }: Props) {
 
-
-    function toggleTag(
-        id: number
-    ) {
-
-        if (
-            selectedTags.includes(id)
-        ) {
-
+    function toggleTag(id: number) {
+        if (selectedTags.includes(id)) {
             onChange(
                 selectedTags.filter(
-                    (tagId) =>
-                        tagId !== id
+                    (tagId) => tagId !== id
                 )
             );
-
-            return;
+        } else {
+            onChange([
+                ...selectedTags,
+                id,
+            ]);
         }
-
-
-        onChange([
-            ...selectedTags,
-            id,
-        ]);
     }
-
 
 
     return (
@@ -60,41 +42,32 @@ export default function TagSelector({
                 border-t
             "
         >
+            {tags.map((tag) => {
+                const isSelected = selectedTags.includes(tag.id);
 
-            {
-                tags.map((tag) => (
-
+                return (
                     <button
                         key={tag.id}
                         type="button"
-                        onClick={() =>
-                            toggleTag(
-                                tag.id
-                            )
-                        }
+                        onClick={() => toggleTag(tag.id)}
                         className={`
                             border
                             rounded
                             px-3
                             py-1
                             text-sm
+                            transition
                             ${
-                                selectedTags.includes(
-                                    tag.id
-                                )
-                                    ? "bg-gray-200"
-                                    : ""
+                                isSelected
+                                    ? "bg-blue-500 text-white border-blue-500"
+                                    : "bg-white text-gray-700"
                             }
                         `}
                     >
-                        {
-                            tag.name
-                        }
+                        {tag.name}
                     </button>
-
-                ))
-            }
-
+                );
+            })}
         </div>
     );
 }

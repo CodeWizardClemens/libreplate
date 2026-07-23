@@ -1,6 +1,10 @@
 from rest_framework import serializers
 
-from .models import Recipe, RecipeTag
+from .models import (
+    Recipe,
+    RecipeTag,
+    RecipeIngredient,
+)
 
 
 class RecipeTagSerializer(serializers.ModelSerializer):
@@ -12,16 +16,35 @@ class RecipeTagSerializer(serializers.ModelSerializer):
         ]
 
 
+class RecipeIngredientSerializer(serializers.ModelSerializer):
+    food_name = serializers.CharField(
+        source="food.name",
+        read_only=True,
+    )
+
+    class Meta:
+        model = RecipeIngredient
+        fields = [
+            "id",
+            "food",
+            "food_name",
+            "default_servings",
+            "serving_amount",
+            "min_servings",
+            "max_servings",
+            "order",
+        ]
+
+
 class RecipeSerializer(serializers.ModelSerializer):
+
     nutrients = serializers.SerializerMethodField()
 
-    # Read: return full tag objects
     tags = RecipeTagSerializer(
         many=True,
         read_only=True,
     )
 
-    # Write: accept tag IDs
     tag_ids = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=RecipeTag.objects.all(),
@@ -29,6 +52,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False,
     )
+
 
     class Meta:
         model = Recipe
@@ -51,13 +75,17 @@ class RecipeSerializer(serializers.ModelSerializer):
             "nutrients",
         )
 
+
     def validate(self, attrs):
+
         request = self.context.get("request")
 
         if request and "tags" in attrs:
+
             tags = attrs["tags"]
 
             for tag in tags:
+
                 if tag.user != request.user:
                     raise serializers.ValidationError(
                         {
@@ -67,7 +95,9 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         return attrs
 
+
     def get_nutrients(self, obj):
+
         nutrients = obj.get_nutrients()
 
         return [

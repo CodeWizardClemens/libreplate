@@ -11,8 +11,25 @@ export interface RecipeTag {
 }
 
 
+export interface RecipeIngredient {
+    id: number;
+
+    food: number;
+    food_name: string;
+
+    default_servings: number;
+    serving_amount: number;
+
+    min_servings: number;
+    max_servings: number;
+
+    order: number;
+}
+
+
 export interface Recipe {
     id: number;
+
     name: string;
 
     is_favorite: boolean;
@@ -26,6 +43,7 @@ export interface Recipe {
     portions: number;
 
     last_used_at: string | null;
+
     created_at: string;
     updated_at: string;
 
@@ -46,9 +64,6 @@ export interface RecipeCreate {
     portions: number;
 
     tag_ids?: number[];
-
-    is_favorite?: boolean;
-    is_pinned?: boolean;
 }
 
 
@@ -63,6 +78,32 @@ export interface RecipeUpdate {
     portions?: number;
 
     tag_ids?: number[];
+}
+
+
+export interface RecipeIngredientCreate {
+    food: number;
+
+    default_servings: number;
+    serving_amount: number;
+
+    min_servings: number;
+    max_servings: number;
+
+    order: number;
+}
+
+
+export interface RecipeIngredientUpdate {
+    food?: number;
+
+    default_servings?: number;
+    serving_amount?: number;
+
+    min_servings?: number;
+    max_servings?: number;
+
+    order?: number;
 }
 
 

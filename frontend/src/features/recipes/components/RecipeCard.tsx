@@ -1,10 +1,19 @@
-import type {
-    Recipe,
-} from "../types";
+import { useState } from "react";
+
+import type { Recipe } from "../types";
+
+import {
+    useRecipeTags,
+    useUpdateRecipe,
+} from "../api";
+
+import RecipeCardActions from "./RecipeCardActions";
+import RecipeCardHeader from "./RecipeCardHeader";
+import RecipeCardNutrients from "./RecipeCardNutrients";
+import RecipeCardTags from "./RecipeCardTags";
 
 
 interface Props {
-
     recipe?: Recipe;
 
     onDelete?: (
@@ -23,9 +32,7 @@ interface Props {
         id: number,
         name: string
     ) => void;
-
 }
-
 
 
 export default function RecipeCard({
@@ -36,9 +43,44 @@ export default function RecipeCard({
     onCopy,
 }: Props) {
 
+    const {
+        data: availableTags = [],
+    } = useRecipeTags();
+
+
+    const updateRecipe =
+        useUpdateRecipe();
+
+
+    const [editingName, setEditingName] =
+        useState(false);
+
+
+    const [editingSummary, setEditingSummary] =
+        useState(false);
+
+
 
     if (!recipe) {
         return null;
+    }
+
+
+
+    function updateRecipeData(
+        data: {
+            name?: string;
+            summary?: string;
+            tag_ids?: number[];
+        }
+    ) {
+
+        updateRecipe.mutate({
+            id: recipe.id,
+
+            data,
+        });
+
     }
 
 
@@ -80,7 +122,6 @@ export default function RecipeCard({
                 "
             >
 
-
                 <div
                     className="
                         row
@@ -89,71 +130,31 @@ export default function RecipeCard({
                     "
                 >
 
+                    <RecipeCardActions
 
-                    {/* Pin + Favorite */}
-                    <div
-                        className="
-                            col-12
-                            col-md-auto
-                            d-flex
-                            gap-2
-                            order-1
-                        "
-                    >
+                        recipe={
+                            recipe
+                        }
 
-                        <button
-                            className="
-                                btn
-                                btn-outline-secondary
-                            "
-                            onClick={() =>
-                                onTogglePinned?.(
-                                    recipe.id
-                                )
-                            }
-                            title="Pin"
-                        >
+                        onCopy={
+                            handleCopy
+                        }
 
-                            <i
-                                className={
-                                    recipe.is_pinned
-                                        ? "bi bi-pin-fill"
-                                        : "bi bi-pin"
-                                }
-                            />
+                        onDelete={
+                            onDelete
+                        }
 
-                        </button>
+                        onToggleFavorite={
+                            onToggleFavorite
+                        }
+
+                        onTogglePinned={
+                            onTogglePinned
+                        }
+
+                    />
 
 
-
-                        <button
-                            className="
-                                btn
-                                btn-outline-warning
-                            "
-                            onClick={() =>
-                                onToggleFavorite?.(
-                                    recipe.id
-                                )
-                            }
-                            title="Favorite"
-                        >
-
-                            <i
-                                className={
-                                    recipe.is_favorite
-                                        ? "bi bi-star-fill"
-                                        : "bi bi-star"
-                                }
-                            />
-
-                        </button>
-
-                    </div>
-
-
-
-                    {/* Main content */}
                     <div
                         className="
                             col
@@ -161,128 +162,59 @@ export default function RecipeCard({
                         "
                     >
 
-                        <h5
-                            className="
-                                card-title
-                                mb-2
-                            "
-                        >
-                            {
-                                recipe.name
+                        <RecipeCardHeader
+
+                            recipe={
+                                recipe
                             }
-                        </h5>
 
-
-
-                        <p
-                            className="
-                                card-text
-                                mb-3
-                            "
-                        >
-                            {
-                                recipe.summary
+                            update={
+                                updateRecipeData
                             }
-                        </p>
+
+                            editingName={
+                                editingName
+                            }
+
+                            setEditingName={
+                                setEditingName
+                            }
+
+                            editingSummary={
+                                editingSummary
+                            }
+
+                            setEditingSummary={
+                                setEditingSummary
+                            }
+
+                        />
 
 
+                        <RecipeCardNutrients
 
-                        {
-                            recipe.nutrients.length > 0 && (
+                            nutrients={
+                                recipe.nutrients
+                            }
 
-                                <div
-                                    className="
-                                        row
-                                        g-2
-                                        mb-3
-                                    "
-                                >
-
-                                    {
-                                        recipe.nutrients.map(
-                                            (nutrient) => (
-
-                                                <div
-                                                    key={
-                                                        nutrient.id
-                                                    }
-                                                    className="
-                                                        col-6
-                                                        col-md-auto
-                                                    "
-                                                >
-
-                                                    <span
-                                                        className="
-                                                            badge
-                                                            text-bg-light
-                                                            border
-                                                        "
-                                                    >
-                                                        {
-                                                            nutrient.name
-                                                        }
-
-                                                        :
-                                                        
-                                                        {" "}
-
-                                                        {
-                                                            nutrient.amount
-                                                        }
-                                                    </span>
-
-                                                </div>
-
-                                            )
-                                        )
-                                    }
-
-                                </div>
-
-                            )
-                        }
+                        />
 
 
+                        <RecipeCardTags
 
-                        {
-                            recipe.tags.length > 0 && (
+                            recipe={
+                                recipe
+                            }
 
-                                <div
-                                    className="
-                                        d-flex
-                                        flex-wrap
-                                        gap-2
-                                    "
-                                >
+                            availableTags={
+                                availableTags
+                            }
 
-                                    {
-                                        recipe.tags.map(
-                                            (tag) => (
+                            update={
+                                updateRecipeData
+                            }
 
-                                                <span
-                                                    key={
-                                                        tag.id
-                                                    }
-                                                    className="
-                                                        badge
-                                                        text-bg-secondary
-                                                    "
-                                                >
-                                                    {
-                                                        tag.name
-                                                    }
-                                                </span>
-
-                                            )
-                                        )
-                                    }
-
-                                </div>
-
-                            )
-                        }
-
+                        />
 
 
                         <div
@@ -293,15 +225,11 @@ export default function RecipeCard({
                             "
                         >
 
-                            {
-                                recipe.portions
-                            }
+                            {recipe.portions}
 
                             {" portions • "}
 
-                            {
-                                recipe.cooking_time
-                            }
+                            {recipe.cooking_time}
 
                             {" min"}
 
@@ -309,131 +237,12 @@ export default function RecipeCard({
 
                     </div>
 
-
-
-                    {/* Desktop actions */}
-                    <div
-                        className="
-                            col-12
-                            col-md-auto
-                            d-none
-                            d-md-flex
-                            gap-2
-                            order-3
-                        "
-                    >
-
-                        <button
-                            className="
-                                btn
-                                btn-outline-primary
-                            "
-                            onClick={handleCopy}
-                            title="Copy"
-                        >
-
-                            <i
-                                className="
-                                    bi
-                                    bi-copy
-                                "
-                            />
-
-                        </button>
-
-
-
-                        <button
-                            className="
-                                btn
-                                btn-outline-danger
-                            "
-                            onClick={() =>
-                                onDelete?.(
-                                    recipe.id
-                                )
-                            }
-                            title="Delete"
-                        >
-
-                            <i
-                                className="
-                                    bi
-                                    bi-trash
-                                "
-                            />
-
-                        </button>
-
-                    </div>
-
-
                 </div>
-
-
-
-                {/* Mobile actions */}
-                <div
-                    className="
-                        d-flex
-                        d-md-none
-                        justify-content-end
-                        gap-2
-                        mt-3
-                    "
-                >
-
-                    <button
-                        className="
-                            btn
-                            btn-outline-primary
-                        "
-                        onClick={handleCopy}
-                    >
-
-                        <i
-                            className="
-                                bi
-                                bi-copy
-                            "
-                        />
-
-                        {" Copy"}
-
-                    </button>
-
-
-
-                    <button
-                        className="
-                            btn
-                            btn-outline-danger
-                        "
-                        onClick={() =>
-                            onDelete?.(
-                                recipe.id
-                            )
-                        }
-                    >
-
-                        <i
-                            className="
-                                bi
-                                bi-trash
-                            "
-                        />
-
-                        {" Delete"}
-
-                    </button>
-
-
-                </div>
-
 
             </div>
 
         </div>
 
     );
+
 }
