@@ -1,4 +1,5 @@
 import axios from "axios";
+
 import {
     useMutation,
     useQuery,
@@ -10,7 +11,6 @@ import type {
     RecipeCreate,
 } from "./types";
 
-
 function getCsrfToken() {
     const cookie = document.cookie
         .split("; ")
@@ -19,12 +19,10 @@ function getCsrfToken() {
     return cookie?.split("=")[1];
 }
 
-
 const api = axios.create({
     baseURL: "/api/recipes/",
     withCredentials: true,
 });
-
 
 api.interceptors.request.use((config) => {
     const csrfToken = getCsrfToken();
@@ -36,12 +34,12 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-
 export const recipeKeys = {
     all: ["recipes"] as const,
-    detail: (id: number) => ["recipes", id] as const,
-};
 
+    detail: (id: number) =>
+        ["recipes", id] as const,
+};
 
 export function useRecipes() {
     return useQuery({
@@ -49,75 +47,32 @@ export function useRecipes() {
 
         queryFn: async () => {
             const { data } = await api.get<Recipe[]>("");
+
             return data;
         },
     });
 }
-
-
-export function useRecipe(id: number) {
-    return useQuery({
-        queryKey: recipeKeys.detail(id),
-
-        queryFn: async () => {
-            const { data } = await api.get<Recipe>(`${id}/`);
-            return data;
-        },
-    });
-}
-
 
 export function useCreateRecipe() {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: async (recipe: RecipeCreate) => {
-            const { data } = await api.post<Recipe>("", recipe);
+            const { data } = await api.post<Recipe>(
+                "",
+                recipe
+            );
+
             return data;
         },
 
-        onSuccess: () => {
+        onSuccess() {
             queryClient.invalidateQueries({
                 queryKey: recipeKeys.all,
             });
         },
     });
 }
-
-
-export function useUpdateRecipe() {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: async ({
-            id,
-            data,
-        }: {
-            id: number;
-            data: Partial<RecipeCreate>;
-        }) => {
-            const response = await api.patch<Recipe>(
-                `${id}/`,
-                data
-            );
-
-            return response.data;
-        },
-
-        onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({
-                queryKey: recipeKeys.all,
-            });
-
-            queryClient.invalidateQueries({
-                queryKey: recipeKeys.detail(
-                    variables.id
-                ),
-            });
-        },
-    });
-}
-
 
 export function useDeleteRecipe() {
     const queryClient = useQueryClient();
@@ -127,7 +82,76 @@ export function useDeleteRecipe() {
             await api.delete(`${id}/`);
         },
 
-        onSuccess: () => {
+        onSuccess() {
+            queryClient.invalidateQueries({
+                queryKey: recipeKeys.all,
+            });
+        },
+    });
+}
+
+export function useToggleFavorite() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (id: number) => {
+            const { data } = await api.post<Recipe>(
+                `${id}/toggle-favorite/`
+            );
+
+            return data;
+        },
+
+        onSuccess() {
+            queryClient.invalidateQueries({
+                queryKey: recipeKeys.all,
+            });
+        },
+    });
+}
+
+export function useTogglePin() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (id: number) => {
+            const { data } = await api.post<Recipe>(
+                `${id}/toggle-pin/`
+            );
+
+            return data;
+        },
+
+        onSuccess() {
+            queryClient.invalidateQueries({
+                queryKey: recipeKeys.all,
+            });
+        },
+    });
+}
+
+export function useCopyRecipe() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({
+            id,
+            name,
+        }: {
+            id: number;
+            name: string;
+        }) => {
+            const { data } = await api.post<Recipe>(
+                `${id}/copy/`,
+                {
+                    name,
+                }
+            );
+
+            return data;
+        },
+
+        onSuccess() {
             queryClient.invalidateQueries({
                 queryKey: recipeKeys.all,
             });
