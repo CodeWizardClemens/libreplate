@@ -85,11 +85,17 @@ class RecipeTag(models.Model):
         on_delete=models.CASCADE,
         related_name="recipe_tags",
     )
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["name"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "name"],
+                name="unique_user_recipe_tag",
+            )
+        ]
 
     def __str__(self):
         return self.name

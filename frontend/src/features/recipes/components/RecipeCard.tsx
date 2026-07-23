@@ -1,12 +1,32 @@
-import type { Recipe } from "../types";
+import type {
+    Recipe,
+} from "../types";
+
 
 interface Props {
+
     recipe?: Recipe;
-    onDelete?: (id: number) => void;
-    onToggleFavorite?: (id: number) => void;
-    onTogglePinned?: (id: number) => void;
-    onCopy?: (id: number, name: string) => void;
+
+    onDelete?: (
+        id: number
+    ) => void;
+
+    onToggleFavorite?: (
+        id: number
+    ) => void;
+
+    onTogglePinned?: (
+        id: number
+    ) => void;
+
+    onCopy?: (
+        id: number,
+        name: string
+    ) => void;
+
 }
+
+
 
 export default function RecipeCard({
     recipe,
@@ -15,94 +35,405 @@ export default function RecipeCard({
     onTogglePinned,
     onCopy,
 }: Props) {
+
+
     if (!recipe) {
         return null;
     }
 
+
+
     function handleCopy() {
-        const name = window.prompt(
-            "New recipe name:",
-            `${recipe.name} Copy`
-        );
+
+        const name =
+            window.prompt(
+                "New recipe name:",
+                `${recipe.name} Copy`
+            );
+
 
         if (name) {
-            onCopy?.(recipe.id, name);
+
+            onCopy?.(
+                recipe.id,
+                name
+            );
+
         }
+
     }
 
+
+
     return (
-        <div className="border rounded p-4 space-y-3">
-            <div className="flex justify-between">
-                <h2 className="text-lg font-semibold">
-                    {recipe.name}
-                </h2>
 
-                <div className="flex gap-3">
-                    <button
-                        onClick={() =>
-                            onTogglePinned?.(recipe.id)
-                        }
+        <div
+            className="
+                card
+                shadow-sm
+            "
+        >
+
+            <div
+                className="
+                    card-body
+                "
+            >
+
+
+                <div
+                    className="
+                        row
+                        g-3
+                        align-items-start
+                    "
+                >
+
+
+                    {/* Pin + Favorite */}
+                    <div
+                        className="
+                            col-12
+                            col-md-auto
+                            d-flex
+                            gap-2
+                            order-1
+                        "
                     >
-                        {recipe.is_pinned ? "📌" : "📍"}
-                    </button>
 
-                    <button
-                        onClick={() =>
-                            onToggleFavorite?.(recipe.id)
-                        }
-                    >
-                        {recipe.is_favorite ? "⭐" : "☆"}
-                    </button>
-                </div>
-            </div>
+                        <button
+                            className="
+                                btn
+                                btn-outline-secondary
+                            "
+                            onClick={() =>
+                                onTogglePinned?.(
+                                    recipe.id
+                                )
+                            }
+                            title="Pin"
+                        >
 
-            <p>
-                {recipe.summary}
-            </p>
+                            <i
+                                className={
+                                    recipe.is_pinned
+                                        ? "bi bi-pin-fill"
+                                        : "bi bi-pin"
+                                }
+                            />
 
-            {recipe.nutrients.length > 0 && (
-                <div className="border-t pt-3">
-                    <h3 className="text-sm font-semibold mb-2">
-                        Nutrients
-                    </h3>
+                        </button>
 
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                        {recipe.nutrients.map((nutrient) => (
-                            <div key={nutrient.id}>
-                                <span className="font-medium">
-                                    {nutrient.name}
-                                </span>
-                                : {nutrient.amount}
-                            </div>
-                        ))}
+
+
+                        <button
+                            className="
+                                btn
+                                btn-outline-warning
+                            "
+                            onClick={() =>
+                                onToggleFavorite?.(
+                                    recipe.id
+                                )
+                            }
+                            title="Favorite"
+                        >
+
+                            <i
+                                className={
+                                    recipe.is_favorite
+                                        ? "bi bi-star-fill"
+                                        : "bi bi-star"
+                                }
+                            />
+
+                        </button>
+
                     </div>
+
+
+
+                    {/* Main content */}
+                    <div
+                        className="
+                            col
+                            order-2
+                        "
+                    >
+
+                        <h5
+                            className="
+                                card-title
+                                mb-2
+                            "
+                        >
+                            {
+                                recipe.name
+                            }
+                        </h5>
+
+
+
+                        <p
+                            className="
+                                card-text
+                                mb-3
+                            "
+                        >
+                            {
+                                recipe.summary
+                            }
+                        </p>
+
+
+
+                        {
+                            recipe.nutrients.length > 0 && (
+
+                                <div
+                                    className="
+                                        row
+                                        g-2
+                                        mb-3
+                                    "
+                                >
+
+                                    {
+                                        recipe.nutrients.map(
+                                            (nutrient) => (
+
+                                                <div
+                                                    key={
+                                                        nutrient.id
+                                                    }
+                                                    className="
+                                                        col-6
+                                                        col-md-auto
+                                                    "
+                                                >
+
+                                                    <span
+                                                        className="
+                                                            badge
+                                                            text-bg-light
+                                                            border
+                                                        "
+                                                    >
+                                                        {
+                                                            nutrient.name
+                                                        }
+
+                                                        :
+                                                        
+                                                        {" "}
+
+                                                        {
+                                                            nutrient.amount
+                                                        }
+                                                    </span>
+
+                                                </div>
+
+                                            )
+                                        )
+                                    }
+
+                                </div>
+
+                            )
+                        }
+
+
+
+                        {
+                            recipe.tags.length > 0 && (
+
+                                <div
+                                    className="
+                                        d-flex
+                                        flex-wrap
+                                        gap-2
+                                    "
+                                >
+
+                                    {
+                                        recipe.tags.map(
+                                            (tag) => (
+
+                                                <span
+                                                    key={
+                                                        tag.id
+                                                    }
+                                                    className="
+                                                        badge
+                                                        text-bg-secondary
+                                                    "
+                                                >
+                                                    {
+                                                        tag.name
+                                                    }
+                                                </span>
+
+                                            )
+                                        )
+                                    }
+
+                                </div>
+
+                            )
+                        }
+
+
+
+                        <div
+                            className="
+                                text-muted
+                                small
+                                mt-3
+                            "
+                        >
+
+                            {
+                                recipe.portions
+                            }
+
+                            {" portions • "}
+
+                            {
+                                recipe.cooking_time
+                            }
+
+                            {" min"}
+
+                        </div>
+
+                    </div>
+
+
+
+                    {/* Desktop actions */}
+                    <div
+                        className="
+                            col-12
+                            col-md-auto
+                            d-none
+                            d-md-flex
+                            gap-2
+                            order-3
+                        "
+                    >
+
+                        <button
+                            className="
+                                btn
+                                btn-outline-primary
+                            "
+                            onClick={handleCopy}
+                            title="Copy"
+                        >
+
+                            <i
+                                className="
+                                    bi
+                                    bi-copy
+                                "
+                            />
+
+                        </button>
+
+
+
+                        <button
+                            className="
+                                btn
+                                btn-outline-danger
+                            "
+                            onClick={() =>
+                                onDelete?.(
+                                    recipe.id
+                                )
+                            }
+                            title="Delete"
+                        >
+
+                            <i
+                                className="
+                                    bi
+                                    bi-trash
+                                "
+                            />
+
+                        </button>
+
+                    </div>
+
+
                 </div>
-            )}
 
-            <div className="text-sm text-gray-500">
-                {recipe.portions}
-                {" portions • "}
-                {recipe.cooking_time}
-                {" min"}
+
+
+                {/* Mobile actions */}
+                <div
+                    className="
+                        d-flex
+                        d-md-none
+                        justify-content-end
+                        gap-2
+                        mt-3
+                    "
+                >
+
+                    <button
+                        className="
+                            btn
+                            btn-outline-primary
+                        "
+                        onClick={handleCopy}
+                    >
+
+                        <i
+                            className="
+                                bi
+                                bi-copy
+                            "
+                        />
+
+                        {" Copy"}
+
+                    </button>
+
+
+
+                    <button
+                        className="
+                            btn
+                            btn-outline-danger
+                        "
+                        onClick={() =>
+                            onDelete?.(
+                                recipe.id
+                            )
+                        }
+                    >
+
+                        <i
+                            className="
+                                bi
+                                bi-trash
+                            "
+                        />
+
+                        {" Delete"}
+
+                    </button>
+
+
+                </div>
+
+
             </div>
 
-            <div className="flex gap-4">
-                <button
-                    onClick={handleCopy}
-                    className="text-blue-600"
-                >
-                    Copy
-                </button>
-
-                <button
-                    onClick={() =>
-                        onDelete?.(recipe.id)
-                    }
-                    className="text-red-600"
-                >
-                    Delete
-                </button>
-            </div>
         </div>
+
     );
 }

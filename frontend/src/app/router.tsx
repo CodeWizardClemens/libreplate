@@ -35,41 +35,65 @@ const router = createBrowserRouter([
             {
                 path: "groceries",
                 element: <GroceriesPage />,
+                handle: {
+                    title: "Groceries",
+                },
             },
 
             {
                 path: "recipes",
                 element: <RecipesPage />,
+                handle: {
+                    title: "Recipes",
+                },
             },
 
             {
                 path: "foods",
                 element: <Placeholder title="Foods" />,
+                handle: {
+                    title: "Foods",
+                },
             },
 
             {
                 path: "meal-plans",
                 element: <Placeholder title="Meal Plans" />,
+                handle: {
+                    title: "Meal Plans",
+                },
             },
 
             {
                 path: "statistics",
                 element: <Placeholder title="Statistics" />,
+                handle: {
+                    title: "Statistics",
+                },
             },
 
             {
                 path: "goals",
                 element: <Placeholder title="Goals" />,
+                handle: {
+                    title: "Goals",
+                },
             },
 
             {
                 path: "settings",
                 element: <Placeholder title="Settings" />,
+                handle: {
+                    title: "Settings",
+                },
             },
 
             {
                 path: "account",
                 element: <Placeholder title="Account" />,
+                handle: {
+                    title: "Account",
+                },
             },
         ],
     },

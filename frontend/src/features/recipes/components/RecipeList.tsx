@@ -1,8 +1,12 @@
 import RecipeCard from "./RecipeCard";
 
-import type { Recipe } from "../types";
+import type {
+    Recipe,
+} from "../types";
+
 
 interface Props {
+
     recipes: Recipe[];
 
     onDelete?: (
@@ -21,7 +25,10 @@ interface Props {
         id: number,
         name: string
     ) => void;
+
 }
+
+
 
 export default function RecipeList({
     recipes,
@@ -30,18 +37,54 @@ export default function RecipeList({
     onTogglePinned,
     onCopy,
 }: Props) {
+
+
     return (
-        <div className="space-y-4">
-            {recipes.map((recipe) => (
-                <RecipeCard
-                    key={recipe.id}
-                    recipe={recipe}
-                    onDelete={onDelete}
-                    onToggleFavorite={onToggleFavorite}
-                    onTogglePinned={onTogglePinned}
-                    onCopy={onCopy}
-                />
-            ))}
+
+        <div
+            className="
+                space-y-4
+            "
+        >
+
+            {
+                recipes.map(
+                    (recipe) => (
+
+                        <RecipeCard
+
+                            key={
+                                recipe.id
+                            }
+
+                            recipe={
+                                recipe
+                            }
+
+                            onDelete={
+                                onDelete
+                            }
+
+                            onToggleFavorite={
+                                onToggleFavorite
+                            }
+
+                            onTogglePinned={
+                                onTogglePinned
+                            }
+
+                            onCopy={
+                                onCopy
+                            }
+
+                        />
+
+                    )
+                )
+            }
+
         </div>
+
     );
+
 }

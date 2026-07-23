@@ -3,12 +3,13 @@ import { List } from "react-bootstrap-icons";
 
 interface Props {
     onMenuClick: () => void;
+    title: string;
 }
 
 export default function TopNavbar({
     onMenuClick,
+    title,
 }: Props) {
-
     return (
         <Navbar
             bg="body"
@@ -34,7 +35,7 @@ export default function TopNavbar({
                     />
 
                     <Navbar.Brand>
-                        LibrePlate
+                        {title}
                     </Navbar.Brand>
 
                 </div>

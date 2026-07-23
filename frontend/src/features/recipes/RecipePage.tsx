@@ -1,16 +1,20 @@
-import { useState } from "react";
+import {
+    useState,
+} from "react";
 
-import RecipeForm from "./components/RecipeForm";
 import RecipeList from "./components/RecipeList";
+import TagSelector from "./components/TagSelector";
+import TagModal from "./components/TagModal";
 
 import {
     useCopyRecipe,
-    useCreateRecipe,
     useDeleteRecipe,
+    useRecipeTags,
     useRecipes,
     useToggleFavorite,
     useTogglePin,
 } from "./api";
+
 
 type SortMethod =
     | "created_at"
@@ -18,10 +22,12 @@ type SortMethod =
     | "name"
     | "last_used_at";
 
-export default function RecipePage() {
-    const recipesQuery = useRecipes();
 
-    const createRecipe = useCreateRecipe();
+export default function RecipePage() {
+
+    const recipesQuery = useRecipes();
+    const tagsQuery = useRecipeTags();
+
     const deleteRecipe = useDeleteRecipe();
 
     const toggleFavorite = useToggleFavorite();
@@ -29,157 +35,323 @@ export default function RecipePage() {
 
     const copyRecipe = useCopyRecipe();
 
+
     const [search, setSearch] = useState("");
-    const [showFavorites, setShowFavorites] = useState(false);
+
+    const [selectedTags, setSelectedTags] =
+        useState<number[]>([]);
+
+    const [showFavorites, setShowFavorites] =
+        useState(false);
+
+    const [showTagModal, setShowTagModal] =
+        useState(false);
+
     const [sortMethod, setSortMethod] =
         useState<SortMethod>("created_at");
 
+
+
     if (recipesQuery.isPending) {
-        return <div>Loading...</div>;
+        return (
+            <div className="container py-3">
+                Loading...
+            </div>
+        );
     }
+
 
     if (recipesQuery.isError) {
-        return <div>Failed to load recipes.</div>;
+        return (
+            <div className="container py-3">
+                Failed to load recipes.
+            </div>
+        );
     }
 
-    const filteredRecipes = recipesQuery.data
-        .filter((recipe) => {
-            const searchTerm = search.toLowerCase();
 
-            const matchesSearch =
-                recipe.name.toLowerCase().includes(searchTerm) ||
-                recipe.summary.toLowerCase().includes(searchTerm);
+    const recipes = recipesQuery.data;
 
-            const matchesFavorite =
-                !showFavorites || recipe.is_favorite;
 
-            return matchesSearch && matchesFavorite;
-        })
-        .sort((a, b) => {
-            switch (sortMethod) {
-                case "name":
-                    return a.name.localeCompare(b.name);
+    const filteredRecipes =
+        recipes
+            .filter((recipe) => {
 
-                case "created_at":
-                    return (
-                        new Date(b.created_at).getTime() -
-                        new Date(a.created_at).getTime()
+                const searchTerm =
+                    search.toLowerCase();
+
+
+                const matchesSearch =
+                    recipe.name
+                        .toLowerCase()
+                        .includes(searchTerm)
+                    ||
+                    recipe.summary
+                        .toLowerCase()
+                        .includes(searchTerm);
+
+
+                const matchesFavorite =
+                    !showFavorites
+                    ||
+                    recipe.is_favorite;
+
+
+                const matchesTags =
+                    selectedTags.length === 0
+                    ||
+                    selectedTags.every(
+                        (tagId) =>
+                            recipe.tags.some(
+                                (tag) =>
+                                    tag.id === tagId
+                            )
                     );
 
-                case "updated_at":
-                    return (
-                        new Date(b.updated_at).getTime() -
-                        new Date(a.updated_at).getTime()
-                    );
 
-                case "last_used_at":
-                    if (!a.last_used_at) {
-                        return 1;
-                    }
+                return (
+                    matchesSearch
+                    &&
+                    matchesFavorite
+                    &&
+                    matchesTags
+                );
+            })
+            .sort((a, b) => {
 
-                    if (!b.last_used_at) {
-                        return -1;
-                    }
+                if (a.is_pinned && !b.is_pinned) {
+                    return -1;
+                }
 
-                    return (
-                        new Date(b.last_used_at).getTime() -
-                        new Date(a.last_used_at).getTime()
-                    );
+                if (!a.is_pinned && b.is_pinned) {
+                    return 1;
+                }
 
-                default:
-                    return 0;
-            }
-        });
+
+                switch (sortMethod) {
+
+                    case "name":
+                        return a.name.localeCompare(b.name);
+
+                    case "created_at":
+                        return (
+                            new Date(b.created_at).getTime()
+                            -
+                            new Date(a.created_at).getTime()
+                        );
+
+                    case "updated_at":
+                        return (
+                            new Date(b.updated_at).getTime()
+                            -
+                            new Date(a.updated_at).getTime()
+                        );
+
+                    case "last_used_at":
+
+                        if (!a.last_used_at) {
+                            return 1;
+                        }
+
+                        if (!b.last_used_at) {
+                            return -1;
+                        }
+
+                        return (
+                            new Date(b.last_used_at).getTime()
+                            -
+                            new Date(a.last_used_at).getTime()
+                        );
+
+                    default:
+                        return 0;
+                }
+            });
+
+
 
     return (
-        <div className="max-w-5xl mx-auto p-8 space-y-8">
-            <h1 className="text-3xl font-bold">
-                Recipes
-            </h1>
 
-            <RecipeForm
-                onSubmit={(recipe) =>
-                    createRecipe.mutate(recipe)
-                }
-            />
+        <div className="container py-3">
 
-            <div className="flex gap-4 items-center">
-                <div className="flex flex-1 border rounded overflow-hidden">
-                    <input
-                        value={search}
-                        onChange={(e) =>
-                            setSearch(e.target.value)
+
+            {/* Main controls */}
+            <div className="row g-2 align-items-center">
+
+
+                <div className="col-auto d-none d-md-block">
+
+                    <a
+                        href="#"
+                        className="btn btn-primary"
+                        onClick={(e) =>
+                            e.preventDefault()
                         }
-                        placeholder="Search recipes..."
-                        className="
-                            flex-1
-                            px-3
-                            py-2
-                            outline-none
-                        "
-                    />
-
-                    <button
-                        onClick={() =>
-                            setShowFavorites(!showFavorites)
-                        }
-                        className="px-4 text-xl"
-                        title="Show favorites"
                     >
-                        {showFavorites ? "⭐" : "☆"}
-                    </button>
+                        New recipe
+                    </a>
+
                 </div>
 
-                <select
-                    value={sortMethod}
-                    onChange={(e) =>
-                        setSortMethod(
-                            e.target.value as SortMethod
-                        )
-                    }
-                    className="
-                        border
-                        rounded
-                        px-3
-                        py-2
-                    "
-                >
-                    <option value="created_at">
-                        Created at
-                    </option>
 
-                    <option value="updated_at">
-                        Updated at
-                    </option>
 
-                    <option value="name">
-                        Name
-                    </option>
+                <div className="col-12 col-md">
 
-                    <option value="last_used_at">
-                        Last used at
-                    </option>
-                </select>
+                    <div className="input-group">
+
+                        <input
+                            value={search}
+                            onChange={(e) =>
+                                setSearch(e.target.value)
+                            }
+                            placeholder="Search recipes..."
+                            className="form-control"
+                        />
+
+
+                        <button
+                            className="btn btn-outline-secondary"
+                            onClick={() =>
+                                setShowFavorites(
+                                    !showFavorites
+                                )
+                            }
+                            title="Show favorites"
+                        >
+
+                            <i
+                                className={
+                                    showFavorites
+                                        ? "bi bi-star-fill"
+                                        : "bi bi-star"
+                                }
+                            />
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+
+                <div className="col-12 col-md-auto">
+
+                    <select
+                        value={sortMethod}
+                        onChange={(e) =>
+                            setSortMethod(
+                                e.target.value as SortMethod
+                            )
+                        }
+                        className="form-select"
+                    >
+
+                        <option value="created_at">
+                            Created at
+                        </option>
+
+                        <option value="updated_at">
+                            Updated at
+                        </option>
+
+                        <option value="name">
+                            Name
+                        </option>
+
+                        <option value="last_used_at">
+                            Last used at
+                        </option>
+
+                    </select>
+
+                </div>
+
             </div>
 
-            <RecipeList
-                recipes={filteredRecipes}
-                onDelete={(id) =>
-                    deleteRecipe.mutate(id)
-                }
-                onToggleFavorite={(id) =>
-                    toggleFavorite.mutate(id)
-                }
-                onTogglePinned={(id) =>
-                    togglePin.mutate(id)
-                }
-                onCopy={(id, name) =>
-                    copyRecipe.mutate({
-                        id,
-                        name,
-                    })
-                }
-            />
+
+
+            {/* Tags */}
+            <div className="row g-2 align-items-center mt-1">
+
+                <div className="col-auto">
+
+                    <button
+                        className="btn btn-outline-secondary"
+                        onClick={() =>
+                            setShowTagModal(true)
+                        }
+                    >
+                        Tags
+                    </button>
+
+                </div>
+
+
+                <div className="col overflow-auto">
+
+                    {
+                        tagsQuery.data &&
+                        <div className="d-flex flex-nowrap gap-2 overflow-auto">
+
+                            <TagSelector
+                                tags={tagsQuery.data}
+                                selectedTags={selectedTags}
+                                onChange={setSelectedTags}
+                            />
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+
+
+            {/* Recipes */}
+            <div className="mt-2">
+
+                <RecipeList
+                    recipes={filteredRecipes}
+
+                    onDelete={(id) =>
+                        deleteRecipe.mutate(id)
+                    }
+
+                    onToggleFavorite={(id) =>
+                        toggleFavorite.mutate(id)
+                    }
+
+                    onTogglePinned={(id) =>
+                        togglePin.mutate(id)
+                    }
+
+                    onCopy={(id, name) =>
+                        copyRecipe.mutate({
+                            id,
+                            name,
+                        })
+                    }
+                />
+
+            </div>
+
+
+
+            {
+                tagsQuery.data &&
+                <TagModal
+                    open={showTagModal}
+                    onClose={() =>
+                        setShowTagModal(false)
+                    }
+                    tags={tagsQuery.data}
+                    selectedTags={selectedTags}
+                    onChange={setSelectedTags}
+                />
+            }
+
         </div>
     );
 }
