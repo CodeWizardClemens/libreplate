@@ -27,9 +27,6 @@ class Recipe(models.Model):
 
         return totals
 
-    def available_tags(self):
-        return RecipeTag.objects.filter(user=self.user).exclude(recipes=self)
-
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="recipes")
     name = models.CharField(max_length=255)
     is_favorite = models.BooleanField(default=False)
@@ -58,25 +55,15 @@ class Recipe(models.Model):
 
 
 class RecipePicture(models.Model):
-    recipe = models.ForeignKey(
+    recipe = models.OneToOneField(
         Recipe,
         on_delete=models.CASCADE,
-        related_name="pictures",
+        related_name="picture",
     )
     image = models.ImageField(upload_to="recipes/")
-    order = models.PositiveIntegerField(default=0)
-
-    class Meta:
-        ordering = ["order"]
-        constraints = [
-            models.UniqueConstraint(
-                fields=["recipe", "order"],
-                name="unique_recipe_picture_order",
-            ),
-        ]
 
     def __str__(self):
-        return f"{self.recipe.name} ({self.order})"
+        return f"{self.recipe.name} picture"
 
 
 class RecipeTag(models.Model):

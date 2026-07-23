@@ -1,71 +1,158 @@
 from django.urls import path
 
-from . import views
+from .api import (
+    RecipeViewSet,
+    RecipeTagViewSet,
+    RecipeIngredientViewSet,
+    RecipePictureViewSet,
+)
+
+
+recipe_list = RecipeViewSet.as_view(
+    {
+        "get": "list",
+        "post": "create",
+    }
+)
+
+
+recipe_detail = RecipeViewSet.as_view(
+    {
+        "get": "retrieve",
+        "put": "update",
+        "patch": "partial_update",
+        "delete": "destroy",
+    }
+)
+
+
+toggle_favorite = RecipeViewSet.as_view(
+    {
+        "post": "toggle_favorite",
+    }
+)
+
+
+toggle_pin = RecipeViewSet.as_view(
+    {
+        "post": "toggle_pin",
+    }
+)
+
+
+recipe_copy = RecipeViewSet.as_view(
+    {
+        "post": "copy",
+    }
+)
+
+
+tag_list = RecipeTagViewSet.as_view(
+    {
+        "get": "list",
+        "post": "create",
+    }
+)
+
+
+tag_detail = RecipeTagViewSet.as_view(
+    {
+        "delete": "destroy",
+    }
+)
+
+
+recipe_ingredients = RecipeIngredientViewSet.as_view(
+    {
+        "get": "list",
+        "post": "create",
+    }
+)
+
+
+recipe_ingredient_detail = RecipeIngredientViewSet.as_view(
+    {
+        "get": "retrieve",
+        "put": "update",
+        "patch": "partial_update",
+        "delete": "destroy",
+    }
+)
+
+
+recipe_picture = RecipePictureViewSet.as_view(
+    {
+        "get": "retrieve",
+        "post": "create",
+        "delete": "destroy",
+    }
+)
+
 
 urlpatterns = [
-    path("", views.recipes, name="recipes"),
-    path("create/", views.recipe_create, name="recipe_create"),
-    path("<int:recipe_id>/", views.recipe_edit, name="recipe_edit"),
-    path("<int:recipe_id>/copy/", views.recipe_copy, name="recipe_copy"),
-    path("<int:recipe_id>/delete/", views.recipe_delete, name="recipe_delete"),
+
     path(
-        "<int:recipe_id>/favorite/",
-        views.toggle_favorite,
-        name="toggle_favorite",
+        "",
+        recipe_list,
     ),
+
+
+    # Tags
+
     path(
-        "<int:recipe_id>/pin/",
-        views.toggle_pin,
-        name="toggle_pin",
+        "tags/",
+        tag_list,
     ),
+
     path(
-        "<int:recipe_id>/add-ingredient/",
-        views.add_recipe_ingredient,
-        name="add_recipe_ingredient",
+        "tags/<int:pk>/delete/",
+        tag_detail,
     ),
+
+
+
+    # Recipes
+
     path(
-        "<int:recipe_id>/nutrition/",
-        views.recipe_nutrition_ajax,
-        name="recipe_nutrition_ajax",
+        "<int:pk>/",
+        recipe_detail,
     ),
+
     path(
-        "meal/<str:meal_id>/<str:meal_name>/<str:meal_date>/add/",
-        views.add_recipes_to_meal_direct,
-        name="add_recipes_to_meal_direct",
+        "<int:pk>/toggle-favorite/",
+        toggle_favorite,
     ),
+
     path(
-        "ingredient/<int:ingredient_id>/delete/",
-        views.ingredient_delete,
-        name="ingredient_delete",
+        "<int:pk>/toggle-pin/",
+        toggle_pin,
     ),
+
     path(
-        "<int:recipe_id>/tags/modal/",
-        views.tags_modal,
-        name="recipe_tags_modal",
+        "<int:pk>/copy/",
+        recipe_copy,
     ),
+
+
+
+    # Ingredients
+
     path(
-        "<int:recipe_id>/tags/save/",
-        views.recipe_tags_save,
-        name="recipe_tags_save",
+        "<int:pk>/ingredients/",
+        recipe_ingredients,
     ),
+
     path(
-        "tags/create/",
-        views.recipe_tag_create,
-        name="recipe_tag_create",
+        "<int:pk>/ingredients/<int:ingredient_pk>/",
+        recipe_ingredient_detail,
     ),
+
+
+
+    # Picture
+
     path(
-        "tags/<int:tag_id>/delete/",
-        views.recipe_tag_delete,
-        name="recipe_tag_delete",
-    ),
-    path(
-        "tags/<int:recipe_id>/<int:tag_id>/delete/",
-        views.delete_tag_from_recipe,
-        name="delete_tag_from_recipe",
-    ),
-    path(
-        "recipes/<int:recipe_id>/tags/<int:tag_id>/add/",
-        views.add_tag_to_recipe,
-        name="add_tag_to_recipe",
+        "<int:pk>/picture/",
+        recipe_picture,
     ),
 ]

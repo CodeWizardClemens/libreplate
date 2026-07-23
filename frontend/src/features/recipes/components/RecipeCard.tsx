@@ -2,247 +2,149 @@ import { useState } from "react";
 
 import type { Recipe } from "../types";
 
-import {
-    useRecipeTags,
-    useUpdateRecipe,
-} from "../api";
+import { useRecipeTags, useUpdateRecipe } from "../api";
 
 import RecipeCardActions from "./RecipeCardActions";
 import RecipeCardHeader from "./RecipeCardHeader";
 import RecipeCardNutrients from "./RecipeCardNutrients";
 import RecipeCardTags from "./RecipeCardTags";
-
+import RecipeCardPicture from "./RecipeCardPicture";
 
 interface Props {
-    recipe?: Recipe;
+  recipe?: Recipe;
 
-    onDelete?: (
-        id: number
-    ) => void;
+  onDelete?: (id: number) => void;
 
-    onToggleFavorite?: (
-        id: number
-    ) => void;
+  onToggleFavorite?: (id: number) => void;
 
-    onTogglePinned?: (
-        id: number
-    ) => void;
+  onTogglePinned?: (id: number) => void;
 
-    onCopy?: (
-        id: number,
-        name: string
-    ) => void;
+  onCopy?: (id: number, name: string) => void;
 }
 
-
 export default function RecipeCard({
-    recipe,
-    onDelete,
-    onToggleFavorite,
-    onTogglePinned,
-    onCopy,
+  recipe,
+  onDelete,
+  onToggleFavorite,
+  onTogglePinned,
+  onCopy,
 }: Props) {
+  const { data: availableTags = [] } = useRecipeTags();
 
-    const {
-        data: availableTags = [],
-    } = useRecipeTags();
+  const updateRecipe = useUpdateRecipe();
 
+  const [editingName, setEditingName] = useState(false);
 
-    const updateRecipe =
-        useUpdateRecipe();
+  const [editingSummary, setEditingSummary] = useState(false);
 
+  if (!recipe) {
+    return null;
+  }
 
-    const [editingName, setEditingName] =
-        useState(false);
+  function updateRecipeData(data: { name?: string; summary?: string; tag_ids?: number[] }) {
+    updateRecipe.mutate({
+      id: recipe.id,
 
+      data,
+    });
+  }
 
-    const [editingSummary, setEditingSummary] =
-        useState(false);
+  function handleCopy() {
+    const name = window.prompt("New recipe name:", `${recipe.name} Copy`);
 
-
-
-    if (!recipe) {
-        return null;
+    if (name) {
+      onCopy?.(recipe.id, name);
     }
+  }
 
-
-
-    function updateRecipeData(
-        data: {
-            name?: string;
-            summary?: string;
-            tag_ids?: number[];
-        }
-    ) {
-
-        updateRecipe.mutate({
-            id: recipe.id,
-
-            data,
-        });
-
-    }
-
-
-
-    function handleCopy() {
-
-        const name =
-            window.prompt(
-                "New recipe name:",
-                `${recipe.name} Copy`
-            );
-
-
-        if (name) {
-
-            onCopy?.(
-                recipe.id,
-                name
-            );
-
-        }
-
-    }
-
-
-
-    return (
-
-        <div
-            className="
+  return (
+    <div
+      className="
                 card
                 shadow-sm
             "
-        >
-
-            <div
-                className="
+    >
+      <div
+        className="
                     card-body
                 "
-            >
+      >
+        <div
+          className="
+    row
+    g-3
+    align-items-start
+  "
+        >
+          <div
+            className="
+      col-auto
+      order-1
+    "
+          >
+            <RecipeCardPicture recipeId={recipe.id} />
+          </div>
 
-                <div
-                    className="
-                        row
-                        g-3
-                        align-items-start
-                    "
-                >
+          <RecipeCardActions
+            recipe={recipe}
 
-                    <RecipeCardActions
+            onCopy={handleCopy}
 
-                        recipe={
-                            recipe
-                        }
+            onDelete={onDelete}
 
-                        onCopy={
-                            handleCopy
-                        }
+            onToggleFavorite={onToggleFavorite}
 
-                        onDelete={
-                            onDelete
-                        }
+            onTogglePinned={onTogglePinned}
+          />
 
-                        onToggleFavorite={
-                            onToggleFavorite
-                        }
+          <div
+            className="
+      col
+      order-2
+    "
+          >
+            <RecipeCardHeader
+              recipe={recipe}
 
-                        onTogglePinned={
-                            onTogglePinned
-                        }
+              update={updateRecipeData}
 
-                    />
+              editingName={editingName}
 
+              setEditingName={setEditingName}
 
-                    <div
-                        className="
-                            col
-                            order-2
-                        "
-                    >
+              editingSummary={editingSummary}
 
-                        <RecipeCardHeader
+              setEditingSummary={setEditingSummary}
+            />
 
-                            recipe={
-                                recipe
-                            }
+            <RecipeCardNutrients nutrients={recipe.nutrients} />
 
-                            update={
-                                updateRecipeData
-                            }
+            <RecipeCardTags
+              recipe={recipe}
 
-                            editingName={
-                                editingName
-                            }
+              availableTags={availableTags}
 
-                            setEditingName={
-                                setEditingName
-                            }
+              update={updateRecipeData}
+            />
 
-                            editingSummary={
-                                editingSummary
-                            }
-
-                            setEditingSummary={
-                                setEditingSummary
-                            }
-
-                        />
-
-
-                        <RecipeCardNutrients
-
-                            nutrients={
-                                recipe.nutrients
-                            }
-
-                        />
-
-
-                        <RecipeCardTags
-
-                            recipe={
-                                recipe
-                            }
-
-                            availableTags={
-                                availableTags
-                            }
-
-                            update={
-                                updateRecipeData
-                            }
-
-                        />
-
-
-                        <div
-                            className="
+            <div
+              className="
                                 text-muted
                                 small
                                 mt-3
                             "
-                        >
+            >
+              {recipe.portions}
 
-                            {recipe.portions}
+              {" portions • "}
 
-                            {" portions • "}
+              {recipe.cooking_time}
 
-                            {recipe.cooking_time}
-
-                            {" min"}
-
-                        </div>
-
-                    </div>
-
-                </div>
-
+              {" min"}
             </div>
-
+          </div>
         </div>
-
-    );
-
+      </div>
+    </div>
+  );
 }

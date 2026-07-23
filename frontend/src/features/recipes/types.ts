@@ -1,119 +1,116 @@
 export interface Nutrient {
-    id: number;
-    name: string;
-    amount: number;
+  id: number;
+  name: string;
+  amount: number;
 }
-
 
 export interface RecipeTag {
-    id: number;
-    name: string;
+  id: number;
+  name: string;
 }
-
 
 export interface RecipeIngredient {
-    id: number;
+  id: number;
 
-    food: number;
-    food_name: string;
+  food: number;
+  food_name: string;
 
-    default_servings: number;
-    serving_amount: number;
+  default_servings: number;
+  serving_amount: number;
 
-    min_servings: number;
-    max_servings: number;
+  min_servings: number;
+  max_servings: number;
 
-    order: number;
+  order: number;
 }
 
+export interface RecipePicture {
+  id: number;
+  image: string;
+  created_at: string;
+}
 
 export interface Recipe {
-    id: number;
+  id: number;
 
-    name: string;
+  name: string;
 
-    is_favorite: boolean;
-    is_pinned: boolean;
+  is_favorite: boolean;
+  is_pinned: boolean;
 
-    summary: string;
-    description: string;
-    instructions: string;
+  summary: string;
+  description: string;
+  instructions: string;
 
-    cooking_time: number;
-    portions: number;
+  cooking_time: number;
+  portions: number;
 
-    last_used_at: string | null;
+  last_used_at: string | null;
 
-    created_at: string;
-    updated_at: string;
+  created_at: string;
+  updated_at: string;
 
-    tags: RecipeTag[];
+  tags: RecipeTag[];
 
-    nutrients: Nutrient[];
+  nutrients: Nutrient[];
 }
-
 
 export interface RecipeCreate {
-    name: string;
+  name: string;
 
-    summary: string;
-    description: string;
-    instructions: string;
+  summary: string;
+  description: string;
+  instructions: string;
 
-    cooking_time: number;
-    portions: number;
+  cooking_time: number;
+  portions: number;
 
-    tag_ids?: number[];
+  tag_ids?: number[];
 }
-
 
 export interface RecipeUpdate {
-    name?: string;
+  name?: string;
 
-    summary?: string;
-    description?: string;
-    instructions?: string;
+  summary?: string;
+  description?: string;
+  instructions?: string;
 
-    cooking_time?: number;
-    portions?: number;
+  cooking_time?: number;
+  portions?: number;
 
-    tag_ids?: number[];
+  tag_ids?: number[];
 }
-
 
 export interface RecipeIngredientCreate {
-    food: number;
+  food: number;
 
-    default_servings: number;
-    serving_amount: number;
+  default_servings: number;
+  serving_amount: number;
 
-    min_servings: number;
-    max_servings: number;
+  min_servings: number;
+  max_servings: number;
 
-    order: number;
+  order: number;
 }
-
 
 export interface RecipeIngredientUpdate {
-    food?: number;
+  food?: number;
 
-    default_servings?: number;
-    serving_amount?: number;
+  default_servings?: number;
+  serving_amount?: number;
 
-    min_servings?: number;
-    max_servings?: number;
+  min_servings?: number;
+  max_servings?: number;
 
-    order?: number;
+  order?: number;
 }
-
 
 export interface ToggleFavoriteResponse {
-    id: number;
-    is_favorite: boolean;
+  id: number;
+  is_favorite: boolean;
 }
 
-
 export interface TogglePinResponse {
-    id: number;
-    is_pinned: boolean;
+  id: number;
+  is_pinned: boolean;
 }

@@ -196,3 +196,6 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ],
 }
+
+MEDIA_ROOT = Path(env("MEDIA_ROOT"))
+MEDIA_URL = "/media/"

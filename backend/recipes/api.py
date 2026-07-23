@@ -10,14 +10,15 @@ from .models import (
     Recipe,
     RecipeIngredient,
     RecipeTag,
+    RecipePicture,
 )
 
 from .serializers import (
     RecipeSerializer,
     RecipeTagSerializer,
     RecipeIngredientSerializer,
+    RecipePictureSerializer,
 )
-
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -37,6 +38,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         return Recipe.objects.filter(
             user=self.request.user
+        ).prefetch_related(
+            "picture",
+            "tags",
         )
 
 
@@ -107,7 +111,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         new_name = request.data.get("name")
 
-
         if not new_name:
 
             return Response(
@@ -148,12 +151,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
 
 
+        if hasattr(recipe, "picture"):
+
+            RecipePicture.objects.create(
+                recipe=new_recipe,
+                image=recipe.picture.image,
+            )
+
+
         return Response(
             self.get_serializer(new_recipe).data,
             status=status.HTTP_201_CREATED,
         )
-
-
 
 
 
@@ -182,8 +191,6 @@ class RecipeTagViewSet(viewsets.ModelViewSet):
         serializer.save(
             user=self.request.user
         )
-
-
 
 
 
@@ -220,6 +227,52 @@ class RecipeIngredientViewSet(viewsets.ModelViewSet):
 
 
     def perform_create(self, serializer):
+
+        serializer.save(
+            recipe=self.get_recipe()
+        )
+
+
+
+class RecipePictureViewSet(viewsets.ModelViewSet):
+
+    authentication_classes = [
+        SessionAuthentication
+    ]
+
+    permission_classes = [
+        IsAuthenticated
+    ]
+
+    serializer_class = RecipePictureSerializer
+
+    def get_recipe(self):
+
+        return Recipe.objects.get(
+            id=self.kwargs["pk"],
+            user=self.request.user,
+        )
+
+    def get_queryset(self):
+
+        return RecipePicture.objects.filter(
+            recipe=self.get_recipe()
+        )
+
+    def get_object(self):
+
+        return RecipePicture.objects.get(
+            recipe=self.get_recipe()
+        )
+
+    def perform_create(self, serializer):
+
+        picture = RecipePicture.objects.filter(
+            recipe=self.get_recipe()
+        ).first()
+
+        if picture:
+            picture.delete()
 
         serializer.save(
             recipe=self.get_recipe()

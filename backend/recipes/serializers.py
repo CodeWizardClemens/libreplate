@@ -4,10 +4,12 @@ from .models import (
     Recipe,
     RecipeTag,
     RecipeIngredient,
+    RecipePicture,
 )
 
 
 class RecipeTagSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = RecipeTag
         fields = [
@@ -17,6 +19,7 @@ class RecipeTagSerializer(serializers.ModelSerializer):
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
+
     food_name = serializers.CharField(
         source="food.name",
         read_only=True,
@@ -36,12 +39,29 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         ]
 
 
+class RecipePictureSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = RecipePicture
+        fields = [
+            "id",
+            "image",
+        ]
+        read_only_fields = [
+            "id",
+        ]
+
+
 class RecipeSerializer(serializers.ModelSerializer):
 
     nutrients = serializers.SerializerMethodField()
 
     tags = RecipeTagSerializer(
         many=True,
+        read_only=True,
+    )
+
+    picture = RecipePictureSerializer(
         read_only=True,
     )
 
@@ -52,7 +72,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False,
     )
-
 
     class Meta:
         model = Recipe
@@ -72,9 +91,9 @@ class RecipeSerializer(serializers.ModelSerializer):
             "updated_at",
             "tags",
             "tag_ids",
+            "picture",
             "nutrients",
         )
-
 
     def validate(self, attrs):
 
@@ -94,7 +113,6 @@ class RecipeSerializer(serializers.ModelSerializer):
                     )
 
         return attrs
-
 
     def get_nutrients(self, obj):
 

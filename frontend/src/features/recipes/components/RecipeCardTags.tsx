@@ -1,117 +1,59 @@
-import type {
-    Recipe,
-} from "../types";
-
+import type { Recipe } from "../types";
 
 interface Props {
+  recipe: Recipe;
 
-    recipe: Recipe;
+  availableTags: Recipe["tags"];
 
-    availableTags: Recipe["tags"];
-
-    update: (
-        data: {
-            tag_ids: number[];
-        }
-    ) => void;
-
+  update: (data: { tag_ids: number[] }) => void;
 }
 
+export default function RecipeCardTags({ recipe, availableTags, update }: Props) {
+  const unusedTags = availableTags.filter(
+    (tag) => !recipe.tags.some((recipeTag) => recipeTag.id === tag.id),
+  );
 
+  function addTag(tagId: number) {
+    update({
+      tag_ids: [
+        ...recipe.tags.map((tag) => tag.id),
 
-export default function RecipeCardTags({
-    recipe,
-    availableTags,
-    update,
-}: Props) {
+        tagId,
+      ],
+    });
+  }
 
+  function removeTag(tagId: number) {
+    update({
+      tag_ids: recipe.tags.filter((tag) => tag.id !== tagId).map((tag) => tag.id),
+    });
+  }
 
-    const unusedTags =
-        availableTags.filter(
-            (tag) =>
-                !recipe.tags.some(
-                    (recipeTag) =>
-                        recipeTag.id === tag.id
-                )
-        );
-
-
-
-    function addTag(
-        tagId: number
-    ) {
-
-        update({
-            tag_ids: [
-                ...recipe.tags.map(
-                    (tag) =>
-                        tag.id
-                ),
-
-                tagId,
-            ],
-        });
-
-    }
-
-
-
-    function removeTag(
-        tagId: number
-    ) {
-
-        update({
-            tag_ids:
-                recipe.tags
-                    .filter(
-                        (tag) =>
-                            tag.id !== tagId
-                    )
-                    .map(
-                        (tag) =>
-                            tag.id
-                    ),
-        });
-
-    }
-
-
-
-    return (
-
-        <div
-            className="
+  return (
+    <div
+      className="
                 d-flex
                 flex-wrap
                 align-items-center
                 gap-2
             "
-        >
-
-            {
-                recipe.tags.map(
-                    (tag) => (
-
-                        <span
-                            key={
-                                tag.id
-                            }
-                            className="
+    >
+      {recipe.tags.map((tag) => (
+        <span
+          key={tag.id}
+          className="
                                 badge
                                 text-bg-secondary
                                 d-flex
                                 align-items-center
                                 gap-1
                             "
-                        >
+        >
+          {tag.name}
 
-                            {tag.name}
-
-
-
-                            <button
-                                type="button"
-                                className="
+          <button
+            type="button"
+            className="
                                     btn
                                     btn-sm
                                     p-0
@@ -119,112 +61,65 @@ export default function RecipeCardTags({
                                     border-0
                                     lh-1
                                 "
-                                onClick={() =>
-                                    removeTag(
-                                        tag.id
-                                    )
-                                }
-                                title="Remove tag"
-                            >
-
-                                <i
-                                    className="
+            onClick={() => removeTag(tag.id)}
+            title="Remove tag"
+          >
+            <i
+              className="
                                         bi
                                         bi-x
                                     "
-                                />
+            />
+          </button>
+        </span>
+      ))}
 
-                            </button>
-
-
-                        </span>
-
-                    )
-                )
-            }
-
-
-
-            {
-                unusedTags.length > 0 && (
-
-                    <div
-                        className="
+      {unusedTags.length > 0 && (
+        <div
+          className="
                             dropdown
                         "
-                    >
-
-                        <button
-                            className="
+        >
+          <button
+            className="
                                 btn
                                 btn-sm
                                 btn-outline-secondary
                             "
-                            type="button"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                            title="Add tag"
-                        >
-
-                            <i
-                                className="
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            title="Add tag"
+          >
+            <i
+              className="
                                     bi
                                     bi-plus
                                 "
-                            />
+            />
+          </button>
 
-                        </button>
-
-
-
-                        <ul
-                            className="
+          <ul
+            className="
                                 dropdown-menu
                             "
-                        >
-
-                            {
-                                unusedTags.map(
-                                    (tag) => (
-
-                                        <li
-                                            key={
-                                                tag.id
-                                            }
-                                        >
-
-                                            <button
-                                                className="
+          >
+            {unusedTags.map((tag) => (
+              <li key={tag.id}>
+                <button
+                  className="
                                                     dropdown-item
                                                 "
-                                                type="button"
-                                                onClick={() =>
-                                                    addTag(
-                                                        tag.id
-                                                    )
-                                                }
-                                            >
-
-                                                {tag.name}
-
-                                            </button>
-
-                                        </li>
-
-                                    )
-                                )
-                            }
-
-                        </ul>
-
-                    </div>
-
-                )
-            }
-
-
+                  type="button"
+                  onClick={() => addTag(tag.id)}
+                >
+                  {tag.name}
+                </button>
+              </li>
+            ))}
+          </ul>
         </div>
-
-    );
-
+      )}
+    </div>
+  );
 }

@@ -1,323 +1,211 @@
-import {
-    useState,
-} from "react";
+import { useState } from "react";
 
-import type {
-    RecipeTag,
-} from "../types";
+import type { RecipeTag } from "../types";
 
-import {
-    useCreateRecipeTag,
-    useDeleteRecipeTag,
-} from "../api";
-
+import { useCreateRecipeTag, useDeleteRecipeTag } from "../api";
 
 interface Props {
-    open: boolean;
+  open: boolean;
 
-    onClose: () => void;
+  onClose: () => void;
 
-    tags: RecipeTag[];
+  tags: RecipeTag[];
 
-    selectedTags: number[];
+  selectedTags: number[];
 
-    onChange: (
-        tags: number[]
-    ) => void;
+  onChange: (tags: number[]) => void;
 }
 
+export default function TagModal({ open, onClose, tags, selectedTags, onChange }: Props) {
+  const [newTag, setNewTag] = useState("");
 
-export default function TagModal({
-    open,
-    onClose,
-    tags,
-    selectedTags,
-    onChange,
-}: Props) {
+  const createTag = useCreateRecipeTag();
 
-    const [
-        newTag,
-        setNewTag,
-    ] = useState("");
+  const deleteTag = useDeleteRecipeTag();
 
+  if (!open) {
+    return null;
+  }
 
-    const createTag =
-        useCreateRecipeTag();
+  function toggleTag(id: number) {
+    if (selectedTags.includes(id)) {
+      onChange(selectedTags.filter((tagId) => tagId !== id));
 
-
-    const deleteTag =
-        useDeleteRecipeTag();
-
-
-
-    if (!open) {
-        return null;
+      return;
     }
 
+    onChange([...selectedTags, id]);
+  }
 
+  function handleCreate() {
+    const name = newTag.trim();
 
-    function toggleTag(
-        id: number
-    ) {
-
-        if (selectedTags.includes(id)) {
-
-            onChange(
-                selectedTags.filter(
-                    (tagId) =>
-                        tagId !== id
-                )
-            );
-
-            return;
-        }
-
-
-        onChange([
-            ...selectedTags,
-            id,
-        ]);
+    if (!name) {
+      return;
     }
 
+    createTag.mutate(name, {
+      onSuccess() {
+        setNewTag("");
+      },
+    });
+  }
 
-
-    function handleCreate() {
-
-        const name =
-            newTag.trim();
-
-
-        if (!name) {
-            return;
-        }
-
-
-        createTag.mutate(
-            name,
-            {
-                onSuccess() {
-                    setNewTag("");
-                },
-            }
-        );
-    }
-
-
-
-    return (
-        <>
-
-            <div
-                className="
+  return (
+    <>
+      <div
+        className="
                     modal-backdrop
                     fade
                     show
                 "
-                onClick={onClose}
-            />
+        onClick={onClose}
+      />
 
-
-            <div
-                className="
+      <div
+        className="
                     modal
                     fade
                     show
                     d-block
                 "
-                tabIndex={-1}
-                role="dialog"
-                aria-modal="true"
-            >
-
-                <div
-                    className="
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+      >
+        <div
+          className="
                         modal-dialog
                         modal-dialog-centered
                     "
-                    role="document"
-                >
-
-                    <div
-                        className="
+          role="document"
+        >
+          <div
+            className="
                             modal-content
                         "
-                    >
-
-                        <div
-                            className="
+          >
+            <div
+              className="
                                 modal-header
                             "
-                        >
-
-                            <h5
-                                className="
+            >
+              <h5
+                className="
                                     modal-title
                                 "
-                            >
-                                Tags
-                            </h5>
+              >
+                Tags
+              </h5>
 
-
-                            <button
-                                type="button"
-                                className="
+              <button
+                type="button"
+                className="
                                     btn-close
                                 "
-                                aria-label="Close"
-                                onClick={onClose}
-                            />
+                aria-label="Close"
+                onClick={onClose}
+              />
+            </div>
 
-                        </div>
-
-
-
-                        <div
-                            className="
+            <div
+              className="
                                 modal-body
                             "
-                        >
-
-                            <div
-                                className="
+            >
+              <div
+                className="
                                     input-group
                                     mb-3
                                 "
-                            >
-
-                                <input
-                                    className="
+              >
+                <input
+                  className="
                                         form-control
                                     "
-                                    value={
-                                        newTag
-                                    }
-                                    onChange={(e) =>
-                                        setNewTag(
-                                            e.target.value
-                                        )
-                                    }
-                                    placeholder="New tag"
-                                />
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  placeholder="New tag"
+                />
 
-
-                                <button
-                                    className="
+                <button
+                  className="
                                         btn
                                         btn-primary
                                     "
-                                    onClick={
-                                        handleCreate
-                                    }
-                                >
-                                    Add
-                                </button>
+                  onClick={handleCreate}
+                >
+                  Add
+                </button>
+              </div>
 
-                            </div>
-
-
-
-                            <div
-                                className="
+              <div
+                className="
                                     list-group
                                 "
-                            >
-
-                                {
-                                    tags.map(
-                                        (tag) => (
-
-                                            <div
-                                                key={
-                                                    tag.id
-                                                }
-                                                className="
+              >
+                {tags.map((tag) => (
+                  <div
+                    key={tag.id}
+                    className="
                                                     list-group-item
                                                     d-flex
                                                     justify-content-between
                                                     align-items-center
                                                 "
-                                            >
-
-                                                <button
-                                                    type="button"
-                                                    className={`
+                  >
+                    <button
+                      type="button"
+                      className={`
                                                         btn
                                                         flex-grow-1
                                                         text-start
                                                         ${
-                                                            selectedTags.includes(
-                                                                tag.id
-                                                            )
-                                                                ? "fw-bold"
-                                                                : ""
+                                                          selectedTags.includes(tag.id)
+                                                            ? "fw-bold"
+                                                            : ""
                                                         }
                                                     `}
-                                                    onClick={() =>
-                                                        toggleTag(
-                                                            tag.id
-                                                        )
-                                                    }
-                                                >
-                                                    {
-                                                        tag.name
-                                                    }
-                                                </button>
+                      onClick={() => toggleTag(tag.id)}
+                    >
+                      {tag.name}
+                    </button>
 
-
-                                                <button
-                                                    type="button"
-                                                    className="
+                    <button
+                      type="button"
+                      className="
                                                         btn
                                                         btn-outline-danger
                                                         btn-sm
                                                     "
-                                                    onClick={() =>
-                                                        deleteTag.mutate(
-                                                            tag.id
-                                                        )
-                                                    }
-                                                >
-                                                    Delete
-                                                </button>
+                      onClick={() => deleteTag.mutate(tag.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-                                            </div>
-
-                                        )
-                                    )
-                                }
-
-                            </div>
-
-                        </div>
-
-
-
-                        <div
-                            className="
+            <div
+              className="
                                 modal-footer
                             "
-                        >
-
-                            <button
-                                type="button"
-                                className="
+            >
+              <button
+                type="button"
+                className="
                                     btn
                                     btn-secondary
                                 "
-                                onClick={onClose}
-                            >
-                                Close
-                            </button>
-
-                        </div>
-
-
-                    </div>
-
-                </div>
-
+                onClick={onClose}
+              >
+                Close
+              </button>
             </div>
-
-        </>
-    );
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }
