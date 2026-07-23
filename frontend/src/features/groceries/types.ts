@@ -7,7 +7,6 @@ export interface GroceryList {
     updated_at: string;
 }
 
-
 export interface GroceryItem {
     id: number;
     food: number;

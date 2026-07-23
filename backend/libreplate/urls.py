@@ -22,6 +22,8 @@ urlpatterns = [
     path("settings/units/", include("units.urls")),
 
     # API
-    path("api/groceries/", include("groceries.api_urls")),
     path("api/accounts/", include("accounts.api_urls")),
+    path("api/groceries/", include("groceries.api_urls")),
+    path("api/recipes/", include("recipes.api_urls")),
+
 ]
