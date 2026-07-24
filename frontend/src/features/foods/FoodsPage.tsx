@@ -1,67 +1,38 @@
-import { useFoods } from "./api";
+import { useState } from "react";
+import FoodPickerModal from "./components/FoodPickerModal";
+import type { Food } from "./types";
 
 
 export default function FoodsPage() {
-  const {
-    data: foods,
-    isLoading,
-    isError,
-  } = useFoods();
-
-
-  if (isLoading) {
-    return <div>Loading foods...</div>;
-  }
-
-
-  if (isError) {
-    return <div>Failed to load foods.</div>;
-  }
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedFood, setSelectedFood] =
+    useState<Food | null>(null);
 
 
   return (
     <div>
-      <h1>Foods</h1>
+      <h1>
+        To display a food press the + button
+      </h1>
+      <button
+        onClick={() => setModalOpen(true)}
+      >
+        +
+      </button>
 
-      {foods?.length === 0 ? (
-        <p>No foods found.</p>
-      ) : (
-        <ul>
-          {foods?.map((food) => (
-            <li key={food.id}>
-              <div>
-                <strong>{food.name}</strong>
-
-                {food.brand && (
-                  <span> ({food.brand})</span>
-                )}
-              </div>
-
-              <div>
-                Serving: {food.serving ?? "-"} {food.unit}
-              </div>
-
-              {food.description && (
-                <p>{food.description}</p>
-              )}
-
-              {food.nutrients.length > 0 && (
-                <ul>
-                  {food.nutrients.map((nutrient) => (
-                    <li
-                      key={`${food.id}-${nutrient.nutrient_name}`}
-                    >
-                      {nutrient.nutrient_name}:{" "}
-                      {nutrient.amount}{" "}
-                      {nutrient.nutrient_unit}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          ))}
-        </ul>
+      {selectedFood && (
+        <h2>
+          Selected food: {selectedFood.name}
+        </h2>
       )}
+
+      <FoodPickerModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSelect={(food) => {
+          setSelectedFood(food);
+        }}
+      />
     </div>
   );
 }

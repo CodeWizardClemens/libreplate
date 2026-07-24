@@ -38,9 +38,7 @@ class RecipeViewTests(TestCase):
         self.ingredient = RecipeIngredient.objects.create(
             recipe=self.recipe,
             food=self.food,
-            default_servings=1,
-            min_servings=2,
-            max_servings=3,
+            number_of_servings=1,
         )
 
     def test_recipe_create(self):
@@ -107,9 +105,7 @@ class RecipeViewTests(TestCase):
 
         ingredient = copy.ingredients.first()
         self.assertEqual(ingredient.food, self.food)
-        self.assertEqual(ingredient.default_servings, 1)
-        self.assertEqual(ingredient.min_servings, 2)
-        self.assertEqual(ingredient.max_servings, 3)
+        self.assertEqual(ingredient.number_of_servings, 1)
 
     def test_recipe_delete(self):
         response = self.client.post(

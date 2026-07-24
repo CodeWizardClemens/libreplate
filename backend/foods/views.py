@@ -526,7 +526,7 @@ def add_foods_to_recipe_direct(request, recipe_id):
         RecipeIngredient.objects.create(
             recipe=recipe,
             food=food,
-            default_servings=1,
+            number_of_servings=1,
             serving_amount=food.serving,
             order=order,
         )

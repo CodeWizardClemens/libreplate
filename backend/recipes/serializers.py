@@ -31,11 +31,13 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
             "id",
             "food",
             "food_name",
-            "default_servings",
+            "number_of_servings",
             "serving_amount",
-            "min_servings",
-            "max_servings",
             "order",
+        ]
+        read_only_fields = [
+            "id",
+            "food_name",
         ]
 
 
@@ -62,6 +64,11 @@ class RecipeSerializer(serializers.ModelSerializer):
     )
 
     picture = RecipePictureSerializer(
+        read_only=True,
+    )
+
+    ingredients = RecipeIngredientSerializer(
+        many=True,
         read_only=True,
     )
 
@@ -93,6 +100,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             "tags",
             "tag_ids",
             "picture",
+            "ingredients",
             "nutrients",
         )
 

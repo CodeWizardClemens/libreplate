@@ -139,10 +139,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             RecipeIngredient.objects.create(
                 recipe=new_recipe,
                 food=ingredient.food,
-                default_servings=ingredient.default_servings,
+                number_of_servings=ingredient.number_of_servings,
                 serving_amount=ingredient.serving_amount,
-                min_servings=ingredient.min_servings,
-                max_servings=ingredient.max_servings,
                 order=ingredient.order,
             )
 
@@ -224,6 +222,14 @@ class RecipeIngredientViewSet(viewsets.ModelViewSet):
             recipe=recipe
         ).select_related(
             "food"
+        )
+
+
+    def get_object(self):
+
+        return RecipeIngredient.objects.get(
+            id=self.kwargs["ingredient_pk"],
+            recipe=self.get_recipe(),
         )
 
 

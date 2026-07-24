@@ -15,7 +15,6 @@ recipe_list = RecipeViewSet.as_view(
     }
 )
 
-
 recipe_detail = RecipeViewSet.as_view(
     {
         "get": "retrieve",
@@ -25,13 +24,11 @@ recipe_detail = RecipeViewSet.as_view(
     }
 )
 
-
 toggle_favorite = RecipeViewSet.as_view(
     {
         "post": "toggle_favorite",
     }
 )
-
 
 toggle_pin = RecipeViewSet.as_view(
     {
@@ -39,13 +36,11 @@ toggle_pin = RecipeViewSet.as_view(
     }
 )
 
-
 recipe_copy = RecipeViewSet.as_view(
     {
         "post": "copy",
     }
 )
-
 
 tag_list = RecipeTagViewSet.as_view(
     {
@@ -54,13 +49,11 @@ tag_list = RecipeTagViewSet.as_view(
     }
 )
 
-
 tag_detail = RecipeTagViewSet.as_view(
     {
         "delete": "destroy",
     }
 )
-
 
 recipe_ingredients = RecipeIngredientViewSet.as_view(
     {
@@ -68,7 +61,6 @@ recipe_ingredients = RecipeIngredientViewSet.as_view(
         "post": "create",
     }
 )
-
 
 recipe_ingredient_detail = RecipeIngredientViewSet.as_view(
     {
@@ -78,7 +70,6 @@ recipe_ingredient_detail = RecipeIngredientViewSet.as_view(
         "delete": "destroy",
     }
 )
-
 
 recipe_picture = RecipePictureViewSet.as_view(
     {
@@ -90,69 +81,25 @@ recipe_picture = RecipePictureViewSet.as_view(
 
 
 urlpatterns = [
-
-    path(
-        "",
-        recipe_list,
-    ),
-
+    path("", recipe_list),
 
     # Tags
-
-    path(
-        "tags/",
-        tag_list,
-    ),
-
-    path(
-        "tags/<int:pk>/delete/",
-        tag_detail,
-    ),
-
-
+    path("tags/", tag_list),
+    path("tags/<int:pk>/delete/", tag_detail),
 
     # Recipes
-
-    path(
-        "<int:pk>/",
-        recipe_detail,
-    ),
-
-    path(
-        "<int:pk>/toggle-favorite/",
-        toggle_favorite,
-    ),
-
-    path(
-        "<int:pk>/toggle-pin/",
-        toggle_pin,
-    ),
-
-    path(
-        "<int:pk>/copy/",
-        recipe_copy,
-    ),
-
-
+    path("<int:pk>/", recipe_detail),
+    path("<int:pk>/toggle-favorite/", toggle_favorite),
+    path("<int:pk>/toggle-pin/", toggle_pin),
+    path("<int:pk>/copy/", recipe_copy),
 
     # Ingredients
-
-    path(
-        "<int:pk>/ingredients/",
-        recipe_ingredients,
-    ),
-
+    path("<int:pk>/ingredients/", recipe_ingredients),
     path(
         "<int:pk>/ingredients/<int:ingredient_pk>/",
         recipe_ingredient_detail,
     ),
 
-
-
     # Picture
-
-    path(
-        "<int:pk>/picture/",
-        recipe_picture,
-    ),
+    path("<int:pk>/picture/", recipe_picture),
 ]

@@ -5,37 +5,43 @@ interface Props {
 }
 
 export default function RecipeCardNutrients({ nutrients }: Props) {
-  if (nutrients.length === 0) {
+  const allowedNutrients = nutrients.filter((nutrient) =>
+    ["energy", "protein", "carbohydrates", "fat", "fats"].includes(
+      nutrient.name.toLowerCase()
+    )
+  );
+
+  if (allowedNutrients.length === 0) {
     return null;
   }
 
   return (
     <div
       className="
-                row
-                g-2
-                mb-3
-            "
+        row
+        g-2
+        mb-3
+      "
     >
-      {nutrients.map((nutrient) => (
+      {allowedNutrients.map((nutrient) => (
         <div
           key={nutrient.id}
           className="
-                                col-6
-                                col-md-auto
-                            "
+            col-6
+            col-md-auto
+          "
         >
           <span
             className="
-                                    badge
-                                    text-bg-light
-                                    border
-                                "
+              badge
+              text-bg-light
+              border
+            "
           >
-            {nutrient.name}
-
+            {nutrient.name.toLowerCase() === "carbohydrates"
+              ? "Carbs"
+              : nutrient.name}
             {": "}
-
             {nutrient.amount}
           </span>
         </div>

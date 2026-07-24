@@ -26,9 +26,7 @@ class RecipeIngredientForm(forms.ModelForm):
 
         fields = [
             "food",
-            "default_servings",
-            "min_servings",
-            "max_servings",
+            "number_of_servings",
         ]
 
     def __init__(self, *args, user=None, **kwargs):

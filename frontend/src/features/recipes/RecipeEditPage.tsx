@@ -77,7 +77,7 @@ export default function RecipeEditPage() {
 
       <InstructionsCard recipe={recipe} />
 
-      <IngredientsCard ingredients={ingredients} />
+      <IngredientsCard recipe={recipe} />
 
       {tags && (
         <TagModal

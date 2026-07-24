@@ -5,6 +5,7 @@ from django.db import models
 from django.utils import timezone
 from collections import defaultdict
 
+from decimal import Decimal, ROUND_HALF_UP
 
 class Recipe(models.Model):
     def get_nutrients(self, per_portion=True):
@@ -24,6 +25,12 @@ class Recipe(models.Model):
         if per_portion and self.portions:
             divisor = Decimal(str(self.portions))
             totals = {nutrient: amount / divisor for nutrient, amount in totals.items()}
+
+        # Round to 0 decimal places
+        totals = {
+            nutrient: amount.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+            for nutrient, amount in totals.items()
+        }
 
         return totals
 
@@ -97,10 +104,8 @@ class RecipeIngredient(models.Model):
 
     food = models.ForeignKey("foods.Food", on_delete=models.CASCADE)
 
-    default_servings = models.FloatField(default=1)
+    number_of_servings = models.FloatField(default=1)
     serving_amount = models.FloatField(default=1)
-    min_servings = models.FloatField(default=0)
-    max_servings = models.FloatField(default=10)
     order = models.PositiveIntegerField(default=0)
 
     class Meta:

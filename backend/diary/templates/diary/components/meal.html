@@ -22,12 +22,6 @@
                     Add food
                 </a>
 
-                <a
-                    class="small text-primary text-decoration-none"
-                    href="{% url 'recipes' %}?meal_id={{ meal.id }}&meal_name={{ meal.name }}&meal_date={{ meal.date }}">
-                    Add recipe
-                </a>
-
             </div>
 
             {% if not meal.is_virtual %}
