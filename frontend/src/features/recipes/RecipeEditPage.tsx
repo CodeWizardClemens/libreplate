@@ -1,16 +1,20 @@
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import {
   useRecipe,
   useRecipeIngredients,
+  useRecipeTags,
 } from "./api";
 
 import BackButton from "./components/edit/BackButton";
 import RecipeInfoBar from "./components/edit/RecipeInfoBar";
 import InstructionsCard from "./components/edit/InstructionsCard";
 import IngredientsCard from "./components/edit/IngredientsCard";
-import RecipeCardPicture from "./components/common/RecipeCardPicture";
-import RecipeCardTags from "./components/recipes/RecipeCardTags";
+import RecipeCardPicture from "./components/common/RecipePicture";
+import TagModal from "./components/common/TagModal";
+import RecipeCardTags from "./components/common/RecipeTags"
+import TitleInfo from "./components/edit/TitleInfo";
 
 export default function RecipeEditPage() {
   const { id } = useParams();
@@ -20,29 +24,33 @@ export default function RecipeEditPage() {
 
   const { data: recipe, isLoading } = useRecipe(recipeId);
   const { data: ingredients } = useRecipeIngredients(recipeId);
+  const { data: tags } = useRecipeTags();
+
+  const [showTagModal, setShowTagModal] = useState(false);
 
   if (isLoading || !recipe) {
-    return <div className="container py-4">Loading...</div>;
+    return (
+      <div className="container py-4">
+        Loading...
+      </div>
+    );
   }
 
   return (
     <div className="container">
-      <div className="mx-auto" style={{ maxWidth: "550px" }}>
+      <div
+        className="mx-auto"
+        style={{
+          maxWidth: "550px",
+        }}
+      >
         <div className="mb-3">
-          <BackButton onClick={() => navigate("/recipes")} />
+          <BackButton
+            onClick={() => navigate("/recipes")}
+          />
         </div>
 
-        <div className="text-center">
-          <h1 className="display-5 text-break mb-2">
-            {recipe.name}
-          </h1>
-
-          <hr className="mt-0" />
-
-          <p className="text-muted mb-0">
-            {recipe.summary}
-          </p>
-        </div>
+        <TitleInfo recipe={recipe} />
 
         <div className="d-flex justify-content-center align-items-center py-2">
           <RecipeCardPicture
@@ -55,20 +63,29 @@ export default function RecipeEditPage() {
         <div className="d-flex justify-content-center mb-2">
           <RecipeInfoBar recipe={recipe} />
         </div>
-  
-        {/* TODO. I want a button here that opens the modal. Selecting a tag
-        in the modal applies them to the recipe and updates the recipe data.
-         */}
 
         <div className="d-flex justify-content-center mb-2">
+          <button
+            className="btn btn-outline-secondary btn-sm m-1"
+            onClick={() => setShowTagModal(true)}
+          >
+            Tags
+          </button>
           <RecipeCardTags recipe={recipe} />
         </div>
-
       </div>
 
-      
       <InstructionsCard recipe={recipe} />
+
       <IngredientsCard ingredients={ingredients} />
+
+      {tags && (
+        <TagModal
+          open={showTagModal}
+          onClose={() => setShowTagModal(false)}
+          tags={tags}
+        />
+      )}
     </div>
   );
 }

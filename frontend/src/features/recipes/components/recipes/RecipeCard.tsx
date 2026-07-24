@@ -7,8 +7,8 @@ import { useRecipeTags, useUpdateRecipe } from "../../api";
 import RecipeCardActions from "./RecipeCardActions";
 import RecipeCardHeader from "./RecipeCardHeader";
 import RecipeCardNutrients from "./RecipeCardNutrients";
-import RecipeCardTags from "./RecipeCardTags";
-import RecipeCardPicture from "../common/RecipeCardPicture";
+import RecipeCardTags from "../common/RecipeTags";
+import RecipeCardPicture from "../common/RecipePicture";
 
 interface Props {
   recipe?: Recipe;

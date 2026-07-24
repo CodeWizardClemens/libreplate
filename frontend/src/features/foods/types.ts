@@ -17,7 +17,7 @@ export interface Food {
   nutrients: FoodNutrient[];
 }
 
-export type FoodCreate = {
+export interface CreateFoodPayload {
   name: string;
   serving?: number | null;
   unit: string;
@@ -26,6 +26,6 @@ export type FoodCreate = {
   description?: string | null;
   is_favorite?: boolean;
   usda_fdc_id?: number | null;
-};
+}
 
-export type FoodUpdate = Partial<FoodCreate>;
+export type UpdateFoodPayload = Partial<CreateFoodPayload>;

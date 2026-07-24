@@ -2,22 +2,21 @@ import { useState } from "react";
 
 import type { RecipeTag } from "../../types";
 
-import { useCreateRecipeTag, useDeleteRecipeTag } from "../../api";
+import {
+  useCreateRecipeTag,
+  useDeleteRecipeTag,
+} from "../../api";
 
 interface Props {
   open: boolean;
   onClose: () => void;
   tags: RecipeTag[];
-  selectedTags: number[];
-  onChange: (tags: number[]) => void;
 }
 
 export default function TagModal({
   open,
   onClose,
   tags,
-  selectedTags,
-  onChange,
 }: Props) {
   const [newTag, setNewTag] = useState("");
 
@@ -26,15 +25,6 @@ export default function TagModal({
 
   if (!open) {
     return null;
-  }
-
-  function toggleTag(id: number) {
-    if (selectedTags.includes(id)) {
-      onChange(selectedTags.filter((tagId) => tagId !== id));
-      return;
-    }
-
-    onChange([...selectedTags, id]);
   }
 
   function handleCreate() {
@@ -100,58 +90,33 @@ export default function TagModal({
               </div>
 
               <div className="list-group">
-                {tags.map((tag) => {
-                  const selected = selectedTags.includes(tag.id);
+                {tags.map((tag) => (
+                  <div
+                    key={tag.id}
+                    className="
+                      list-group-item
+                      d-flex
+                      justify-content-between
+                      align-items-center
+                    "
+                  >
+                    <span>
+                      {tag.name}
+                    </span>
 
-                  return (
-                    <div
-                      key={tag.id}
+                    <button
+                      type="button"
                       className="
-                        list-group-item
-                        d-flex
-                        justify-content-between
-                        align-items-center
+                        btn
+                        btn-outline-danger
+                        btn-sm
                       "
+                      onClick={() => deleteTag.mutate(tag.id)}
                     >
-                      <button
-                        type="button"
-                        className={`
-                          btn
-                          border-0
-                          bg-transparent
-                          p-0
-                          d-flex
-                          align-items-center
-                          gap-2
-                          ${
-                            selected
-                              ? "text-primary fw-bold"
-                              : "text-body"
-                          }
-                        `}
-                        onClick={() => toggleTag(tag.id)}
-                      >
-                        {tag.name}
-
-                        {selected && (
-                          <i className="bi bi-check-circle-fill text-primary" />
-                        )}
-                      </button>
-
-                      <button
-                        type="button"
-                        className="
-                          btn
-                          btn-outline-danger
-                          btn-sm
-                        "
-                        onClick={() => deleteTag.mutate(tag.id)}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  );
-                })}
+                      Delete
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
 

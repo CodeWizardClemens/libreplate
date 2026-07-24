@@ -9,6 +9,8 @@ import LoginPage from "../features/auth/pages/LoginPage";
 import GroceriesPage from "../features/groceries/pages/GroceriesPage";
 import RecipesPage from "../features/recipes/RecipePage";
 import RecipeEditPage from "../features/recipes/RecipeEditPage";
+import FoodsPage from "../features/foods/FoodsPage";
+
 
 function Placeholder({ title }: { title: string }) {
     return (
@@ -18,6 +20,7 @@ function Placeholder({ title }: { title: string }) {
         </>
     );
 }
+
 
 const router = createBrowserRouter([
     {
@@ -59,7 +62,7 @@ const router = createBrowserRouter([
 
             {
                 path: "foods",
-                element: <Placeholder title="Foods" />,
+                element: <FoodsPage />,
                 handle: {
                     title: "Foods",
                 },

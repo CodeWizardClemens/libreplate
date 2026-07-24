@@ -4,16 +4,12 @@ from django.db import models
 
 class Food(models.Model):
     name = models.CharField(max_length=255)
-
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="foods")
-
     serving = models.DecimalField(max_digits=6, decimal_places=2)
-
     unit = models.ForeignKey(
         "units.Unit", on_delete=models.CASCADE, null=True, blank=True
     )
 
-    thumbnail_path = models.CharField(max_length=500, blank=True, null=True)
     barcode = models.CharField(max_length=50, blank=True)
     brand = models.CharField(max_length=255, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
@@ -41,10 +37,6 @@ class Food(models.Model):
         return self.name
 
     def get_thumbnail_url(self):
-        if self.thumbnail_path:
-            from django.conf import settings
-
-            return f"{settings.MEDIA_URL}{self.thumbnail_path}"
         return None
 
 
