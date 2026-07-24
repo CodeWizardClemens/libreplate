@@ -1,44 +1,55 @@
 import type { Recipe } from "../../types";
 
+import {
+  useRecipeTags,
+  useUpdateRecipe,
+} from "../../api";
+
 interface Props {
   recipe: Recipe;
-  availableTags: Recipe["tags"];
-  update: (data: { tag_ids: number[] }) => void;
 }
 
 export default function RecipeCardTags({
   recipe,
-  availableTags,
-  update,
 }: Props) {
+  const { data: availableTags = [] } = useRecipeTags();
+  const updateRecipe = useUpdateRecipe();
+
   const unusedTags = availableTags.filter(
     (tag) =>
       !recipe.tags.some(
-        (recipeTag) => recipeTag.id === tag.id
+        (recipeTag) => recipeTag.id === tag.id,
       ),
   );
 
   function stopCardClick(
-    event: React.MouseEvent
+    event: React.MouseEvent,
   ) {
     event.stopPropagation();
   }
 
-  function addTag(tagId: number) {
-    update({
-      tag_ids: [
-        ...recipe.tags.map((tag) => tag.id),
-        tagId,
-      ],
+  function updateRecipeData(tagIds: number[]) {
+    updateRecipe.mutate({
+      id: recipe.id,
+      data: {
+        tag_ids: tagIds,
+      },
     });
   }
 
+  function addTag(tagId: number) {
+    updateRecipeData([
+      ...recipe.tags.map((tag) => tag.id),
+      tagId,
+    ]);
+  }
+
   function removeTag(tagId: number) {
-    update({
-      tag_ids: recipe.tags
+    updateRecipeData(
+      recipe.tags
         .filter((tag) => tag.id !== tagId)
         .map((tag) => tag.id),
-    });
+    );
   }
 
   return (

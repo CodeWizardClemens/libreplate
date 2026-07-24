@@ -3,14 +3,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   useRecipe,
   useRecipeIngredients,
-  useRecipePicture,
 } from "./api";
 
 import BackButton from "./components/edit/BackButton";
-import RecipeHeaderCard from "./components/edit/RecipeHeaderCard";
+import RecipeInfoBar from "./components/edit/RecipeInfoBar";
 import InstructionsCard from "./components/edit/InstructionsCard";
 import IngredientsCard from "./components/edit/IngredientsCard";
 import RecipeCardPicture from "./components/common/RecipeCardPicture";
+import RecipeCardTags from "./components/recipes/RecipeCardTags";
 
 export default function RecipeEditPage() {
   const { id } = useParams();
@@ -19,7 +19,6 @@ export default function RecipeEditPage() {
   const recipeId = Number(id);
 
   const { data: recipe, isLoading } = useRecipe(recipeId);
-  const { data: picture } = useRecipePicture(recipeId);
   const { data: ingredients } = useRecipeIngredients(recipeId);
 
   if (isLoading || !recipe) {
@@ -45,31 +44,30 @@ export default function RecipeEditPage() {
           </p>
         </div>
 
-        <div className="d-flex justify-content-center align-items-center py-4">
+        <div className="d-flex justify-content-center align-items-center py-2">
           <RecipeCardPicture
             recipeId={recipe.id}
             width={550}
             height={350}
           />
         </div>
-      </div>
-      <RecipeHeaderCard recipe={recipe} picture={picture} />
 
-        <div className="text-center mb-4">
-          <strong>Tags:</strong>{" "}
-          {recipe?.tags?.map((tag: any) => (
-            <span
-              key={tag.name}
-              className="badge bg-secondary me-1"
-            >
-              {tag.name}
-            </span>
-          ))}
+        <div className="d-flex justify-content-center mb-2">
+          <RecipeInfoBar recipe={recipe} />
+        </div>
+  
+        {/* TODO. I want a button here that opens the modal. Selecting a tag
+        in the modal applies them to the recipe and updates the recipe data.
+         */}
+
+        <div className="d-flex justify-content-center mb-2">
+          <RecipeCardTags recipe={recipe} />
         </div>
 
+      </div>
 
+      
       <InstructionsCard recipe={recipe} />
-
       <IngredientsCard ingredients={ingredients} />
     </div>
   );

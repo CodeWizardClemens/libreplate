@@ -43,6 +43,7 @@ export interface Recipe {
   instructions: string;
 
   cooking_time: number;
+  prepping_time: number;
   portions: number;
 
   last_used_at: string | null;
@@ -63,6 +64,7 @@ export interface RecipeCreate {
   instructions: string;
 
   cooking_time: number;
+  prepping_time: number;
   portions: number;
 
   tag_ids?: number[];
@@ -76,6 +78,7 @@ export interface RecipeUpdate {
   instructions?: string;
 
   cooking_time?: number;
+  prepping_time?: number;
   portions?: number;
 
   tag_ids?: number[];

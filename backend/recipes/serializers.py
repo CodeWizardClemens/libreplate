@@ -85,6 +85,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             "description",
             "instructions",
             "cooking_time",
+            "prepping_time",
             "portions",
             "last_used_at",
             "created_at",

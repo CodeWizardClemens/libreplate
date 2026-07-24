@@ -128,6 +128,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             description=recipe.description,
             instructions=recipe.instructions,
             cooking_time=recipe.cooking_time,
+            prepping_time=recipe.prepping_time,
             portions=recipe.portions,
             last_used_at=timezone.now(),
         )

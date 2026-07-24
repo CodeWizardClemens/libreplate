@@ -93,8 +93,6 @@ export default function RecipeCard({
 
             <RecipeCardTags
               recipe={recipe}
-              availableTags={availableTags}
-              update={updateRecipeData}
             />
 
             <div className="text-muted small mt-3">
@@ -103,8 +101,14 @@ export default function RecipeCard({
               {" portions"}
 
               <i className="bi bi-clock ms-2 me-1"></i>
+              {"Cook: "}
               {recipe.cooking_time ?? 0}
-              {" min"}
+              {" m"}
+
+              <i className="bi bi-clock ms-2 me-1"></i>
+              {"Prep: "}
+              {recipe.prepping_time ?? 0}
+              {" m"}
             </div>
           </div>
 

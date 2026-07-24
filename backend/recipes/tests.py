@@ -31,6 +31,7 @@ class RecipeViewTests(TestCase):
             description="Bla bla long text",
             instructions="step1: boil pasta, step2: bake chicken etc.",
             cooking_time="1:00:00",
+            prepping_time="1:00:00",
             portions=1,
         )
 
@@ -95,6 +96,8 @@ class RecipeViewTests(TestCase):
         self.assertEqual(copy.description, self.recipe.description)
         self.assertEqual(copy.instructions, self.recipe.instructions)
         self.assertEqual(copy.cooking_time, self.recipe.cooking_time)
+        self.assertEqual(copy.prepping_time, self.recipe.prepping_time)
+
         self.assertEqual(copy.portions, self.recipe.portions)
 
         self.assertTrue(copy.name.startswith(self.recipe.name))

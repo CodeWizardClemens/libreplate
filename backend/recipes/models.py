@@ -36,6 +36,8 @@ class Recipe(models.Model):
     description = models.TextField(blank=True, null=True)
     instructions = models.TextField(blank=True, null=True)
     cooking_time = models.CharField(max_length=20, blank=True, null=True)
+    prepping_time = models.CharField(max_length=20, blank=True, null=True)
+
     portions = models.FloatField(
         default=1, help_text="Number of portions this recipe creates"
     )
