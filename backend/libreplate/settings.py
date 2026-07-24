@@ -23,6 +23,7 @@ env = environ.Env(
 # Load from root directory, now in 'backend'
 environ.Env.read_env(BASE_DIR.parent / ".env")
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 

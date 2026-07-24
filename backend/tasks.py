@@ -45,7 +45,7 @@ VENV_DIR = BASE_DIR / ".venv"
 load_dotenv(BASE_DIR.parent / ".env")
 
 
-def django(c: Context, command: str) -> None:
+def django_run(c: Context, command: str) -> None:
     """
     Run a Django management command.
     """
@@ -105,8 +105,8 @@ def migrate(c: Context):
     Create new Django migrations and apply pending database migrations.
     """
     log("Creating and applying migrations")
-    django(c, "makemigrations")
-    django(c, "migrate")
+    django_run(c, "makemigrations")
+    django_run(c, "migrate")
 
 
 @task
@@ -115,7 +115,7 @@ def collectstatic(c: Context):
     Collect Django static files for deployment.
     """
     log("Collecting static files")
-    django(c, "collectstatic --noinput")
+    django_run(c, "collectstatic --noinput")
 
 
 @task
@@ -138,7 +138,7 @@ def sync_default_data(c: Context):
     log("Syncing default data")
 
     for sync_command in ["sync_nutrients", "sync_units", "sync_body_metrics"]:
-        django(c, sync_command)
+        django_run(c, sync_command)
 
 
 @task
@@ -158,7 +158,7 @@ def add_user(
     """
     log(f"Adding new user `{username}`")
 
-    django(
+    django_run(
         c,
         "add_user "
         f"{shlex.quote(username)} "
@@ -175,7 +175,7 @@ def remove_user(c: Context, username):
     Remove an existing LibrePlate user account.
     """
     log(f"Removing user `{username}`")
-    django(c, f'remove_user "{username}"')
+    django_run(c, f'remove_user "{username}"')
 
 
 @task
@@ -186,7 +186,7 @@ def add_usda_api_key(c: Context, key):
     Stores the provided API key so LibrePlate can access USDA food information.
     """
     log("Add a USDA API key")
-    django(c, f"add_usda_api_key {key}")
+    django_run(c, f"add_usda_api_key {key}")
 
 
 @task
@@ -206,7 +206,7 @@ def serve(c: Context):
         # TODO allow for gunicorn config to be passed as argument.
         c.run("uv run gunicorn libreplate.wsgi:application")
     else:
-        django(c, "runserver")
+        django_run(c, "runserver")
 
 
 @task
@@ -215,7 +215,7 @@ def test(c: Context):
     Run the LibrePlate automated test suite.
     """
     log("Running tests")
-    django(c, "test")
+    django_run(c, "test")
 
 
 @task

@@ -18,7 +18,7 @@ interface IngredientsCardProps {
 }
 
 
-const nutrientNames = {
+const nutrients = {
   energy: ["energy", "calories"],
   protein: ["protein"],
   fat: ["fat", "total lipid"],
@@ -38,6 +38,19 @@ const headers = [
 ];
 
 
+type NutrientTotals = Record<keyof typeof nutrients, number>;
+
+
+function emptyTotals(): NutrientTotals {
+  return {
+    energy: 0,
+    protein: 0,
+    fat: 0,
+    carbohydrates: 0,
+  };
+}
+
+
 function getNutrient(food: Food, names: string[]) {
   return (
     food.nutrients.find((n) =>
@@ -49,14 +62,20 @@ function getNutrient(food: Food, names: string[]) {
 }
 
 
-function getIngredientMultiplier(
+function calculateNutrients(
   food: Food,
   ingredient: RecipeIngredient,
-) {
-  return (
+): NutrientTotals {
+  const multiplier =
     ingredient.number_of_servings *
-    (ingredient.serving_amount / (food.serving ?? 1))
-  );
+    (ingredient.serving_amount / (food.serving ?? 1));
+
+  return Object.fromEntries(
+    Object.entries(nutrients).map(([key, names]) => [
+      key,
+      getNutrient(food, names) * multiplier,
+    ]),
+  ) as NutrientTotals;
 }
 
 
@@ -80,11 +99,7 @@ function NumberInput({
 
 
 function NutrientCell({ value }: { value: number }) {
-  return (
-    <td className="text-start text-muted">
-      {Math.round(value)}
-    </td>
-  );
+  return <td className="text-start text-muted">{Math.round(value)}</td>;
 }
 
 
@@ -106,15 +121,10 @@ function IngredientRow({
   const updateMutation = useUpdateRecipeIngredient();
 
 
-  if (!food) {
-    return (
-      <tr>
-        <td colSpan={8} className="text-center py-3 text-muted">
-          Loading...
-        </td>
-      </tr>
-    );
-  }
+  const values = useMemo(
+    () => (food ? calculateNutrients(food, ingredient) : emptyTotals()),
+    [food, ingredient.number_of_servings, ingredient.serving_amount],
+  );
 
 
   const update = (data: Partial<RecipeIngredient>) => {
@@ -128,34 +138,15 @@ function IngredientRow({
   };
 
 
-  const nutrients = useMemo(() => {
-    const multiplier = getIngredientMultiplier(
-      food,
-      ingredient,
+  if (!food) {
+    return (
+      <tr>
+        <td colSpan={8} className="text-center py-3 text-muted">
+          Loading...
+        </td>
+      </tr>
     );
-
-    return {
-      energy:
-        getNutrient(food, nutrientNames.energy) *
-        multiplier,
-
-      protein:
-        getNutrient(food, nutrientNames.protein) *
-        multiplier,
-
-      fat:
-        getNutrient(food, nutrientNames.fat) *
-        multiplier,
-
-      carbohydrates:
-        getNutrient(food, nutrientNames.carbohydrates) *
-        multiplier,
-    };
-  }, [
-    food,
-    ingredient.number_of_servings,
-    ingredient.serving_amount,
-  ]);
+  }
 
 
   return (
@@ -166,9 +157,7 @@ function IngredientRow({
         <NumberInput
           value={ingredient.number_of_servings}
           onChange={(value) =>
-            update({
-              number_of_servings: value,
-            })
+            update({ number_of_servings: value })
           }
         />
       </td>
@@ -177,17 +166,14 @@ function IngredientRow({
         <NumberInput
           value={ingredient.serving_amount}
           onChange={(value) =>
-            update({
-              serving_amount: value,
-            })
+            update({ serving_amount: value })
           }
         />
       </td>
 
-      <NutrientCell value={nutrients.energy} />
-      <NutrientCell value={nutrients.protein} />
-      <NutrientCell value={nutrients.fat} />
-      <NutrientCell value={nutrients.carbohydrates} />
+      {Object.values(values).map((value) => (
+        <NutrientCell key={value} value={value} />
+      ))}
 
       <td className="text-end">
         <button
@@ -201,29 +187,33 @@ function IngredientRow({
   );
 }
 
-function TotalsRow({
-  totals,
+
+function IngredientTotalsItem({
+  ingredient,
+  onChange,
 }: {
-  totals: {
-    energy: number;
-    protein: number;
-    fat: number;
-    carbohydrates: number;
-  };
+  ingredient: RecipeIngredient;
+  onChange: (
+    id: number,
+    values: NutrientTotals,
+  ) => void;
 }) {
-  return (
-    <tfoot className="table-light fw-semibold">
-      <tr>
-        <td>Totals</td>
-        <td colSpan={2}></td>
-        <td>{Math.round(totals.energy)}</td>
-        <td>{Math.round(totals.protein)}</td>
-        <td>{Math.round(totals.fat)}</td>
-        <td>{Math.round(totals.carbohydrates)}</td>
-        <td></td>
-      </tr>
-    </tfoot>
-  );
+  const { data: food } = useFood(ingredient.food);
+
+  useEffect(() => {
+    if (!food) return;
+
+    onChange(
+      ingredient.id,
+      calculateNutrients(food, ingredient),
+    );
+  }, [
+    food,
+    ingredient.number_of_servings,
+    ingredient.serving_amount,
+  ]);
+
+  return null;
 }
 
 
@@ -232,120 +222,85 @@ function IngredientTotals({
 }: {
   ingredients: RecipeIngredient[];
 }) {
-  const [totals, setTotals] = useState({
-    energy: 0,
-    protein: 0,
-    fat: 0,
-    carbohydrates: 0,
-  });
+  const [ingredientTotals, setIngredientTotals] = useState<
+    Record<number, NutrientTotals>
+  >({});
 
 
   useEffect(() => {
-    setTotals({
-      energy: 0,
-      protein: 0,
-      fat: 0,
-      carbohydrates: 0,
+    // Remove deleted ingredients from totals
+    setIngredientTotals((current) => {
+      const next = { ...current };
+
+      Object.keys(next).forEach((id) => {
+        if (!ingredients.some((i) => i.id === Number(id))) {
+          delete next[Number(id)];
+        }
+      });
+
+      return next;
     });
   }, [ingredients]);
 
 
-  const addTotals = (
-    values: {
-      energy: number;
-      protein: number;
-      fat: number;
-      carbohydrates: number;
-    },
-  ) => {
-    setTotals((current) => ({
-      energy: current.energy + values.energy,
-      protein: current.protein + values.protein,
-      fat: current.fat + values.fat,
-      carbohydrates:
-        current.carbohydrates + values.carbohydrates,
-    }));
-  };
+  const totals = useMemo(() => {
+    return ingredients.reduce<NutrientTotals>(
+      (sum, ingredient) => {
+        const values =
+          ingredientTotals[ingredient.id] ?? emptyTotals();
+
+        return {
+          energy: sum.energy + values.energy,
+          protein: sum.protein + values.protein,
+          fat: sum.fat + values.fat,
+          carbohydrates:
+            sum.carbohydrates + values.carbohydrates,
+        };
+      },
+      emptyTotals(),
+    );
+  }, [ingredients, ingredientTotals]);
 
 
   return (
     <>
       {ingredients.map((ingredient) => (
-        <IngredientTotalCalculator
+        <IngredientTotalsItem
           key={ingredient.id}
           ingredient={ingredient}
-          onCalculated={addTotals}
+          onChange={(id, values) =>
+            setIngredientTotals((current) => ({
+              ...current,
+              [id]: values,
+            }))
+          }
         />
       ))}
 
-      <TotalsRow totals={totals} />
+      <tfoot className="table-light fw-semibold">
+        <tr>
+          <td>Totals</td>
+          <td colSpan={2} />
+
+          {Object.values(totals).map((value, index) => (
+            <td key={index}>
+              {Math.round(value)}
+            </td>
+          ))}
+
+          <td />
+        </tr>
+      </tfoot>
     </>
   );
-}
-
-
-function IngredientTotalCalculator({
-  ingredient,
-  onCalculated,
-}: {
-  ingredient: RecipeIngredient;
-  onCalculated: (values: {
-    energy: number;
-    protein: number;
-    fat: number;
-    carbohydrates: number;
-  }) => void;
-}) {
-  const { data: food } = useFood(ingredient.food);
-
-
-  useEffect(() => {
-    if (!food) return;
-
-
-    const multiplier = getIngredientMultiplier(
-      food,
-      ingredient,
-    );
-
-
-    onCalculated({
-      energy:
-        getNutrient(food, nutrientNames.energy) *
-        multiplier,
-
-      protein:
-        getNutrient(food, nutrientNames.protein) *
-        multiplier,
-
-      fat:
-        getNutrient(food, nutrientNames.fat) *
-        multiplier,
-
-      carbohydrates:
-        getNutrient(food, nutrientNames.carbohydrates) *
-        multiplier,
-    });
-  }, [
-    food,
-    ingredient.number_of_servings,
-    ingredient.serving_amount,
-  ]);
-
-
-  return null;
 }
 
 
 export default function IngredientsCard({
   recipe,
 }: IngredientsCardProps) {
-  const [ingredients, setIngredients] = useState(
-    recipe.ingredients,
-  );
-
+  const [ingredients, setIngredients] = useState(recipe.ingredients);
   const [pickerOpen, setPickerOpen] = useState(false);
-
 
   const createMutation = useCreateRecipeIngredient();
   const deleteMutation = useDeleteRecipeIngredient();
@@ -363,10 +318,7 @@ export default function IngredientsCard({
     setIngredients((items) =>
       items.map((item) =>
         item.id === id
-          ? {
-              ...item,
-              ...data,
-            }
+          ? { ...item, ...data }
           : item,
       ),
     );
@@ -427,59 +379,47 @@ export default function IngredientsCard({
         </div>
 
 
-        <div className="table-responsive">
-          <table className="table table-hover align-middle">
-            <thead className="table-light">
+        <table className="table table-hover align-middle">
+          <thead className="table-light">
+            <tr>
+              {headers.map((header) => (
+                <th key={header}>{header}</th>
+              ))}
+            </tr>
+          </thead>
+
+          <tbody>
+            {ingredients.length ? (
+              ingredients.map((ingredient) => (
+                <IngredientRow
+                  key={ingredient.id}
+                  recipeId={recipe.id}
+                  ingredient={ingredient}
+                  onDelete={removeIngredient}
+                  onUpdate={updateIngredient}
+                />
+              ))
+            ) : (
               <tr>
-                {headers.map((header) => (
-                  <th key={header}>
-                    {header}
-                  </th>
-                ))}
+                <td colSpan={8} className="text-center py-5 text-muted">
+                  No ingredients added yet
+                </td>
               </tr>
-            </thead>
-
-
-            <tbody>
-              {ingredients.length ? (
-                ingredients.map((ingredient) => (
-                  <IngredientRow
-                    key={ingredient.id}
-                    recipeId={recipe.id}
-                    ingredient={ingredient}
-                    onDelete={removeIngredient}
-                    onUpdate={updateIngredient}
-                  />
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan={8}
-                    className="text-center py-5 text-muted"
-                  >
-                    No ingredients added yet
-                  </td>
-                </tr>
-              )}
-            </tbody>
-
-
-            {ingredients.length > 0 && (
-              <IngredientTotals ingredients={ingredients} />
             )}
+          </tbody>
 
-          </table>
-        </div>
+          {ingredients.length > 0 && (
+            <IngredientTotals ingredients={ingredients} />
+          )}
+        </table>
 
       </div>
-
 
       <FoodPickerModal
         isOpen={pickerOpen}
         onClose={() => setPickerOpen(false)}
         onSelect={addFood}
       />
-
     </div>
   );
 }
