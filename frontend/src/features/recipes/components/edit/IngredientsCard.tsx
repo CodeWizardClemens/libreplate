@@ -325,27 +325,30 @@ export default function IngredientsCard({
   };
 
 
-  const addFood = (food: Food) => {
-    createMutation.mutate(
-      {
+  // FoodPickerModal supports selecting multiple foods at once (checkmarks +
+  // "Add N foods"), so this now receives an array and creates one ingredient
+  // per food, adding each sequentially so `order` stays correct.
+  const addFood = async (foods: Food[]) => {
+    setPickerOpen(false);
+
+    let nextOrder = ingredients.length;
+
+    for (const food of foods) {
+      const order = nextOrder;
+      nextOrder += 1;
+
+      const ingredient = await createMutation.mutateAsync({
         recipeId: recipe.id,
         data: {
           food: food.id,
           number_of_servings: 1,
           serving_amount: food.serving ?? 1,
-          order: ingredients.length,
+          order,
         },
-      },
-      {
-        onSuccess: (ingredient) =>
-          setIngredients((items) => [
-            ...items,
-            ingredient,
-          ]),
-      },
-    );
+      });
 
-    setPickerOpen(false);
+      setIngredients((items) => [...items, ingredient]);
+    }
   };
 
 

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import RecipeList from "./components/recipes/RecipeList";
 import TagSelector from "./components/recipes/TagSelector";
@@ -6,6 +7,7 @@ import TagModal from "./components/common/TagModal";
 
 import {
   useCopyRecipe,
+  useCreateRecipe,
   useDeleteRecipe,
   useRecipeTags,
   useRecipes,
@@ -24,6 +26,7 @@ type SortMethod =
 
 export default function RecipePage() {
 
+  const navigate = useNavigate();
 
   const recipesQuery = useRecipes();
   const tagsQuery = useRecipeTags();
@@ -35,6 +38,8 @@ export default function RecipePage() {
   const togglePin = useTogglePin();
 
   const copyRecipe = useCopyRecipe();
+
+  const createRecipe = useCreateRecipe();
 
 
 
@@ -80,6 +85,27 @@ export default function RecipePage() {
   const recipes = recipesQuery.data;
 
 
+
+
+
+  function handleAddRecipe() {
+    createRecipe.mutate(
+      {
+        name: "New recipe",
+        summary: "",
+        description: "",
+        instructions: "",
+        cooking_time: 0,
+        prepping_time: 0,
+        portions: 1,
+      },
+      {
+        onSuccess: (recipe) => {
+          navigate(`/recipes/${recipe.id}/edit`);
+        },
+      },
+    );
+  }
 
 
 
@@ -245,32 +271,22 @@ export default function RecipePage() {
 
 
 
-        <div className="col-auto d-none col-md-block">
+        <div className="col-auto">
 
 
-          <a
-            href="#"
+          <button
+            type="button"
             className="btn btn-primary"
-            onClick={(e) =>
-              e.preventDefault()
-            }
+            onClick={handleAddRecipe}
+            disabled={createRecipe.isPending}
           >
             New recipe
-          </a>
-
+          </button>
 
         </div>
 
-
-
-
-
         <div className="col-12 col-md">
-
-
           <div className="input-group">
-
-
 
             <input
               value={search}

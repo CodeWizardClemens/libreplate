@@ -19,6 +19,17 @@ urlpatterns = [
         name="meal-food-create",
     ),
     path(
+        "meal-foods/<int:pk>/",
+        MealFoodViewSet.as_view(
+            {
+                "patch": "partial_update",
+                "put": "update",
+                "delete": "destroy",
+            }
+        ),
+        name="meal-food-detail",
+    ),
+    path(
         "",
         MealViewSet.as_view(
             {

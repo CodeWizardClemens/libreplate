@@ -7,12 +7,14 @@ import {
 } from "./api";
 
 import FoodPickerModal from "../foods/components/FoodPickerModal";
+import RecipePickerModal from "../recipes/components/common/Recipepickermodal";
 
 import DiaryHeader from "./components/DiaryHeader";
 import MealList from "./components/MealList";
 
 import type { DayMeal } from "./types";
 import type { Food } from "../foods/types";
+import type { Recipe } from "../recipes/types";
 
 function formatDate(date: Date) {
   return date.toISOString().split("T")[0];
@@ -23,6 +25,7 @@ export default function DiaryPage() {
 
   const [selectedDate, setSelectedDate] = useState(todayString);
   const [isFoodPickerOpen, setIsFoodPickerOpen] = useState(false);
+  const [isRecipePickerOpen, setIsRecipePickerOpen] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState<DayMeal | null>(null);
 
   const {
@@ -46,39 +49,84 @@ export default function DiaryPage() {
     setIsFoodPickerOpen(true);
   }
 
-  async function handleFoodSelect(food: Food) {
-    if (!selectedMeal) {
+  function openRecipePicker(meal: DayMeal) {
+    setSelectedMeal(meal);
+    setIsRecipePickerOpen(true);
+  }
+
+  // Ensures the meal slot is persisted, returning its id. Meal slots start
+  // out as unsaved placeholders (meal_id === null) until the first food or
+  // recipe is added to them.
+  async function ensureMealId(meal: DayMeal) {
+    if (meal.meal_id !== null) {
+      return meal.meal_id;
+    }
+
+    const newMeal = await createMeal.mutateAsync({
+      default_meal: meal.default_meal.id,
+      name: meal.name,
+      date: meal.date,
+      note: meal.note,
+      order: meal.order,
+      meal_foods: [],
+    });
+
+    return newMeal.id;
+  }
+
+  async function handleFoodSelect(foods: Food[]) {
+    if (!selectedMeal || foods.length === 0) {
       return;
     }
 
-    let mealId = selectedMeal.meal_id;
+    const mealId = await ensureMealId(selectedMeal);
 
-    if (mealId === null) {
-      const newMeal = await createMeal.mutateAsync({
-        default_meal: selectedMeal.default_meal.id,
-        name: selectedMeal.name,
-        date: selectedMeal.date,
-        note: selectedMeal.note,
-        order: selectedMeal.order,
-        meal_foods: [],
+    // Add sequentially so cache invalidation after each add reflects a
+    // consistent state.
+    for (const food of foods) {
+      await createMealFood.mutateAsync({
+        meal_id: mealId,
+        food_id: food.id,
+        serving_size: food.serving ?? 1,
+        number_of_servings: 1,
       });
-
-      mealId = newMeal.id;
     }
-
-    await createMealFood.mutateAsync({
-      meal_id: mealId,
-      food_id: food.id,
-      serving_size: food.serving_size ?? 1,
-      number_of_servings: 1,
-    });
 
     setIsFoodPickerOpen(false);
     setSelectedMeal(null);
   }
 
+  // A recipe has no direct representation on a meal — adding one expands
+  // each of its ingredients into its own meal-food entry, with the
+  // ingredient's number_of_servings scaled by how many servings of the
+  // recipe the user chose to add.
+  async function handleRecipeSelect(recipe: Recipe, servings: number) {
+    if (!selectedMeal) {
+      return;
+    }
+
+    const mealId = await ensureMealId(selectedMeal);
+
+    for (const ingredient of recipe.ingredients) {
+      await createMealFood.mutateAsync({
+        meal_id: mealId,
+        food_id: ingredient.food,
+        serving_size: ingredient.serving_amount,
+        number_of_servings: ingredient.number_of_servings * servings,
+      });
+    }
+
+    setIsRecipePickerOpen(false);
+    setSelectedMeal(null);
+  }
+
   function closeFoodPicker() {
     setIsFoodPickerOpen(false);
+    setSelectedMeal(null);
+  }
+
+  function closeRecipePicker() {
+    setIsRecipePickerOpen(false);
     setSelectedMeal(null);
   }
 
@@ -88,6 +136,12 @@ export default function DiaryPage() {
         isOpen={isFoodPickerOpen}
         onClose={closeFoodPicker}
         onSelect={handleFoodSelect}
+      />
+
+      <RecipePickerModal
+        isOpen={isRecipePickerOpen}
+        onClose={closeRecipePicker}
+        onSelect={handleRecipeSelect}
       />
 
       <DiaryHeader
@@ -120,6 +174,7 @@ export default function DiaryPage() {
       <MealList
         meals={meals}
         onAddFood={openFoodPicker}
+        onAddRecipe={openRecipePicker}
       />
     </div>
   );
