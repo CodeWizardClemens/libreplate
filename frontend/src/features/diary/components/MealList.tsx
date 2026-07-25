@@ -5,19 +5,17 @@ import { computeMealTotals } from "@/features/diary/utils/MealFormulas";
 
 type Props = {
   meals: DayMeal[];
-  onAddFood: (meal: DayMeal) => void;
-  onAddRecipe: (meal: DayMeal) => void;
+  onAdd: (meal: DayMeal) => void;
 };
 
-export default function MealList({ meals, onAddFood, onAddRecipe }: Props) {
+export default function MealList({ meals, onAdd }: Props) {
   return (
     <div className="row g-3">
       {meals.map((meal) => (
         <MealCard
           key={meal.default_meal.id}
           meal={meal}
-          onAddFood={onAddFood}
-          onAddRecipe={onAddRecipe}
+          onAdd={onAdd}
         />
       ))}
     </div>
@@ -26,8 +24,10 @@ export default function MealList({ meals, onAddFood, onAddRecipe }: Props) {
 
 function MealCard({
   meal,
-  onAddFood,
-  onAddRecipe,
+  onAdd,
+}: {
+  meal: DayMeal;
+  onAdd: (meal: DayMeal) => void;
 }) {
   const [open, setOpen] = useState(true);
 
@@ -35,18 +35,20 @@ function MealCard({
 
   return (
     <div className="col-12">
-      <div className="card shadow-sm">
+      <div className="card">
         <div className="card-body">
-
           {/* Header */}
-          <div className="d-flex justify-content-between align-items-start mb-3">
-
+          <div className="d-flex justify-content-between align-items-start mb-1">
             <div className="d-flex align-items-center gap-2">
               <button
                 className="btn btn-sm btn-light"
-                onClick={() => setOpen(o => !o)}
+                onClick={() => setOpen((o) => !o)}
               >
-                <i className={`bi ${open ? "bi-chevron-down" : "bi-chevron-right"}`} />
+                <i
+                  className={`bi ${
+                    open ? "bi-chevron-down" : "bi-chevron-right"
+                  }`}
+                />
               </button>
 
               <div>
@@ -59,42 +61,33 @@ function MealCard({
                   <span>C {totals.carbs.toFixed(0)}</span>
                 </div>
 
-                {meal.meal_id === null && (
+                {/* {meal.meal_id === null && (
                   <span className="badge bg-light text-dark">Empty</span>
-                )}
+                )} */}
               </div>
             </div>
 
-            <div className="d-flex gap-2">
-              <button
-                className="btn btn-sm btn-primary"
-                onClick={() => onAddRecipe(meal)}
-              >
-                + Recipe
-              </button>
-
-              <button
-                className="btn btn-sm btn-primary"
-                onClick={() => onAddFood(meal)}
-              >
-                + Food
-              </button>
-            </div>
+            <button
+              className="btn btn-sm btn-primary"
+              onClick={() => onAdd(meal)}
+              aria-label="Add to meal"
+            >
+              <i className="bi bi-plus-lg" />
+            </button>
           </div>
 
           {/* Collapsible content */}
           <div className={`collapse ${open ? "show" : ""}`}>
             {meal.meal_foods.length === 0 ? (
-              <div className="text-muted">No foods added.</div>
+              <div className="text-muted"></div>
             ) : (
               <ul className="list-group list-group-flush">
-                {meal.meal_foods.map(item => (
+                {meal.meal_foods.map((item) => (
                   <MealFoodItem key={item.id} item={item} />
                 ))}
               </ul>
             )}
           </div>
-
         </div>
       </div>
     </div>

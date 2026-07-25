@@ -1,14 +1,5 @@
 import { useRef } from "react";
 
-function displayDate(date: string) {
-  return new Date(date).toLocaleDateString(undefined, {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
-
 type Props = {
   selectedDate: string;
   todayString: string;
@@ -54,9 +45,9 @@ export default function DiaryHeader({
   );
 
   return (
-    <div className="d-flex justify-content-center mb-4 w-100">
-      <div className="d-flex flex-wrap justify-content-center align-items-center gap-2 w-100">
-        {/* Previous day */}
+    <div className="d-flex justify-content-center mb-3">
+      <div className="d-flex flex-wrap justify-content-center align-items-center gap-2">
+
         <button
           onClick={onPrevious}
           className="btn btn-outline-secondary d-flex align-items-center gap-1 flex-shrink-0"
@@ -84,7 +75,6 @@ export default function DiaryHeader({
             tabIndex={-1}
           />
           
-          {/* Visible button - fully clickable */}
           <button
             onClick={handleButtonClick}
             type="button"
@@ -96,7 +86,6 @@ export default function DiaryHeader({
           </button>
         </div>
 
-        {/* Today */}
         <button
           onClick={onToday}
           className="btn btn-primary flex-shrink-0"
@@ -105,7 +94,6 @@ export default function DiaryHeader({
           Today
         </button>
 
-        {/* Next day */}
         <button
           onClick={onNext}
           className="btn btn-outline-secondary d-flex align-items-center gap-1 flex-shrink-0"

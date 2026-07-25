@@ -21,7 +21,7 @@ export interface Food {
 export interface FoodCreate {
   name: string;
   serving?: number | null;
-  unit_id: string;
+  unitID: string;
   barcode?: string | null;
   brand?: string | null;
   description?: string | null;

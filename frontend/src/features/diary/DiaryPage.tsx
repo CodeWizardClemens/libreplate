@@ -9,6 +9,7 @@ import {
 
 import FoodPickerModal from "../foods/components/FoodPickerModal";
 import RecipePickerModal from "../recipes/components/common/Recipepickermodal";
+import AddToMealModal from "./components/AddToMealModal";
 
 import DiaryHeader from "./components/DiaryHeader";
 import MealList from "./components/MealList";
@@ -25,8 +26,11 @@ export default function DiaryPage() {
   const todayString = formatDate(new Date());
 
   const [selectedDate, setSelectedDate] = useState(todayString);
+
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isFoodPickerOpen, setIsFoodPickerOpen] = useState(false);
   const [isRecipePickerOpen, setIsRecipePickerOpen] = useState(false);
+
   const [selectedMeal, setSelectedMeal] = useState<DayMeal | null>(null);
 
   const {
@@ -45,19 +49,21 @@ export default function DiaryPage() {
     setSelectedDate(formatDate(date));
   }
 
-  function openFoodPicker(meal: DayMeal) {
+  function openAddModal(meal: DayMeal) {
     setSelectedMeal(meal);
+    setIsAddModalOpen(true);
+  }
+
+  function openFoodPicker() {
+    setIsAddModalOpen(false);
     setIsFoodPickerOpen(true);
   }
 
-  function openRecipePicker(meal: DayMeal) {
-    setSelectedMeal(meal);
+  function openRecipePicker() {
+    setIsAddModalOpen(false);
     setIsRecipePickerOpen(true);
   }
 
-  // Ensures the meal slot is persisted, returning its id. Meal slots start
-  // out as unsaved placeholders (meal_id === null) until the first food or
-  // recipe is added to them.
   async function ensureMealId(meal: DayMeal) {
     if (meal.meal_id !== null) {
       return meal.meal_id;
@@ -82,8 +88,6 @@ export default function DiaryPage() {
 
     const mealId = await ensureMealId(selectedMeal);
 
-    // Add sequentially so cache invalidation after each add reflects a
-    // consistent state.
     for (const food of foods) {
       await createMealFood.mutateAsync({
         meal_id: mealId,
@@ -97,10 +101,6 @@ export default function DiaryPage() {
     setSelectedMeal(null);
   }
 
-  // A recipe has no direct representation on a meal — adding one expands
-  // each of its ingredients into its own meal-food entry, with the
-  // ingredient's number_of_servings scaled by how many servings of the
-  // recipe the user chose to add.
   async function handleRecipeSelect(recipe: Recipe, servings: number) {
     if (!selectedMeal) {
       return;
@@ -113,11 +113,17 @@ export default function DiaryPage() {
         meal_id: mealId,
         food_id: ingredient.food,
         serving_size: ingredient.serving_amount,
-        number_of_servings: ingredient.number_of_servings * servings,
+        number_of_servings:
+          ingredient.number_of_servings * servings,
       });
     }
 
     setIsRecipePickerOpen(false);
+    setSelectedMeal(null);
+  }
+
+  function closeAddModal() {
+    setIsAddModalOpen(false);
     setSelectedMeal(null);
   }
 
@@ -132,7 +138,14 @@ export default function DiaryPage() {
   }
 
   return (
-    <div className="container py-4">
+    <div className="container">
+      <AddToMealModal
+        isOpen={isAddModalOpen}
+        onClose={closeAddModal}
+        onFood={openFoodPicker}
+        onRecipe={openRecipePicker}
+      />
+
       <FoodPickerModal
         isOpen={isFoodPickerOpen}
         onClose={closeFoodPicker}
@@ -174,11 +187,9 @@ export default function DiaryPage() {
 
       <DailyTotalsBar meals={meals} />
 
-
       <MealList
         meals={meals}
-        onAddFood={openFoodPicker}
-        onAddRecipe={openRecipePicker}
+        onAdd={openAddModal}
       />
     </div>
   );

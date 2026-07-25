@@ -36,7 +36,7 @@ export default function FoodsPage() {
   function handleAddFood() {
     createFood.mutate({
       name: "New food",
-      unit: "g",
+      unitID: "g",
       serving: null,
       barcode: null,
       brand: null,

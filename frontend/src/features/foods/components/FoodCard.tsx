@@ -9,7 +9,7 @@ import FoodCardHeader from "./FoodCardHeader";
 import FoodCardNutrients from "./FoodCardNutrients";
 
 interface Props {
-  food?: Food;
+  food: Food;
 
   onDelete?: (id: number) => void;
   onToggleFavorite?: (id: number) => void;

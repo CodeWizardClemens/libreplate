@@ -20,7 +20,7 @@ export default function FoodEditPage() {
   const [brand, setBrand] = useState("");
   const [description, setDescription] = useState("");
   const [serving, setServing] = useState<number | "">("");
-  const [unit, setUnit] = useState("");
+  const [unitID, setUnit] = useState("");
   const [barcode, setBarcode] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
   const [nutrients, setNutrients] = useState<FoodNutrient[]>([]);
@@ -95,7 +95,7 @@ export default function FoodEditPage() {
           brand: brand || null,
           description: description || null,
           serving: serving === "" ? null : Number(serving),
-          unit,
+          unitID,
           barcode: barcode || null,
           is_favorite: isFavorite,
           nutrients: nutrients.map((n) => ({
@@ -194,7 +194,7 @@ export default function FoodEditPage() {
               <label className="form-label">Unit</label>
               <input
                 className="form-control"
-                value={unit}
+                value={unitID}
                 onChange={(e) => setUnit(e.target.value)}
               />
             </div>
