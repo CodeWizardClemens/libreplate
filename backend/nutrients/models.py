@@ -9,6 +9,13 @@ class Nutrient(models.Model):
     description = models.TextField(blank=True, null=True)
     abbreviation = models.CharField(max_length=100, blank=True, null=True)
 
+    unit = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
+        help_text="Display unit for this nutrient's amount (e.g. g, mg, kcal).",
+    )
+
     show_in_diary_total = models.BooleanField(
         null=True,
         blank=True,

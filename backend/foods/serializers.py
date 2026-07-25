@@ -10,7 +10,6 @@ class FoodNutrientSerializer(serializers.ModelSerializer):
     nutrient_id = serializers.PrimaryKeyRelatedField(
         queryset=Nutrient.objects.all(),
         source="nutrient",
-        write_only=True,
     )
 
     nutrient_name = serializers.CharField(

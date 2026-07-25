@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import type { FoodNutrient } from "@/types/FoodTypes";
 
 import { useDeleteFood, useFood, useUpdateFood } from "@/api/FoodAPI";
+import { useNutrients } from "@/api/NutrientAPI";
 
 export default function FoodEditPage() {
   const { id } = useParams();
@@ -11,6 +12,7 @@ export default function FoodEditPage() {
   const foodId = Number(id);
 
   const foodQuery = useFood(foodId);
+  const nutrientsQuery = useNutrients();
   const updateFood = useUpdateFood();
   const deleteFood = useDeleteFood();
 
@@ -37,14 +39,44 @@ export default function FoodEditPage() {
     setUnit(food.unit);
     setBarcode(food.barcode ?? "");
     setIsFavorite(food.is_favorite);
-    setNutrients(food.nutrients);
   }, [foodQuery.data]);
 
-  if (foodQuery.isPending) {
+  useEffect(() => {
+    if (!foodQuery.data || !nutrientsQuery.data) {
+      return;
+    }
+
+    const food = foodQuery.data;
+
+    // Show every nutrient meant for the food-edit screen, plus any
+    // nutrient already on this food even if it's since been hidden there.
+    const relevantNutrients = nutrientsQuery.data.filter(
+      (nutrient) =>
+        nutrient.show_in_food_edit ||
+        food.nutrients.some((n) => n.nutrient_id === nutrient.id),
+    );
+
+    const merged: FoodNutrient[] = relevantNutrients.map((nutrient) => {
+      const existing = food.nutrients.find(
+        (n) => n.nutrient_id === nutrient.id,
+      );
+
+      return {
+        nutrient_id: nutrient.id,
+        nutrient_name: nutrient.name,
+        nutrient_unit: nutrient.unit ?? "",
+        amount: existing?.amount ?? 0,
+      };
+    });
+
+    setNutrients(merged);
+  }, [foodQuery.data, nutrientsQuery.data]);
+
+  if (foodQuery.isPending || nutrientsQuery.isPending) {
     return <div className="container py-3">Loading...</div>;
   }
 
-  if (foodQuery.isError) {
+  if (foodQuery.isError || nutrientsQuery.isError) {
     return <div className="container py-3">Failed to load food.</div>;
   }
 
@@ -52,10 +84,6 @@ export default function FoodEditPage() {
     setNutrients((prev) =>
       prev.map((n, i) => (i === index ? { ...n, amount } : n)),
     );
-  }
-
-  function removeNutrient(index: number) {
-    setNutrients((prev) => prev.filter((_, i) => i !== index));
   }
 
   function handleSave() {
@@ -70,12 +98,10 @@ export default function FoodEditPage() {
           unit,
           barcode: barcode || null,
           is_favorite: isFavorite,
-          nutrients: nutrients
-            .filter((n) => n.nutrient_id != null)
-            .map((n) => ({
-              nutrient_id: n.nutrient_id!,
-              amount: n.amount,
-            })),
+          nutrients: nutrients.map((n) => ({
+            nutrient_id: n.nutrient_id!,
+            amount: n.amount,
+          })),
         },
       },
       {
@@ -203,7 +229,7 @@ export default function FoodEditPage() {
           <h5 className="mb-3">Nutrients</h5>
 
           {nutrients.length === 0 && (
-            <p className="text-muted">No nutrients on this food.</p>
+            <p className="text-muted">No nutrients configured.</p>
           )}
 
           {nutrients.map((nutrient, index) => (
@@ -211,13 +237,13 @@ export default function FoodEditPage() {
               key={nutrient.nutrient_id ?? index}
               className="row g-2 align-items-center mb-2"
             >
-              <div className="col-12 col-md-5">
+              <div className="col-12 col-md-6">
                 <span className="form-control-plaintext">
                   {nutrient.nutrient_name}
                 </span>
               </div>
 
-              <div className="col-6 col-md-3">
+              <div className="col-8 col-md-4">
                 <input
                   type="number"
                   className="form-control"
@@ -232,17 +258,6 @@ export default function FoodEditPage() {
                 <span className="form-control-plaintext text-muted">
                   {nutrient.nutrient_unit}
                 </span>
-              </div>
-
-              <div className="col-2 col-md-2 text-md-end">
-                <button
-                  type="button"
-                  className="btn btn-outline-danger btn-sm"
-                  onClick={() => removeNutrient(index)}
-                  title="Remove nutrient"
-                >
-                  <i className="bi bi-x" />
-                </button>
               </div>
             </div>
           ))}

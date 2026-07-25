@@ -6,10 +6,15 @@ export interface SortOption<TSort extends string> {
   label: string;
 }
 
+export interface SearchScope {
+  count: number;
+  label: string;
+}
+
 interface Props<TSort extends string, TagType extends Tag> {
   search: string;
   onSearchChange: (value: string) => void;
-  searchPlaceholder?: string;
+  scope: SearchScope;
 
   showFavorites: boolean;
   onToggleFavorites: () => void;
@@ -29,7 +34,7 @@ interface Props<TSort extends string, TagType extends Tag> {
 export default function SearchBar<TSort extends string, TagType extends Tag>({
   search,
   onSearchChange,
-  searchPlaceholder = "Search...",
+  scope,
   showFavorites,
   onToggleFavorites,
   sortMethod,
@@ -41,6 +46,11 @@ export default function SearchBar<TSort extends string, TagType extends Tag>({
   onManageTags,
   manageTagsLabel = "Tags",
 }: Props<TSort, TagType>) {
+  const placeholder =
+    scope.count <= 1
+      ? "Not much to search through..."
+      : `Searching ${scope.count} ${scope.label}`;
+
   return (
     <>
       <div className="row g-2 align-items-center">
@@ -49,7 +59,7 @@ export default function SearchBar<TSort extends string, TagType extends Tag>({
             <input
               value={search}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder={searchPlaceholder}
+              placeholder={placeholder}
               className="form-control"
             />
 

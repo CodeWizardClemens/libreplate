@@ -11,6 +11,8 @@ interface Props {
   search: string;
   onSearchChange: (value: string) => void;
 
+  foodCount: number;
+
   showFavorites: boolean;
   onToggleFavorites: () => void;
 
@@ -21,6 +23,7 @@ interface Props {
 export default function FoodSearchBar({
   search,
   onSearchChange,
+  foodCount,
   showFavorites,
   onToggleFavorites,
   sortMethod,
@@ -30,7 +33,7 @@ export default function FoodSearchBar({
     <SearchBar
       search={search}
       onSearchChange={onSearchChange}
-      searchPlaceholder="Search foods..."
+      scope={{ count: foodCount, label: "foods" }}
       showFavorites={showFavorites}
       onToggleFavorites={onToggleFavorites}
       sortMethod={sortMethod}

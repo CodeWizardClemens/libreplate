@@ -1,11 +1,32 @@
 from django.urls import path
 
-from . import views
+from .api import NutrientViewSet
+
+
+nutrient_list = NutrientViewSet.as_view(
+    {
+        "get": "list",
+    }
+)
+
+
+nutrient_detail = NutrientViewSet.as_view(
+    {
+        "get": "retrieve",
+    }
+)
+
 
 urlpatterns = [
-    path("", views.nutrients, name="nutrients"),
-    path("create/", views.create_nutrient, name="create_nutrient"),
-    path("<int:pk>/edit/", views.edit_nutrient, name="edit_nutrient"),
-    path("<int:pk>/delete/", views.delete_nutrient, name="delete_nutrient"),
-    path("nutrients/reorder/", views.reorder_nutrients, name="reorder_nutrients"),
+    path(
+        "",
+        nutrient_list,
+        name="nutrient-list",
+    ),
+
+    path(
+        "<int:pk>/",
+        nutrient_detail,
+        name="nutrient-detail",
+    ),
 ]

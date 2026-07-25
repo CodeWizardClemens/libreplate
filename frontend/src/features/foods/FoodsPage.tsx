@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-import FoodList from "./components/FoodList";
+import FoodList from "@/features/foods/components/FoodList";
 import FoodSearchBar, {
   type FoodSortMethod,
-} from "./components/FoodSearchBar";
+} from "@/features/foods/components/FoodSearchBar";
 
 import {
   useCreateFood,
@@ -104,6 +104,7 @@ export default function FoodsPage() {
         <FoodSearchBar
           search={search}
           onSearchChange={setSearch}
+          foodCount={filteredFoods.length}
           showFavorites={showFavorites}
           onToggleFavorites={() => setShowFavorites(!showFavorites)}
           sortMethod={sortMethod}

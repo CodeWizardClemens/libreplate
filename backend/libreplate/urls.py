@@ -10,6 +10,8 @@ urlpatterns = [
     path("api/groceries/", include("groceries.api_urls")),
     path("api/recipes/", include("recipes.urls")),
     path("api/meals/", include("meals.urls")),
+    path("api/nutrients/", include("nutrients.urls")),
+
 ]
 
 if settings.DEBUG:

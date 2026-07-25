@@ -132,6 +132,7 @@ export default function RecipePage() {
         <RecipeSearchBar
           search={search}
           onSearchChange={setSearch}
+          recipeCount={filteredRecipes.length}
           showFavorites={showFavorites}
           onToggleFavorites={() => setShowFavorites(!showFavorites)}
           sortMethod={sortMethod}
