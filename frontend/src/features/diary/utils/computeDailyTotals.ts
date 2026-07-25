@@ -1,4 +1,4 @@
-import type { DayMeal } from "../../../types/MealTypes";
+import type { DayMeal } from "@/types/MealTypes";
 import { computeMealTotals } from "./MealFormulas";
 
 export interface DailyTotals {

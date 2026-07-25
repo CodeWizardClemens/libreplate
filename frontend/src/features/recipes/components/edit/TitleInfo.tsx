@@ -1,7 +1,7 @@
-import { useUpdateRecipe } from "../../api";
-import type { Recipe } from "../../../../types/RecipeTypes";
+import { useUpdateRecipe } from "@/api/RecipeAPI";
+import type { Recipe } from "@/types/RecipeTypes";
 
-import { useInlineEdit } from "../../hooks/useInlineEdit";
+import { useInlineEdit } from "@/features/recipes/hooks/useInlineEdit";
 
 import type { ReactNode } from "react";
 

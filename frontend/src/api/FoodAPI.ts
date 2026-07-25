@@ -1,5 +1,3 @@
-// Food API
-
 import axios from "axios";
 
 import {
@@ -12,7 +10,7 @@ import type {
   Food,
   FoodCreate,
   FoodUpdate,
-} from "../../types/FoodTypes";
+} from "@/types/FoodTypes";
 
 
 function getCsrfToken() {

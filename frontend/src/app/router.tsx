@@ -9,6 +9,7 @@ import LoginPage from "../features/auth/pages/LoginPage";
 import GroceriesPage from "../features/groceries/pages/GroceriesPage";
 import RecipesPage from "../features/recipes/RecipePage";
 import RecipeEditPage from "../features/recipes/RecipeEditPage";
+import FoodEditPage from "../features/foods/FoodEditPage";
 import FoodsPage from "../features/foods/FoodsPage";
 import DiaryPage from "../features/diary/DiaryPage";
 
@@ -65,6 +66,13 @@ const router = createBrowserRouter([
                 element: <RecipeEditPage />,
                 handle: {
                     title: "Edit Recipe",
+                },
+            },
+            {
+                path: "foods/:id/edit",
+                element: <FoodEditPage />,
+                handle: {
+                    title: "Edit Food",
                 },
             },
 

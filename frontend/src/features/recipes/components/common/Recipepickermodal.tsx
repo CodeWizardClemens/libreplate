@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { Recipe } from "../../../../types/RecipeTypes";
-import { useRecipes } from "../../api";
+import type { Recipe } from "@/types/RecipeTypes";
+import { useRecipes } from "@/api/RecipeAPI";
 
 interface RecipePickerModalProps {
   isOpen: boolean;

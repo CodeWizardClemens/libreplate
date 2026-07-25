@@ -1,11 +1,11 @@
 import { useState } from "react";
 
-import type { RecipeTag } from "../../../../types/RecipeTypes";
+import type { RecipeTag } from "@/types/RecipeTypes";
 
 import {
   useCreateRecipeTag,
   useDeleteRecipeTag,
-} from "../../api";
+} from "@/api/RecipeAPI";
 
 interface Props {
   open: boolean;

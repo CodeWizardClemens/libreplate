@@ -1,13 +1,13 @@
-import type { Recipe } from "@/types/RecipeTypes";
+import type { Food } from "@/types/FoodTypes";
 
 interface Props {
-  nutrients: Recipe["nutrients"];
+  nutrients: Food["nutrients"];
 }
 
-export default function RecipeCardNutrients({ nutrients }: Props) {
+export default function FoodCardNutrients({ nutrients }: Props) {
   const allowedNutrients = nutrients.filter((nutrient) =>
     ["energy", "protein", "carbohydrates", "fat", "fats"].includes(
-      nutrient.name.toLowerCase()
+      nutrient.nutrient_name.toLowerCase()
     )
   );
 
@@ -23,9 +23,9 @@ export default function RecipeCardNutrients({ nutrients }: Props) {
         mb-3
       "
     >
-      {allowedNutrients.map((nutrient) => (
+      {allowedNutrients.map((nutrient, index) => (
         <div
-          key={nutrient.id}
+          key={nutrient.nutrient_id ?? index}
           className="
             col-6
             col-md-auto
@@ -38,11 +38,12 @@ export default function RecipeCardNutrients({ nutrients }: Props) {
               border
             "
           >
-            {nutrient.name.toLowerCase() === "carbohydrates"
+            {nutrient.nutrient_name.toLowerCase() === "carbohydrates"
               ? "Carbs"
-              : nutrient.name}
+              : nutrient.nutrient_name}
             {": "}
             {nutrient.amount}
+            {nutrient.nutrient_unit}
           </span>
         </div>
       ))}

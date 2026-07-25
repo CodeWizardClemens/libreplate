@@ -1,9 +1,9 @@
-import type { Recipe } from "../../../../types/RecipeTypes";
+import type { Recipe } from "@/types/RecipeTypes";
 
 import {
   useRecipeTags,
   useUpdateRecipe,
-} from "../../api";
+} from "@/api/RecipeAPI";
 
 interface Props {
   recipe: Recipe;

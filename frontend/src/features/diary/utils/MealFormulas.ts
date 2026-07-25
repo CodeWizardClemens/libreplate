@@ -1,4 +1,6 @@
-export function computeMealTotals(mealFoods) {
+import type { MealFood } from "@/types/MealTypes"
+
+export function computeMealTotals(mealFoods: MealFood[]) {
   const totals = {
     energy: 0,
     protein: 0,

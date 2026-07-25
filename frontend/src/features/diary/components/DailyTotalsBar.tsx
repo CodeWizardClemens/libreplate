@@ -1,4 +1,4 @@
-import type { DayMeal } from "../../../types/MealTypes";
+import type { DayMeal } from "@/types/MealTypes";
 import { computeDailyTotals } from "../utils/computeDailyTotals";
 
 type Props = {

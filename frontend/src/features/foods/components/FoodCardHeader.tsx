@@ -1,42 +1,46 @@
 import { useState } from "react";
-import type { Recipe } from "../types";
+
+import type { Food } from "@/types/FoodTypes";
 import { useEditableFieldKeyboard } from "@/hooks/useEditableFieldKeyboard";
 
 interface Props {
-  recipe: Recipe;
-  update: (data: { name?: string; summary?: string }) => void;
+  food: Food;
+  update: (data: { name?: string; description?: string }) => void;
   editingName: boolean;
   setEditingName: (value: boolean) => void;
-  editingSummary: boolean;
-  setEditingSummary: (value: boolean) => void;
+  editingDescription: boolean;
+  setEditingDescription: (value: boolean) => void;
 }
 
-type Field = "name" | "summary";
+type Field = "name" | "description";
 
-export default function RecipeCardHeader({
-  recipe,
+export default function FoodCardHeader({
+  food,
   update,
   editingName,
   setEditingName,
-  editingSummary,
-  setEditingSummary,
+  editingDescription,
+  setEditingDescription,
 }: Props) {
   const [values, setValues] = useState({
-    name: recipe.name,
-    summary: recipe.summary,
+    name: food.name,
+    description: food.description ?? "",
   });
 
   const [hoveredField, setHoveredField] = useState<Field | null>(null);
 
+  const currentValue = (field: Field) =>
+    field === "name" ? food.name : food.description ?? "";
+
   const edit = (field: Field) => {
     setValues((v) => ({
       ...v,
-      [field]: recipe[field],
+      [field]: currentValue(field),
     }));
 
     field === "name"
       ? setEditingName(true)
-      : setEditingSummary(true);
+      : setEditingDescription(true);
   };
 
   const save = (field: Field) => {
@@ -46,18 +50,18 @@ export default function RecipeCardHeader({
 
     field === "name"
       ? setEditingName(false)
-      : setEditingSummary(false);
+      : setEditingDescription(false);
   };
 
   const cancel = (field: Field) => {
     setValues((v) => ({
       ...v,
-      [field]: recipe[field],
+      [field]: currentValue(field),
     }));
 
     field === "name"
       ? setEditingName(false)
-      : setEditingSummary(false);
+      : setEditingDescription(false);
   };
 
   const nameKeyDown = useEditableFieldKeyboard({
@@ -65,9 +69,9 @@ export default function RecipeCardHeader({
     cancel: () => cancel("name"),
   });
 
-  const summaryKeyDown = useEditableFieldKeyboard({
-    save: () => save("summary"),
-    cancel: () => cancel("summary"),
+  const descriptionKeyDown = useEditableFieldKeyboard({
+    save: () => save("description"),
+    cancel: () => cancel("description"),
   });
 
   const stopCardClick = (e: React.MouseEvent) => {
@@ -134,17 +138,17 @@ export default function RecipeCardHeader({
           onChange={(e) =>
             updateValue(field, e.target.value)
           }
-          onKeyDown={summaryKeyDown}
+          onKeyDown={descriptionKeyDown}
           onBlur={() => save(field)}
         />
       )
     ) : field === "name" ? (
       <h5 className="card-title mb-0">
-        {recipe[field]}
+        {food.name}
       </h5>
     ) : (
-      <p className="card-text mb-0">
-        {recipe[field]}
+      <p className="card-text mb-0 text-muted">
+        {food.description || "No description"}
       </p>
     );
 
@@ -177,7 +181,7 @@ export default function RecipeCardHeader({
       {renderEditableRow("name", editingName)}
 
       <div className="mt-1 w-100">
-        {renderEditableRow("summary", editingSummary)}
+        {renderEditableRow("description", editingDescription)}
       </div>
     </>
   );

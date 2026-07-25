@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useDeleteMealFood, useUpdateMealFood } from "../../../api/MealAPI";
-import type { MealFood } from "../types";
+import { useDeleteMealFood} from "@/api/MealAPI";
+import type { MealFood } from "@/types/MealTypes";
 import EditMealFoodModal from "./EditMealFoodModal";
 
 type Props = {

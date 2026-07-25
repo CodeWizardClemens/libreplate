@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { GroceryList, GroceryItem } from "../../../types/GroceryTypes";
+import type { GroceryList, GroceryItem } from "@/types/GroceryTypes";
 
 import {
     getGroceryLists,

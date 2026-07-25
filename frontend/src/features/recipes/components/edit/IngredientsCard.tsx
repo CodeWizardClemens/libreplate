@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 
-import type { Recipe, RecipeIngredient } from "../../../../types/RecipeTypes";
-import type { Food } from "../../../../types/FoodTypes";
+import type { Recipe, RecipeIngredient } from "@/types/RecipeTypes";
+import type { Food } from "@/types/FoodTypes";
 
 import {
   useCreateRecipeIngredient,
   useDeleteRecipeIngredient,
   useUpdateRecipeIngredient,
-} from "../../api";
+} from "@/api/RecipeAPI";
 
-import { useFood } from "../../../foods/api";
-import FoodPickerModal from "../../../foods/components/FoodPickerModal";
+import { useFood } from "@/api/FoodAPI";
+import FoodPickerModal from "@/features/foods/components/FoodPickerModal";
 
 
 interface IngredientsCardProps {

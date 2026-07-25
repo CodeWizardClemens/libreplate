@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { Food } from "../../../types/FoodTypes";
-import { useFoods } from "../api";
+import type { Food } from "@/types/FoodTypes";
+import { useFoods } from "@/api/FoodAPI";
 
 interface FoodPickerModalProps {
   isOpen: boolean;

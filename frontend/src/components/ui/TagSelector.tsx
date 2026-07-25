@@ -1,4 +1,4 @@
-import type { Tag } from "../../types/RecipeTypes";
+import type { Tag } from "@/types/TagTypes";
 
 interface Props<TagType extends Tag> {
   tags: TagType[];

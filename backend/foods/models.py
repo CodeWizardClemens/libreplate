@@ -10,7 +10,7 @@ class Food(models.Model):
         "units.Unit", on_delete=models.CASCADE, null=True, blank=True
     )
 
-    barcode = models.CharField(max_length=50, blank=True)
+    barcode = models.CharField(max_length=50, blank=True, null=True)
     brand = models.CharField(max_length=255, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
 

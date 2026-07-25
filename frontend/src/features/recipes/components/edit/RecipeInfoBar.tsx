@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 
-import { useUpdateRecipe } from "../../api";
+import { useUpdateRecipe } from "@/api/RecipeAPI";
 
 type Props = {
   recipe?: any;

@@ -1,6 +1,6 @@
 import { useRef } from "react";
 
-import { useRecipePicture, useUploadRecipePicture } from "../../api";
+import { useRecipePicture, useUploadRecipePicture } from "@/api/RecipeAPI";
 
 interface Props {
   recipeId: number;

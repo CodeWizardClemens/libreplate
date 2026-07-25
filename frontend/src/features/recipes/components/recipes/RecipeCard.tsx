@@ -1,8 +1,8 @@
 import { useState } from "react";
 
-import type { Recipe } from "../../../../types/RecipeTypes";
+import type { Recipe } from "@/types/RecipeTypes";
 
-import { useRecipeTags, useUpdateRecipe } from "../../api";
+import { useRecipeTags, useUpdateRecipe } from "@/api/RecipeAPI";
 
 import RecipeCardActions from "./RecipeCardActions";
 import RecipeCardHeader from "./RecipeCardHeader";

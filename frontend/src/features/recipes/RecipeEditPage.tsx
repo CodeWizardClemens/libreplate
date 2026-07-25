@@ -3,9 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import {
   useRecipe,
-  useRecipeIngredients,
   useRecipeTags,
-} from "./api";
+} from "@/api/RecipeAPI";
 
 import BackButton from "./components/edit/BackButton";
 import RecipeInfoBar from "./components/edit/RecipeInfoBar";
@@ -23,7 +22,6 @@ export default function RecipeEditPage() {
   const recipeId = Number(id);
 
   const { data: recipe, isLoading } = useRecipe(recipeId);
-  const { data: ingredients } = useRecipeIngredients(recipeId);
   const { data: tags } = useRecipeTags();
 
   const [showTagModal, setShowTagModal] = useState(false);

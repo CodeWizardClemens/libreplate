@@ -1,7 +1,8 @@
 import { useState } from "react";
-import type { DayMeal } from "../../../types/MealTypes";
+import type { DayMeal } from "@/types/MealTypes";
 import MealFoodItem from "./MealFoodItem";
-import { computeMealTotals } from "../utils/MealFormulas";
+import { computeMealTotals } from "@/features/diary/utils/MealFormulas";
+
 type Props = {
   meals: DayMeal[];
   onAddFood: (meal: DayMeal) => void;

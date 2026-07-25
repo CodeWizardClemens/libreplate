@@ -17,7 +17,7 @@ import type {
   RecipePicture,
   ToggleFavoriteResponse,
   TogglePinResponse,
-} from "../../types/RecipeTypes";
+} from "@/types/RecipeTypes";
 
 function getCsrfToken() {
   const cookie = document.cookie

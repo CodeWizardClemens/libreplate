@@ -1,21 +1,17 @@
 import { useNavigate } from "react-router-dom";
 
-import type { Recipe } from "@/types/RecipeTypes";
+import type { Food } from "@/types/FoodTypes";
 
 interface Props {
-  recipe: Recipe;
-  onCopy: () => void;
+  food: Food;
   onDelete?: (id: number) => void;
   onToggleFavorite?: (id: number) => void;
-  onTogglePinned?: (id: number) => void;
 }
 
-export default function RecipeCardActions({
-  recipe,
-  onCopy,
+export default function FoodCardActions({
+  food,
   onDelete,
   onToggleFavorite,
-  onTogglePinned,
 }: Props) {
   const navigate = useNavigate();
 
@@ -27,11 +23,11 @@ export default function RecipeCardActions({
 
   const handleDelete = () => {
     const confirmed = window.confirm(
-      `Are you sure you want to delete "${recipe.name}"? This cannot be undone.`,
+      `Are you sure you want to delete "${food.name}"? This cannot be undone.`,
     );
 
     if (confirmed) {
-      onDelete?.(recipe.id);
+      onDelete?.(food.id);
     }
   };
 
@@ -39,40 +35,19 @@ export default function RecipeCardActions({
     <>
       <button
         className={
-          recipe.is_pinned
+          food.is_favorite
             ? "btn btn-primary"
             : "btn btn-outline-secondary"
         }
         onClick={(e) => {
           stopCardClick(e);
-          onTogglePinned?.(recipe.id);
-        }}
-        title="Pin"
-      >
-        <i
-          className={
-            recipe.is_pinned
-              ? "bi bi-pin-fill"
-              : "bi bi-pin"
-          }
-        />
-      </button>
-
-      <button
-        className={
-          recipe.is_favorite
-            ? "btn btn-primary"
-            : "btn btn-outline-secondary"
-        }
-        onClick={(e) => {
-          stopCardClick(e);
-          onToggleFavorite?.(recipe.id);
+          onToggleFavorite?.(food.id);
         }}
         title="Favorite"
       >
         <i
           className={
-            recipe.is_favorite
+            food.is_favorite
               ? "bi bi-heart-fill"
               : "bi bi-heart"
           }
@@ -83,22 +58,11 @@ export default function RecipeCardActions({
         className="btn btn-outline-secondary"
         onClick={(e) => {
           stopCardClick(e);
-          navigate(`/recipes/${recipe.id}/edit`);
+          navigate(`/foods/${food.id}/edit`);
         }}
         title="Edit"
       >
         <i className="bi bi-pencil" />
-      </button>
-
-      <button
-        className="btn btn-outline-secondary"
-        onClick={(e) => {
-          stopCardClick(e);
-          onCopy();
-        }}
-        title="Copy"
-      >
-        <i className="bi bi-copy" />
       </button>
 
       <button

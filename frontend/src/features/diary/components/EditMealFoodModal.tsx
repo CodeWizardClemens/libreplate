@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useUpdateMealFood } from "../../../api/MealAPI";
+import { useUpdateMealFood } from "@/api/MealAPI";
 import type { MealFood } from "../types";
 
 type Props = {

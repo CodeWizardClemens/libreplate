@@ -5,7 +5,7 @@ import {
   useDayMeals,
   useCreateMeal,
   useCreateMealFood,
-} from "../../api/MealAPI";
+} from "@/api/MealAPI";
 
 import FoodPickerModal from "../foods/components/FoodPickerModal";
 import RecipePickerModal from "../recipes/components/common/Recipepickermodal";
@@ -13,9 +13,9 @@ import RecipePickerModal from "../recipes/components/common/Recipepickermodal";
 import DiaryHeader from "./components/DiaryHeader";
 import MealList from "./components/MealList";
 
-import type { DayMeal } from "../../types/MealTypes";
-import type { Food } from "../../types/FoodTypes";
-import type { Recipe } from "../../types/RecipeTypes";
+import type { DayMeal } from "@/types/MealTypes";
+import type { Food } from "@/types/FoodTypes";
+import type { Recipe } from "@/types/RecipeTypes";
 
 function formatDate(date: Date) {
   return date.toISOString().split("T")[0];

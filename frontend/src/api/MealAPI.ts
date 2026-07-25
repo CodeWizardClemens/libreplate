@@ -16,7 +16,7 @@ import type {
   DefaultMealCreate,
   DefaultMealUpdate,
   DayMeal,
-} from "../types/MealTypes";
+} from "@/types/MealTypes";
 
 function getCsrfToken() {
   const cookie = document.cookie
@@ -134,7 +134,7 @@ export function useCreateMealFood() {
     },
     onSuccess(data) {
       queryClient.invalidateQueries({ queryKey: mealFoodKeys.all });
-      queryClient.invalidateQueries({ queryKey: mealKeys.detail(data.meal_id) });
+      queryClient.invalidateQueries({ queryKey: mealKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: mealKeys.all });
     },
   });
@@ -155,7 +155,7 @@ export function useUpdateMealFood() {
     },
     onSuccess(data) {
       queryClient.invalidateQueries({ queryKey: mealFoodKeys.all });
-      queryClient.invalidateQueries({ queryKey: mealKeys.detail(data.meal_id) });
+      queryClient.invalidateQueries({ queryKey: mealKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: mealKeys.all });
       // Diary page reads from the day-scoped query, so invalidate that too
       queryClient.invalidateQueries({ queryKey: ["meals", "day"] });
