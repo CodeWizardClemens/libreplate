@@ -1,0 +1,286 @@
+from django.utils import timezone
+
+from rest_framework import status, viewsets
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+from .models import (
+    Recipe,
+    RecipeIngredient,
+    RecipeTag,
+    RecipePicture,
+)
+
+from .serializers import (
+    RecipeSerializer,
+    RecipeTagSerializer,
+    RecipeIngredientSerializer,
+    RecipePictureSerializer,
+)
+
+
+class RecipeViewSet(viewsets.ModelViewSet):
+
+    authentication_classes = [
+        SessionAuthentication
+    ]
+
+    permission_classes = [
+        IsAuthenticated
+    ]
+
+    serializer_class = RecipeSerializer
+
+
+    def get_queryset(self):
+
+        return Recipe.objects.filter(
+            user=self.request.user
+        ).prefetch_related(
+            "picture",
+            "tags",
+        )
+
+
+    def perform_create(self, serializer):
+
+        serializer.save(
+            user=self.request.user
+        )
+
+
+    @action(
+        detail=True,
+        methods=["post"]
+    )
+    def toggle_favorite(self, request, pk=None):
+
+        recipe = self.get_object()
+
+        recipe.is_favorite = not recipe.is_favorite
+
+        recipe.save(
+            update_fields=[
+                "is_favorite",
+                "updated_at",
+            ]
+        )
+
+        return Response(
+            {
+                "id": recipe.id,
+                "is_favorite": recipe.is_favorite,
+            }
+        )
+
+
+    @action(
+        detail=True,
+        methods=["post"]
+    )
+    def toggle_pin(self, request, pk=None):
+
+        recipe = self.get_object()
+
+        recipe.is_pinned = not recipe.is_pinned
+
+        recipe.save(
+            update_fields=[
+                "is_pinned",
+                "updated_at",
+            ]
+        )
+
+        return Response(
+            {
+                "id": recipe.id,
+                "is_pinned": recipe.is_pinned,
+            }
+        )
+
+
+    @action(
+        detail=True,
+        methods=["post"]
+    )
+    def copy(self, request, pk=None):
+
+        recipe = self.get_object()
+
+        new_name = request.data.get("name")
+
+        if not new_name:
+
+            return Response(
+                {
+                    "name": "This field is required."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
+        new_recipe = Recipe.objects.create(
+            user=request.user,
+            name=new_name,
+            summary=recipe.summary,
+            description=recipe.description,
+            instructions=recipe.instructions,
+            cooking_time=recipe.cooking_time,
+            prepping_time=recipe.prepping_time,
+            portions=recipe.portions,
+            last_used_at=timezone.now(),
+        )
+
+
+        for ingredient in recipe.ingredients.all():
+
+            RecipeIngredient.objects.create(
+                recipe=new_recipe,
+                food=ingredient.food,
+                number_of_servings=ingredient.number_of_servings,
+                serving_amount=ingredient.serving_amount,
+                order=ingredient.order,
+            )
+
+
+        new_recipe.tags.set(
+            recipe.tags.all()
+        )
+
+
+        if hasattr(recipe, "picture"):
+
+            RecipePicture.objects.create(
+                recipe=new_recipe,
+                image=recipe.picture.image,
+            )
+
+
+        return Response(
+            self.get_serializer(new_recipe).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+
+class RecipeTagViewSet(viewsets.ModelViewSet):
+
+    authentication_classes = [
+        SessionAuthentication
+    ]
+
+    permission_classes = [
+        IsAuthenticated
+    ]
+
+    serializer_class = RecipeTagSerializer
+
+
+    def get_queryset(self):
+
+        return RecipeTag.objects.filter(
+            user=self.request.user
+        )
+
+
+    def perform_create(self, serializer):
+
+        serializer.save(
+            user=self.request.user
+        )
+
+
+
+class RecipeIngredientViewSet(viewsets.ModelViewSet):
+
+    authentication_classes = [
+        SessionAuthentication
+    ]
+
+    permission_classes = [
+        IsAuthenticated
+    ]
+
+    serializer_class = RecipeIngredientSerializer
+
+
+    def get_recipe(self):
+
+        return Recipe.objects.get(
+            id=self.kwargs["pk"],
+            user=self.request.user,
+        )
+
+
+    def get_queryset(self):
+
+        recipe = self.get_recipe()
+
+        return RecipeIngredient.objects.filter(
+            recipe=recipe
+        ).select_related(
+            "food"
+        )
+
+
+    def get_object(self):
+
+        return RecipeIngredient.objects.get(
+            id=self.kwargs["ingredient_pk"],
+            recipe=self.get_recipe(),
+        )
+
+
+    def perform_create(self, serializer):
+
+        serializer.save(
+            recipe=self.get_recipe()
+        )
+
+
+
+class RecipePictureViewSet(viewsets.ModelViewSet):
+
+    authentication_classes = [
+        SessionAuthentication
+    ]
+
+    permission_classes = [
+        IsAuthenticated
+    ]
+
+    serializer_class = RecipePictureSerializer
+
+    def get_recipe(self):
+
+        return Recipe.objects.get(
+            id=self.kwargs["pk"],
+            user=self.request.user,
+        )
+
+    def get_queryset(self):
+
+        return RecipePicture.objects.filter(
+            recipe=self.get_recipe()
+        )
+
+    def get_object(self):
+
+        return RecipePicture.objects.get(
+            recipe=self.get_recipe()
+        )
+
+    def perform_create(self, serializer):
+
+        picture = RecipePicture.objects.filter(
+            recipe=self.get_recipe()
+        ).first()
+
+        if picture:
+            picture.delete()
+
+        serializer.save(
+            recipe=self.get_recipe()
+        )

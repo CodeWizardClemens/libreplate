@@ -1,0 +1,51 @@
+import type { Recipe } from "@/types/RecipeTypes";
+
+interface Props {
+  nutrients: Recipe["nutrients"];
+}
+
+export default function RecipeCardNutrients({ nutrients }: Props) {
+  const allowedNutrients = nutrients.filter((nutrient) =>
+    ["energy", "protein", "carbohydrates", "fat", "fats"].includes(
+      nutrient.name.toLowerCase()
+    )
+  );
+
+  if (allowedNutrients.length === 0) {
+    return null;
+  }
+
+  return (
+    <div
+      className="
+        row
+        g-2
+        mb-3
+      "
+    >
+      {allowedNutrients.map((nutrient) => (
+        <div
+          key={nutrient.id}
+          className="
+            col-6
+            col-md-auto
+          "
+        >
+          <span
+            className="
+              badge
+              text-bg-light
+              border
+            "
+          >
+            {nutrient.name.toLowerCase() === "carbohydrates"
+              ? "Carbs"
+              : nutrient.name}
+            {": "}
+            {nutrient.amount}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
