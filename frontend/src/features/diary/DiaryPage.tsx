@@ -1,10 +1,11 @@
 import { useState } from "react";
+import DailyTotalsBar from "./components//DailyTotalsBar";
 
 import {
   useDayMeals,
   useCreateMeal,
   useCreateMealFood,
-} from "./api";
+} from "../../api/MealAPI";
 
 import FoodPickerModal from "../foods/components/FoodPickerModal";
 import RecipePickerModal from "../recipes/components/common/Recipepickermodal";
@@ -12,9 +13,9 @@ import RecipePickerModal from "../recipes/components/common/Recipepickermodal";
 import DiaryHeader from "./components/DiaryHeader";
 import MealList from "./components/MealList";
 
-import type { DayMeal } from "./types";
-import type { Food } from "../foods/types";
-import type { Recipe } from "../recipes/types";
+import type { DayMeal } from "../../types/MealTypes";
+import type { Food } from "../../types/FoodTypes";
+import type { Recipe } from "../../types/RecipeTypes";
 
 function formatDate(date: Date) {
   return date.toISOString().split("T")[0];
@@ -170,6 +171,9 @@ export default function DiaryPage() {
           No meal slots configured.
         </div>
       )}
+
+      <DailyTotalsBar meals={meals} />
+
 
       <MealList
         meals={meals}

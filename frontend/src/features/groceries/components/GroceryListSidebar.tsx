@@ -1,4 +1,4 @@
-import type { GroceryList } from "../types";
+import type { GroceryList } from "../../../types/GroceryTypes";
 
 interface Props {
     lists: GroceryList[];

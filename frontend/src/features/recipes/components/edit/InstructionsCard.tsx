@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
-import type { Recipe } from "../../types";
+import type { Recipe } from "../../../../types/RecipeTypes";
 import { useUpdateRecipe } from "../../api";
 
 type Props = {

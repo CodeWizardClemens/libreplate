@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Food } from "../types";
+import type { Food } from "../../../types/FoodTypes";
 import { useFoods } from "../api";
 
 interface FoodPickerModalProps {

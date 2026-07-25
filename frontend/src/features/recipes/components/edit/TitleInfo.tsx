@@ -1,5 +1,5 @@
 import { useUpdateRecipe } from "../../api";
-import type { Recipe } from "../../types";
+import type { Recipe } from "../../../../types/RecipeTypes";
 
 import { useInlineEdit } from "../../hooks/useInlineEdit";
 

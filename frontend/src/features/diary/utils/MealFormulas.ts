@@ -7,7 +7,7 @@ export function computeMealTotals(mealFoods) {
   };
 
   for (const mf of mealFoods) {
-    const multiplier = mf.serving_size * mf.number_of_servings;
+    const multiplier = mf.serving_size * mf.number_of_servings / 100;
 
     for (const n of mf.food.nutrients) {
       const amount = n.amount * multiplier;
@@ -28,7 +28,7 @@ export function computeMealTotals(mealFoods) {
           totals.fat += amount;
           break;
 
-        case "carbohydrate":
+        case "carbohydrates":
         case "carbs":
         case "carbohydrate, by difference":
           totals.carbs += amount;

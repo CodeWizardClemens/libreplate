@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
-import type { Recipe, RecipeIngredient } from "../../types";
-import type { Food } from "../../../foods/types";
+import type { Recipe, RecipeIngredient } from "../../../../types/RecipeTypes";
+import type { Food } from "../../../../types/FoodTypes";
 
 import {
   useCreateRecipeIngredient,

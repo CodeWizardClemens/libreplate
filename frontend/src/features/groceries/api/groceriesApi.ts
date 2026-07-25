@@ -1,7 +1,7 @@
 import type {
     GroceryList,
     GroceryItem,
-} from "../types";
+} from "../../../types/GroceryTypes";
 
 
 const BASE_URL = "/api/groceries";

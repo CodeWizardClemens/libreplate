@@ -1,13 +1,7 @@
-export interface Nutrient {
-  id: number;
-  name: string;
-  amount: number;
-}
+import type { Nutrient } from "./NutrientTypes";
+import type {Tag} from "./TagTypes"
 
-export interface RecipeTag {
-  id: number;
-  name: string;
-}
+export interface RecipeTag extends Tag {}
 
 export interface RecipeIngredient {
   id: number;

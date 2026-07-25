@@ -1,7 +1,7 @@
-import type { RecipeTag } from "../../types";
+import type { Tag } from "../../types/RecipeTypes";
 
-interface Props {
-  tags: RecipeTag[];
+interface Props<TagType extends Tag> {
+  tags: TagType[];
   selectedTags: number[];
   onChange: (tags: number[]) => void;
 }

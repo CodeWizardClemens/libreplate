@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import RecipeList from "./components/recipes/RecipeList";
-import TagSelector from "./components/recipes/TagSelector";
+import TagSelector from "../../components/ui/TagSelector";
 import TagModal from "./components/common/TagModal";
 
 import {

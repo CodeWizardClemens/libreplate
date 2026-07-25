@@ -16,7 +16,7 @@ import type {
   DefaultMealCreate,
   DefaultMealUpdate,
   DayMeal,
-} from "./types";
+} from "../types/MealTypes";
 
 function getCsrfToken() {
   const cookie = document.cookie

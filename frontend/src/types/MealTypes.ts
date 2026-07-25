@@ -1,4 +1,4 @@
-import type { Food } from "../foods/types";
+import type { Food } from "../../types/FoodTypes";
 
 /* ===========================
  * Meal Foods

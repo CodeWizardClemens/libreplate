@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { DayMeal } from "../types";
+import type { DayMeal } from "../../../types/MealTypes";
 import MealFoodItem from "./MealFoodItem";
 import { computeMealTotals } from "../utils/MealFormulas";
 type Props = {
@@ -51,12 +51,11 @@ function MealCard({
               <div>
                 <h2 className="h5 mb-1">{meal.name}</h2>
 
-                {/* Nutrient bar */}
                 <div className="small text-muted d-flex gap-3">
-                  <span>Energy: {totals.energy.toFixed(0)} kcal</span>
-                  <span>Protein: {totals.protein.toFixed(1)} g</span>
-                  <span>Fat: {totals.fat.toFixed(1)} g</span>
-                  <span>Carbs: {totals.carbs.toFixed(1)} g</span>
+                  <span>Kcal {totals.energy.toFixed(0)}</span>
+                  <span>P {totals.protein.toFixed(0)}</span>
+                  <span>F {totals.fat.toFixed(0)}</span>
+                  <span>C {totals.carbs.toFixed(0)}</span>
                 </div>
 
                 {meal.meal_id === null && (
@@ -70,14 +69,14 @@ function MealCard({
                 className="btn btn-sm btn-primary"
                 onClick={() => onAddRecipe(meal)}
               >
-                + Add recipe
+                + Recipe
               </button>
 
               <button
                 className="btn btn-sm btn-primary"
                 onClick={() => onAddFood(meal)}
               >
-                + Add food
+                + Food
               </button>
             </div>
           </div>

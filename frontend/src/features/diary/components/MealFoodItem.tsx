@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useDeleteMealFood, useUpdateMealFood } from "../api";
+import { useDeleteMealFood, useUpdateMealFood } from "../../../api/MealAPI";
 import type { MealFood } from "../types";
 import EditMealFoodModal from "./EditMealFoodModal";
 

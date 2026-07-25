@@ -12,7 +12,7 @@ import type {
   Food,
   FoodCreate,
   FoodUpdate,
-} from "./types";
+} from "../../types/FoodTypes";
 
 
 function getCsrfToken() {
