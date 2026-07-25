@@ -20,7 +20,7 @@ if settings.DEBUG:
 
     urlpatterns += [
         path("", views.default_page),
-        path("accounts/", include("accounts.urls")),
+        # path("accounts/", include("accounts.urls")),
         path("accounts/", include("django.contrib.auth.urls")),
         path("accounts/profile/", views.profile, name="profile"),
     ]

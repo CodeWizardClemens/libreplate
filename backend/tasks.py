@@ -110,15 +110,6 @@ def migrate(c: Context):
 
 
 @task
-def collectstatic(c: Context):
-    """
-    Collect Django static files for deployment.
-    """
-    log("Collecting static files")
-    django_run(c, "collectstatic --noinput")
-
-
-@task
 def update(c: Context):
     """
     Update LibrePlate dependencies, source code, and database state.
@@ -127,7 +118,6 @@ def update(c: Context):
     c.run("git pull origin master")
     c.run("uv sync")
     migrate(c)
-    collectstatic(c)
 
 
 @task
@@ -224,10 +214,5 @@ def init(c: Context):
     Initialize LibrePlate.
     """
     log("Installing libreplate")
-
     migrate(c)
-
-    if IS_RELEASE:
-        collectstatic(c)
-
     sync_default_data(c)

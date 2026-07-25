@@ -52,7 +52,6 @@ INSTALLED_APPS = [
     "integrations.apps.IntegrationsConfig",
     "body_metrics.apps.BodyMetricsConfig",
     "goals.apps.GoalsConfig",
-    "settings.apps.SettingsConfig",
     "user_statistics.apps.UserStatisticsConfig",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -60,7 +59,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "shared",
 ]
 
 MIDDLEWARE = [
