@@ -47,10 +47,9 @@ class MealPlanFood(models.Model):
         related_name="foods",
     )
 
-    meal = models.ForeignKey(
-        "default_meals.DefaultMeal",
-        on_delete=models.CASCADE,
-        related_name="meal_plan_foods",
+    meal = models.CharField(
+        max_length=255,
+        default="New Meal Plan",
     )
 
     food = models.ForeignKey(
@@ -77,10 +76,9 @@ class MealPlanRecipe(models.Model):
         related_name="recipes",
     )
 
-    meal = models.ForeignKey(
-        "default_meals.DefaultMeal",
-        on_delete=models.CASCADE,
-        related_name="meal_plan_recipes",
+    meal = models.CharField(
+        max_length=255,
+        default="New Meal Plan",
     )
 
     recipe = models.ForeignKey(

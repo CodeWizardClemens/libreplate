@@ -10,7 +10,7 @@ import GroceriesPage from "../features/groceries/pages/GroceriesPage";
 import RecipesPage from "../features/recipes/RecipePage";
 import RecipeEditPage from "../features/recipes/RecipeEditPage";
 import FoodsPage from "../features/foods/FoodsPage";
-
+import DiaryPage from "../features/diary/DiaryPage";
 
 function Placeholder({ title }: { title: string }) {
     return (
@@ -34,6 +34,14 @@ const router = createBrowserRouter([
             {
                 index: true,
                 element: <Navigate to="/groceries" replace />,
+            },
+
+            {
+                path: "diary",
+                element: <DiaryPage />,
+                handle: {
+                    title: "Diary",
+                },
             },
 
             {

@@ -5,7 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from .defaults import DEFAULT_MEALS
-from .models import DefaultMeal
+from ..default_meals.models import DefaultMeal
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)

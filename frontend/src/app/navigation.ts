@@ -20,7 +20,7 @@ export interface NavigationItem {
 export const mainNavigation: NavigationItem[] = [
     {
         label: "Diary",
-        path: "/",
+        path: "/diary",
         icon: JournalText,
     },
     {

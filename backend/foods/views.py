@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.views import View
 from django.views.decorators.http import require_POST
 
-from diary.models import Meal, MealFood
+from meals.models import Meal, MealFood
 from foods.forms import FoodForm
 from foods.models import Food, FoodNutrient
 from foods.services.usda_client import USDAClient

@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from diary.models import MealFood
+from meals.models import MealFood
 
 
 def generate_grocery_items(grocery_list):

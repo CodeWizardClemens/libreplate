@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
 from body_metrics.models import BodyMetric, BodyMetricLog
-from diary.models import MealFood
+from meals.models import MealFood
 from nutrients.models import Nutrient
 
 from .forms import GraphForm
