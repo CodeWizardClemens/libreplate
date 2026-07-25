@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import type { Recipe } from "@/types/RecipeTypes";
 
-import { useRecipeTags, useUpdateRecipe } from "@/api/RecipeAPI";
+import { useUpdateRecipe } from "@/api/RecipeAPI";
 
 import RecipeCardActions from "./RecipeCardActions";
 import RecipeCardHeader from "./RecipeCardHeader";
@@ -11,7 +11,7 @@ import RecipeCardTags from "../common/RecipeTags";
 import RecipeCardPicture from "../common/RecipePicture";
 
 interface Props {
-  recipe?: Recipe;
+  recipe: Recipe;
 
   onDelete?: (id: number) => void;
   onToggleFavorite?: (id: number) => void;
@@ -26,15 +26,10 @@ export default function RecipeCard({
   onTogglePinned,
   onCopy,
 }: Props) {
-  const { data: availableTags = [] } = useRecipeTags();
   const updateRecipe = useUpdateRecipe();
 
   const [editingName, setEditingName] = useState(false);
   const [editingSummary, setEditingSummary] = useState(false);
-
-  if (!recipe) {
-    return null;
-  }
 
   function updateRecipeData(data: {
     name?: string;
@@ -62,9 +57,12 @@ export default function RecipeCard({
     <div className="card shadow-sm">
       <div className="card-body">
         <div className="row g-3 align-items-start">
-
           <div className="col-auto order-1">
-            <RecipeCardPicture recipeId={recipe.id} height={150} width={150} />
+            <RecipeCardPicture
+              recipeId={recipe.id}
+              height={150}
+              width={150}
+            />
           </div>
 
           <div className="col-auto order-3 ms-auto">
@@ -111,7 +109,6 @@ export default function RecipeCard({
               {" m"}
             </div>
           </div>
-
         </div>
       </div>
     </div>

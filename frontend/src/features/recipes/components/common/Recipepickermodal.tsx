@@ -14,7 +14,6 @@ export default function RecipePickerModal({
   onSelect,
 }: RecipePickerModalProps) {
   const [search, setSearch] = useState("");
-  const [servingsById, setServingsById] = useState<Record<number, string>>({});
 
   const { data: recipes, isLoading, isError } = useRecipes();
 
@@ -29,7 +28,6 @@ export default function RecipePickerModal({
 
   function reset() {
     setSearch("");
-    setServingsById({});
   }
 
   function handleClose() {
@@ -37,120 +35,89 @@ export default function RecipePickerModal({
     onClose();
   }
 
-  function getServings(recipeId: number) {
-    return servingsById[recipeId] ?? "1";
-  }
-
-  function setServings(recipeId: number, value: string) {
-    setServingsById((prev) => ({ ...prev, [recipeId]: value }));
-  }
-
   function handleAdd(recipe: Recipe) {
-    const parsed = parseFloat(getServings(recipe.id));
-    const servings = Number.isNaN(parsed) || parsed <= 0 ? 1 : parsed;
-
-    onSelect(recipe, servings);
+    onSelect(recipe, 1);
     reset();
   }
 
   return (
     <div
       onClick={handleClose}
+      className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
       style={{
-        position: "fixed",
-        inset: 0,
         background: "rgba(0,0,0,0.4)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
         zIndex: 1050,
       }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        className="bg-white p-4 rounded-4 shadow-lg d-flex flex-column"
         style={{
-          background: "white",
-          padding: "20px",
           width: "460px",
           maxHeight: "80vh",
-          borderRadius: "8px",
-          display: "flex",
-          flexDirection: "column",
         }}
       >
-        <h2>Select recipe</h2>
+        <h2 className="mb-3">Select recipe</h2>
 
-        <input
-          placeholder="Search recipes..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          <div className="mb-3">
+            <input
+              type="text"
+              className="form-control rounded-2"
+              placeholder="Search recipes..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+
+        {isLoading && (
+          <p className="text-muted">Loading recipes...</p>
+        )}
+
+        {isError && (
+          <p className="text-danger">Failed to load recipes.</p>
+        )}
+
+        <div
+          className="list-group overflow-auto flex-grow-1"
           style={{
-            width: "100%",
-            marginBottom: "15px",
+            minHeight: 0,
           }}
-        />
-
-        {isLoading && <p>Loading recipes...</p>}
-
-        {isError && <p>Failed to load recipes.</p>}
-
-        <div style={{ overflowY: "auto", flex: 1 }}>
+        >
           {filteredRecipes.map((recipe) => (
-            <div
+            <button
               key={recipe.id}
+              type="button"
+              className="list-group-item list-group-item-action d-flex align-items-center"
+              onClick={() => handleAdd(recipe)}
               style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "100%",
-                padding: "6px 4px",
-                marginBottom: "4px",
-                borderRadius: "4px",
-                gap: "8px",
+                textAlign: "left",
               }}
             >
-              <div style={{ minWidth: 0 }}>
-                <div
-                  style={{
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {recipe.name}
-                </div>
-
-                <div style={{ color: "#666", fontSize: "0.85em" }}>
-                  {recipe.ingredients.length} ingredient
-                  {recipe.ingredients.length === 1 ? "" : "s"}
-                </div>
+              <div
+                className="text-truncate"
+                style={{
+                  maxWidth: "38ch",
+                }}
+              >
+                {recipe.name}
               </div>
-
-              <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
-                <input
-                  type="number"
-                  min={0}
-                  step="any"
-                  value={getServings(recipe.id)}
-                  onChange={(e) => setServings(recipe.id, e.target.value)}
-                  style={{ width: "3.5rem", textAlign: "center" }}
-                  aria-label={`Servings of ${recipe.name} to add`}
-                />
-
-                <span style={{ color: "#666", fontSize: "0.85em" }}>servings</span>
-
-                <button onClick={() => handleAdd(recipe)}>Add</button>
-              </div>
-            </div>
+            </button>
           ))}
 
           {!isLoading && filteredRecipes.length === 0 && (
-            <p style={{ color: "#666" }}>No recipes found.</p>
+            <p className="text-muted mt-3">
+              No recipes found.
+            </p>
           )}
         </div>
 
-        <div style={{ marginTop: "15px" }}>
-          <button onClick={handleClose}>Cancel</button>
+        <div className="mt-3 d-flex justify-content-end">
+          <button
+            className="btn btn-secondary"
+            onClick={handleClose}
+          >
+            Cancel
+          </button>
         </div>
       </div>
     </div>

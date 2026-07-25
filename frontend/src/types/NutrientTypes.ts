@@ -14,3 +14,9 @@ export interface Nutrient {
   show_in_foods: boolean | null;
   show_in_goal_edit: boolean | null;
 }
+
+export interface RecipeNutrient {
+  id: number;
+  name: string;
+  amount: number;
+}

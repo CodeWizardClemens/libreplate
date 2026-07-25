@@ -1,13 +1,7 @@
 import {
-    BarChart,
     Book,
-    Bullseye,
-    Calendar2Week,
     Cake2,
-    Cart3,
-    Gear,
     JournalText,
-    PersonCircle,
     type Icon
 } from "react-bootstrap-icons";
 

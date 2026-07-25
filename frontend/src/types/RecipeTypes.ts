@@ -1,5 +1,5 @@
-import type { Nutrient } from "./NutrientTypes";
-import type {Tag} from "./TagTypes"
+import type { RecipeNutrient } from "./NutrientTypes";
+import type { Tag } from "./TagTypes";
 
 export interface RecipeTag extends Tag {}
 
@@ -38,7 +38,7 @@ export interface Recipe extends RecipeFields {
   tags: RecipeTag[];
   picture: RecipePicture | null;
   ingredients: RecipeIngredient[];
-  nutrients: Nutrient[];
+  nutrients: RecipeNutrient[];
 }
 
 export interface RecipeCreate extends RecipeFields {

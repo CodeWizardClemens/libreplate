@@ -1,12 +1,16 @@
 import type { Tag } from "@/types/TagTypes";
 
-interface Props<TagType extends Tag> {
-  tags: TagType[];
+interface Props {
+  tags: Tag[];
   selectedTags: number[];
   onChange: (tags: number[]) => void;
 }
 
-export default function TagSelector({ tags, selectedTags, onChange }: Props) {
+export default function TagSelector({
+  tags,
+  selectedTags,
+  onChange,
+}: Props) {
   function toggleTag(id: number) {
     if (selectedTags.includes(id)) {
       onChange(selectedTags.filter((tagId) => tagId !== id));
