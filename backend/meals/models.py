@@ -64,7 +64,6 @@ class Meal(models.Model):
 
 
 class MealFood(models.Model):
-
     meal = models.ForeignKey(
         Meal,
         on_delete=models.CASCADE,
@@ -79,7 +78,6 @@ class MealFood(models.Model):
     serving_size = models.FloatField()
 
     number_of_servings = models.FloatField()
-
 
     def __str__(self):
         return f"{self.food} ({self.number_of_servings}) in {self.meal}"

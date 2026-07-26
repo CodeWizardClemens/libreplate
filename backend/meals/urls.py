@@ -1,7 +1,6 @@
 from django.urls import path
 
-from .api import (DayMealsAPIView, DefaultMealViewSet, MealFoodViewSet,
-                  MealViewSet)
+from .api import DayMealsAPIView, DefaultMealViewSet, MealFoodViewSet, MealViewSet
 
 urlpatterns = [
     path(
@@ -46,8 +45,6 @@ urlpatterns = [
         ),
         name="meal-detail",
     ),
-
-
     path(
         "defaults/",
         DefaultMealViewSet.as_view(
@@ -58,8 +55,6 @@ urlpatterns = [
         ),
         name="default-meal-list",
     ),
-
-
     path(
         "defaults/<int:pk>/",
         DefaultMealViewSet.as_view(
@@ -72,12 +67,9 @@ urlpatterns = [
         ),
         name="default-meal-detail",
     ),
-
-
     path(
         "day/<str:day>/",
         DayMealsAPIView.as_view(),
         name="day-meals",
     ),
-
 ]

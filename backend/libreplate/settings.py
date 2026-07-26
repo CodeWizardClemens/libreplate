@@ -76,11 +76,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "libreplate.wsgi.application"
 
-DATABASES = {
-    "default": env.db(
-        "DATABASE_URL"
-    )
-}
+DATABASES = {"default": env.db("DATABASE_URL")}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -117,41 +113,35 @@ STATICFILES_DIRS = [
 ]
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = Path(env("MEDIA_ROOT")
-)
+MEDIA_ROOT = Path(env("MEDIA_ROOT"))
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-
     "formatters": {
         "verbose": {
             "format": "{levelname} {asctime} {name} {message}",
             "style": "{",
         },
     },
-
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },
     },
-
     "root": {
         "handlers": ["console"],
         "level": "INFO",
     },
-
     "loggers": {
         "django": {
             "handlers": ["console"],
             "level": "INFO",
             "propagate": False,
         },
-
         "LibrePlate": {
             "handlers": ["console"],
             "level": "DEBUG",
@@ -177,7 +167,6 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
     ],
-
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],

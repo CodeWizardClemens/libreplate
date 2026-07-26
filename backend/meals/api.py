@@ -5,8 +5,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import DefaultMeal, Meal, MealFood
-from .serializers import (DayMealSerializer, DefaultMealSerializer,
-                          MealFoodCreateSerializer, MealSerializer)
+from .serializers import (
+    DayMealSerializer,
+    DefaultMealSerializer,
+    MealFoodCreateSerializer,
+    MealSerializer,
+)
 
 
 class MealViewSet(viewsets.ModelViewSet):
@@ -80,10 +84,7 @@ class DayMealsAPIView(APIView):
             )
         )
 
-        meals_by_default = {
-            meal.default_meal_id: meal
-            for meal in meals
-        }
+        meals_by_default = {meal.default_meal_id: meal for meal in meals}
 
         response = []
 
@@ -131,13 +132,9 @@ class MealFoodViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = MealFoodCreateSerializer
 
-
     def get_queryset(self):
 
-        return MealFood.objects.filter(
-            meal__user=self.request.user
-        )
-
+        return MealFood.objects.filter(meal__user=self.request.user)
 
     def perform_create(self, serializer):
 

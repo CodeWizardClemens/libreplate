@@ -2,21 +2,21 @@ from django.conf import settings
 from django.http import FileResponse
 from django.urls import include, path, re_path
 from django.views.static import serve
-from drf_spectacular.views import (SpectacularAPIView, SpectacularRedocView,
-                                   SpectacularSwaggerView)
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
 
 
 def react_app(request):
-    return FileResponse(
-        (settings.FRONTEND_DIST / "index.html").open("rb")
-    )
+    return FileResponse((settings.FRONTEND_DIST / "index.html").open("rb"))
 
 
 urlpatterns = [
     # =========================
     # API routes
     # =========================
-
     path("api/accounts/", include("accounts.api_urls")),
     path("api/foods/", include("foods.api_urls")),
     path("api/groceries/", include("groceries.api_urls")),
@@ -39,20 +39,14 @@ if settings.DEBUG:
             SpectacularAPIView.as_view(),
             name="schema",
         ),
-
         path(
             "api/docs/",
-            SpectacularSwaggerView.as_view(
-                url_name="schema"
-            ),
+            SpectacularSwaggerView.as_view(url_name="schema"),
             name="swagger-ui",
         ),
-
         path(
             "api/redoc/",
-            SpectacularRedocView.as_view(
-                url_name="schema"
-            ),
+            SpectacularRedocView.as_view(url_name="schema"),
             name="redoc",
         ),
     ]
@@ -70,7 +64,6 @@ urlpatterns += [
             "document_root": settings.FRONTEND_DIST / "assets",
         },
     ),
-
     re_path(
         r"^(?P<path>[^/]+\.(?:png|jpg|jpeg|svg|ico|webp|gif|txt))$",
         serve,
@@ -78,7 +71,6 @@ urlpatterns += [
             "document_root": settings.FRONTEND_DIST,
         },
     ),
-
     re_path(
         r"^favicon\.ico$",
         serve,
@@ -87,7 +79,6 @@ urlpatterns += [
             "path": "favicon.ico",
         },
     ),
-
     # React SPA fallback
     re_path(
         r"^(?!api/).*",

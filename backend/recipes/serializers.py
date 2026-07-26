@@ -4,7 +4,6 @@ from .models import Recipe, RecipeIngredient, RecipePicture, RecipeTag
 
 
 class RecipeTagSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = RecipeTag
         fields = [
@@ -14,7 +13,6 @@ class RecipeTagSerializer(serializers.ModelSerializer):
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
-
     food_name = serializers.CharField(
         source="food.name",
         read_only=True,
@@ -37,7 +35,6 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipePictureSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = RecipePicture
         fields = [
@@ -49,7 +46,6 @@ class RecipePictureSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-
     nutrients = serializers.SerializerMethodField()
     has_picture = serializers.SerializerMethodField()
     tags = RecipeTagSerializer(
@@ -99,16 +95,12 @@ class RecipeSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
 
         if request and "tags" in attrs:
-
             tags = attrs["tags"]
 
             for tag in tags:
-
                 if tag.user != request.user:
                     raise serializers.ValidationError(
-                        {
-                            "tag_ids": "You cannot use another user's tags."
-                        }
+                        {"tag_ids": "You cannot use another user's tags."}
                     )
 
         return attrs

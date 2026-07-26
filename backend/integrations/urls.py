@@ -7,7 +7,6 @@ urlpatterns = [
         "usda/search/",
         USDASearchAPIView.as_view(),
     ),
-
     path(
         "usda/save/",
         USDASaveAPIView.as_view(),

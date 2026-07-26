@@ -7,8 +7,6 @@ from .serializers import NutrientSerializer
 
 class NutrientViewSet(ReadOnlyModelViewSet):
     serializer_class = NutrientSerializer
-    permission_classes = [
-        IsAuthenticated
-    ]
+    permission_classes = [IsAuthenticated]
 
     queryset = Nutrient.objects.all()

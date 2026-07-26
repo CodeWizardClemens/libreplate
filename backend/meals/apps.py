@@ -6,4 +6,4 @@ class MealsConfig(AppConfig):
     name = "meals"
 
     def ready(self):
-        from . import signals
+        pass

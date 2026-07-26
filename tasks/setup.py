@@ -5,7 +5,7 @@ import shlex
 from invoke import Context, task
 
 from .db import migrate, sync_default_data
-from .utils import django_run, log
+from .utils import django_run, info
 
 
 @task
@@ -13,7 +13,7 @@ def init(c: Context):
     """
     Initialize LibrePlate.
     """
-    log("Installing LibrePlate")
+    info("Installing LibrePlate")
 
     migrate(c)
     sync_default_data(c)
@@ -31,7 +31,7 @@ def user_add(
     """
     Create a new LibrePlate user account.
     """
-    log(f"Adding new user `{username}`")
+    info(f"Adding new user `{username}`")
 
     django_run(
         c,
@@ -49,7 +49,7 @@ def user_remove(c: Context, username: str):
     """
     Remove an existing LibrePlate user account.
     """
-    log(f"Removing user `{username}`")
+    info(f"Removing user `{username}`")
 
     django_run(
         c,
@@ -62,7 +62,7 @@ def add_usda_api_key(c: Context, key: str):
     """
     Configure the USDA API key.
     """
-    log("Adding USDA API key")
+    info("Adding USDA API key")
 
     django_run(
         c,

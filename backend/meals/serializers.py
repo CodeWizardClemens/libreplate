@@ -1,7 +1,8 @@
 from django.db import transaction
+from rest_framework import serializers
+
 from foods.models import Food
 from foods.serializers import FoodSerializer
-from rest_framework import serializers
 
 from .models import DefaultMeal, Meal, MealFood
 
@@ -126,9 +127,7 @@ class MealSerializer(serializers.ModelSerializer):
         return instance
 
     def to_representation(self, instance):
-        representation = super().to_representation(
-            instance
-        )
+        representation = super().to_representation(instance)
 
         representation["meal_foods"] = MealFoodSerializer(
             instance.meal_foods.select_related(
@@ -183,19 +182,17 @@ class DayMealSerializer(serializers.Serializer):
         many=True,
     )
 
-class MealFoodCreateSerializer(serializers.ModelSerializer):
 
+class MealFoodCreateSerializer(serializers.ModelSerializer):
     meal_id = serializers.PrimaryKeyRelatedField(
         queryset=Meal.objects.all(),
         source="meal",
     )
 
-
     food_id = serializers.PrimaryKeyRelatedField(
         queryset=Food.objects.all(),
         source="food",
     )
-
 
     class Meta:
         model = MealFood
@@ -211,7 +208,6 @@ class MealFoodCreateSerializer(serializers.ModelSerializer):
         read_only_fields = [
             "id",
         ]
-
 
     def validate_food_id(self, food):
 

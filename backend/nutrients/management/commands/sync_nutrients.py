@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+
 from nutrients.services import sync_default_nutrients
 
 

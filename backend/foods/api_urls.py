@@ -26,7 +26,6 @@ urlpatterns = [
         food_list,
         name="food-list",
     ),
-
     path(
         "<int:pk>/",
         food_detail,

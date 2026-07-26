@@ -22,7 +22,6 @@ urlpatterns = [
         nutrient_list,
         name="nutrient-list",
     ),
-
     path(
         "<int:pk>/",
         nutrient_detail,

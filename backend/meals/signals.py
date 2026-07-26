@@ -1,6 +1,5 @@
 # default_meals/signals.py
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -14,6 +13,4 @@ def create_default_meals(sender, instance, created, **kwargs):
     if not created:
         return
 
-    DefaultMeal.objects.bulk_create(
-        get_default_meals(user=instance)
-    )
+    DefaultMeal.objects.bulk_create(get_default_meals(user=instance))

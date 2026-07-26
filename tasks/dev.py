@@ -1,49 +1,114 @@
+"""
+Invoke tasks for project development workflows.
+
+This module provides command-line tasks for maintaining the LibrePlate codebase,
+including:
+
+- Running code quality checks
+- Automatically formatting source code
+- Running the Django test suite
+- Starting the development or production web server
+"""
+
 from invoke import Context, task
 
-from .utils import BASE_DIR, IS_DEBUG, VENV_DIR, django_run, log
+from .utils import (
+    BASE_DIR,
+    IS_DEBUG,
+    VENV_DIR,
+    django_run,
+    info,
+    npx_run,
+    print_success,
+    uv_run,
+)
 
 
-@task(name="check-code-quality")
-def check_code_quality(c: Context):
+def isort_cmd(check_only: bool = False) -> str:
+    args = [
+        "isort",
+        str(BASE_DIR),
+        "--skip",
+        str(VENV_DIR),
+        "--settings-path",
+        "backend/pyproject.toml",
+    ]
+
+    if check_only:
+        args.insert(2, "--check-only")
+
+    return " ".join(args)
+
+
+def black_cmd() -> str:
+    return f"black {BASE_DIR} --check --exclude '(/\\.venv/)'"
+
+
+def ruff_check_cmd(fix: bool = False, exit_zero: bool = False) -> str:
+    args = [
+        "ruff",
+        "check",
+        str(BASE_DIR),
+        "--exclude",
+        str(VENV_DIR),
+    ]
+
+    if fix:
+        args.append("--fix")
+
+    if exit_zero:
+        args.append("--exit-zero")
+
+    return " ".join(args)
+
+
+@task(help={"verbose": "Show stdout output from commands."})
+def code_check(c: Context, verbose: bool = False) -> None:
     """
     Run code quality checks.
     """
-    log("Checking code quality. This may take a while.")
 
-    c.run(
-        f"isort {BASE_DIR} --check-only --skip {VENV_DIR}"
-    )
-    c.run(
-        f"black {BASE_DIR} --check --exclude '{VENV_DIR}'"
-    )
-    c.run(
-        f"ruff check {BASE_DIR} --exclude {VENV_DIR}"
-    )
+    if verbose:
+        info("Checking code quality. This may take a while.")
+
+    uv_run(c, isort_cmd(check_only=True), quiet_stdout=not verbose)
+    uv_run(c, black_cmd(), quiet_stdout=not verbose)
+    uv_run(c, ruff_check_cmd(fix=True), quiet_stdout=not verbose)
+    npx_run(c, "oxlint .", quiet_stdout=not verbose)
+    npx_run(c, "prettier --check .", quiet_stdout=not verbose)
+
+    print_success(message="Succesfully ran all code checks")
 
 
-@task(name="format-code")
-def format_code(c: Context):
+@task(help={"verbose": "Show stdout output from commands."})
+def code_format(c: Context, verbose: bool = False) -> None:
     """
     Automatically format the codebase.
     """
-    c.run(
-        f"isort {BASE_DIR} --skip {VENV_DIR}"
-    )
-    c.run(
-        f"black {BASE_DIR} --exclude '{VENV_DIR}'"
-    )
-    c.run(
-        f"ruff format {BASE_DIR} --exclude {VENV_DIR}"
-    )
+
+    if verbose:
+        info("Formatting codebase.")
+
+    npx_run(c, "prettier --write .", quiet_stdout=not verbose)
+    uv_run(c, isort_cmd(), quiet_stdout=not verbose)
+    uv_run(c, black_cmd().replace("--check", ""), quiet_stdout=not verbose)
+    uv_run(c, f"ruff format {BASE_DIR} --exclude {VENV_DIR}", quiet_stdout=not verbose)
+    uv_run(c, ruff_check_cmd(fix=True, exit_zero=True), quiet_stdout=not verbose)
+
+    print_success(message="Succesfully ran all formatters")
 
 
-@task
-def test(c: Context):
+@task(help={"verbose": "Show stdout output from commands."})
+def test(c: Context, verbose: bool = False) -> None:
     """
     Run the LibrePlate automated test suite.
     """
-    log("Running tests")
-    django_run(c, "test")
+
+    if verbose:
+        info("Running tests")
+    django_run(c, "test", quiet_stdout=not verbose)
+
+    print_success(message="Succesfully ran all tests")
 
 
 @task
@@ -51,7 +116,7 @@ def serve(c: Context):
     """
     Start the LibrePlate web server.
     """
-    log("Running server")
+    info("Running server")
 
     if IS_DEBUG:
         django_run(c, "runserver")

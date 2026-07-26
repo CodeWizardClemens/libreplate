@@ -10,44 +10,33 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .models import Recipe, RecipeIngredient, RecipePicture, RecipeTag
-from .serializers import (RecipeIngredientSerializer, RecipePictureSerializer,
-                          RecipeSerializer, RecipeTagSerializer)
+from .serializers import (
+    RecipeIngredientSerializer,
+    RecipePictureSerializer,
+    RecipeSerializer,
+    RecipeTagSerializer,
+)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
+    authentication_classes = [SessionAuthentication]
 
-    authentication_classes = [
-        SessionAuthentication
-    ]
-
-    permission_classes = [
-        IsAuthenticated
-    ]
+    permission_classes = [IsAuthenticated]
 
     serializer_class = RecipeSerializer
 
-
     def get_queryset(self):
 
-        return Recipe.objects.filter(
-            user=self.request.user
-        ).prefetch_related(
+        return Recipe.objects.filter(user=self.request.user).prefetch_related(
             "picture",
             "tags",
         )
 
-
     def perform_create(self, serializer):
 
-        serializer.save(
-            user=self.request.user
-        )
+        serializer.save(user=self.request.user)
 
-
-    @action(
-        detail=True,
-        methods=["post"]
-    )
+    @action(detail=True, methods=["post"])
     def toggle_favorite(self, request, pk=None):
 
         recipe = self.get_object()
@@ -68,11 +57,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             }
         )
 
-
-    @action(
-        detail=True,
-        methods=["post"]
-    )
+    @action(detail=True, methods=["post"])
     def toggle_pin(self, request, pk=None):
 
         recipe = self.get_object()
@@ -93,11 +78,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             }
         )
 
-
-    @action(
-        detail=True,
-        methods=["post"]
-    )
+    @action(detail=True, methods=["post"])
     def copy(self, request, pk=None):
 
         recipe = self.get_object()
@@ -105,14 +86,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         new_name = request.data.get("name")
 
         if not new_name:
-
             return Response(
-                {
-                    "name": "This field is required."
-                },
+                {"name": "This field is required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
 
         new_recipe = Recipe.objects.create(
             user=request.user,
@@ -126,9 +103,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             last_used_at=timezone.now(),
         )
 
-
         for ingredient in recipe.ingredients.all():
-
             RecipeIngredient.objects.create(
                 recipe=new_recipe,
                 food=ingredient.food,
@@ -137,19 +112,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 order=ingredient.order,
             )
 
-
-        new_recipe.tags.set(
-            recipe.tags.all()
-        )
-
+        new_recipe.tags.set(recipe.tags.all())
 
         if hasattr(recipe, "picture"):
-
             RecipePicture.objects.create(
                 recipe=new_recipe,
                 image=recipe.picture.image,
             )
-
 
         return Response(
             self.get_serializer(new_recipe).data,
@@ -157,47 +126,28 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
 
 
-
 class RecipeTagViewSet(viewsets.ModelViewSet):
+    authentication_classes = [SessionAuthentication]
 
-    authentication_classes = [
-        SessionAuthentication
-    ]
-
-    permission_classes = [
-        IsAuthenticated
-    ]
+    permission_classes = [IsAuthenticated]
 
     serializer_class = RecipeTagSerializer
 
-
     def get_queryset(self):
 
-        return RecipeTag.objects.filter(
-            user=self.request.user
-        )
-
+        return RecipeTag.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
 
-        serializer.save(
-            user=self.request.user
-        )
-
+        serializer.save(user=self.request.user)
 
 
 class RecipeIngredientViewSet(viewsets.ModelViewSet):
+    authentication_classes = [SessionAuthentication]
 
-    authentication_classes = [
-        SessionAuthentication
-    ]
-
-    permission_classes = [
-        IsAuthenticated
-    ]
+    permission_classes = [IsAuthenticated]
 
     serializer_class = RecipeIngredientSerializer
-
 
     def get_recipe(self):
 
@@ -206,17 +156,11 @@ class RecipeIngredientViewSet(viewsets.ModelViewSet):
             user=self.request.user,
         )
 
-
     def get_queryset(self):
 
         recipe = self.get_recipe()
 
-        return RecipeIngredient.objects.filter(
-            recipe=recipe
-        ).select_related(
-            "food"
-        )
-
+        return RecipeIngredient.objects.filter(recipe=recipe).select_related("food")
 
     def get_object(self):
 
@@ -225,24 +169,15 @@ class RecipeIngredientViewSet(viewsets.ModelViewSet):
             recipe=self.get_recipe(),
         )
 
-
     def perform_create(self, serializer):
 
-        serializer.save(
-            recipe=self.get_recipe()
-        )
-
+        serializer.save(recipe=self.get_recipe())
 
 
 class RecipePictureViewSet(viewsets.ViewSet):
+    authentication_classes = [SessionAuthentication]
 
-    authentication_classes = [
-        SessionAuthentication
-    ]
-
-    permission_classes = [
-        IsAuthenticated
-    ]
+    permission_classes = [IsAuthenticated]
 
     parser_classes = [
         MultiPartParser,
@@ -251,14 +186,12 @@ class RecipePictureViewSet(viewsets.ViewSet):
 
     serializer_class = RecipePictureSerializer
 
-
     def get_recipe(self):
 
         return Recipe.objects.get(
             id=self.kwargs["pk"],
             user=self.request.user,
         )
-
 
     def retrieve(self, request, pk=None):
         """
@@ -268,25 +201,17 @@ class RecipePictureViewSet(viewsets.ViewSet):
         """
 
         try:
-            picture = RecipePicture.objects.get(
-                recipe=self.get_recipe()
-            )
+            picture = RecipePicture.objects.get(recipe=self.get_recipe())
 
         except RecipePicture.DoesNotExist:
-            return Response(
-                status=status.HTTP_404_NOT_FOUND
-            )
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
-
-        content_type, _ = mimetypes.guess_type(
-            picture.image.name
-        )
+        content_type, _ = mimetypes.guess_type(picture.image.name)
 
         return FileResponse(
             picture.image.open("rb"),
             content_type=content_type or "application/octet-stream",
         )
-
 
     def create(self, request, pk=None):
         """
@@ -297,11 +222,7 @@ class RecipePictureViewSet(viewsets.ViewSet):
 
         recipe = self.get_recipe()
 
-
-        picture, created = RecipePicture.objects.get_or_create(
-            recipe=recipe
-        )
-
+        picture, created = RecipePicture.objects.get_or_create(recipe=recipe)
 
         serializer = RecipePictureSerializer(
             picture,
@@ -309,26 +230,16 @@ class RecipePictureViewSet(viewsets.ViewSet):
             partial=True,
         )
 
+        serializer.is_valid(raise_exception=True)
 
-        serializer.is_valid(
-            raise_exception=True
-        )
-
-
-        serializer.save(
-            recipe=recipe
-        )
-
+        serializer.save(recipe=recipe)
 
         return Response(
             {
                 "id": picture.id,
             },
-            status=status.HTTP_201_CREATED
-            if created
-            else status.HTTP_200_OK,
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
         )
-
 
     def destroy(self, request, pk=None):
         """
@@ -336,19 +247,11 @@ class RecipePictureViewSet(viewsets.ViewSet):
         """
 
         try:
-            picture = RecipePicture.objects.get(
-                recipe=self.get_recipe()
-            )
+            picture = RecipePicture.objects.get(recipe=self.get_recipe())
 
         except RecipePicture.DoesNotExist:
-            return Response(
-                status=status.HTTP_404_NOT_FOUND
-            )
-
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
         picture.delete()
 
-
-        return Response(
-            status=status.HTTP_204_NO_CONTENT
-        )
+        return Response(status=status.HTTP_204_NO_CONTENT)

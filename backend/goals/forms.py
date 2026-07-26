@@ -1,5 +1,6 @@
-from body_metrics.models import BodyMetric
 from django import forms
+
+from body_metrics.models import BodyMetric
 from nutrients.models import Nutrient
 
 from .models import GoalBodyMetric, GoalGroup, GoalNutrient

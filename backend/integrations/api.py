@@ -1,32 +1,24 @@
-from integrations.usda import USDAError, save_by_id, search
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from integrations.usda import USDAError, save_by_id, search
+
 from .serializers import USDAFoodSearchSerializer, USDASaveSerializer
 
 
 class USDASearchAPIView(APIView):
+    authentication_classes = [SessionAuthentication]
 
-    authentication_classes = [
-        SessionAuthentication
-    ]
-
-    permission_classes = [
-        IsAuthenticated
-    ]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
 
-        serializer = USDAFoodSearchSerializer(
-            data=request.query_params
-        )
+        serializer = USDAFoodSearchSerializer(data=request.query_params)
 
-        serializer.is_valid(
-            raise_exception=True
-        )
+        serializer.is_valid(raise_exception=True)
 
         try:
             result = search(
@@ -36,12 +28,9 @@ class USDASearchAPIView(APIView):
 
         except USDAError as exc:
             return Response(
-                {
-                    "error": str(exc)
-                },
+                {"error": str(exc)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
 
         foods = [
             {
@@ -53,7 +42,6 @@ class USDASearchAPIView(APIView):
             for food in result["foods"]
         ]
 
-
         return Response(
             {
                 "foods": foods,
@@ -61,26 +49,17 @@ class USDASearchAPIView(APIView):
             }
         )
 
+
 class USDASaveAPIView(APIView):
+    authentication_classes = [SessionAuthentication]
 
-    authentication_classes = [
-        SessionAuthentication
-    ]
-
-    permission_classes = [
-        IsAuthenticated
-    ]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
 
-        serializer = USDASaveSerializer(
-            data=request.data
-        )
+        serializer = USDASaveSerializer(data=request.data)
 
-        serializer.is_valid(
-            raise_exception=True
-        )
-
+        serializer.is_valid(raise_exception=True)
 
         try:
             food = save_by_id(
@@ -90,12 +69,9 @@ class USDASaveAPIView(APIView):
 
         except USDAError as exc:
             return Response(
-                {
-                    "error": str(exc)
-                },
+                {"error": str(exc)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
 
         return Response(
             {

@@ -7,6 +7,7 @@ from typing import Any
 import requests
 from django.contrib.auth.models import User
 from django.db import transaction
+
 from foods.models import Food, FoodNutrient
 from integrations.models import USDAAPISettings
 from nutrients.models import Nutrient
@@ -30,24 +31,16 @@ def _validate_pagination(
     page_number: int,
 ) -> None:
     if page_size < MIN_PAGE_SIZE:
-        raise USDAError(
-            "page_size must be greater than zero."
-        )
+        raise USDAError("page_size must be greater than zero.")
 
     if page_size > MAX_PAGE_SIZE:
-        raise USDAError(
-            f"page_size cannot exceed {MAX_PAGE_SIZE}."
-        )
+        raise USDAError(f"page_size cannot exceed {MAX_PAGE_SIZE}.")
 
     if page_number < MIN_PAGE_NUMBER:
-        raise USDAError(
-            "page_number must start at 1."
-        )
+        raise USDAError("page_number must start at 1.")
 
     if page_number > MAX_PAGE_NUMBER:
-        raise USDAError(
-            f"page_number cannot exceed {MAX_PAGE_NUMBER}."
-        )
+        raise USDAError(f"page_number cannot exceed {MAX_PAGE_NUMBER}.")
 
 
 def _normalize_food_name(name: str) -> str:
@@ -98,9 +91,7 @@ def _request(
         raise USDAError("Food not found.")
 
     if not response.ok:
-        raise USDAError(
-            f"USDA API error: {response.status_code} {response.text}"
-        )
+        raise USDAError(f"USDA API error: {response.status_code} {response.text}")
 
     return response.json()
 
@@ -165,11 +156,7 @@ def _get_global_unit(name: str) -> Unit | None:
 
 
 def _extract_brand(food: dict[str, Any]) -> str | None:
-    return (
-        food.get("brandOwner")
-        or food.get("brandName")
-        or None
-    )
+    return food.get("brandOwner") or food.get("brandName") or None
 
 
 def _create_unsaved_food(
@@ -283,10 +270,7 @@ def _save_nutrients(
         usda_nutrient_number__isnull=False,
     )
 
-    nutrient_map = {
-        nutrient.usda_nutrient_number: nutrient
-        for nutrient in nutrients
-    }
+    nutrient_map = {nutrient.usda_nutrient_number: nutrient for nutrient in nutrients}
 
     for item in nutrient_data:
         nutrient = item.get("nutrient")
@@ -294,9 +278,7 @@ def _save_nutrients(
         if not nutrient:
             continue
 
-        nutrient_number = str(
-            nutrient.get("number")
-        )
+        nutrient_number = str(nutrient.get("number"))
 
         db_nutrient = nutrient_map.get(nutrient_number)
 

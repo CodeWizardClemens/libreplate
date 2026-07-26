@@ -1,6 +1,6 @@
 from invoke import Context, task
 
-from .utils import django_run, log
+from .utils import django_run, info
 
 
 @task
@@ -8,7 +8,7 @@ def migrate(c: Context):
     """
     Create and apply Django migrations.
     """
-    log("Creating and applying migrations")
+    info("Creating and applying migrations")
 
     django_run(c, "makemigrations")
     django_run(c, "migrate")
@@ -19,7 +19,7 @@ def sync_default_data(c: Context):
     """
     Synchronize default application data.
     """
-    log("Syncing default data")
+    info("Syncing default data")
 
     for command in [
         "sync_nutrients",

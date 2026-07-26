@@ -1,7 +1,11 @@
 from django.urls import path
 
-from .api import (RecipeIngredientViewSet, RecipePictureViewSet,
-                  RecipeTagViewSet, RecipeViewSet)
+from .api import (
+    RecipeIngredientViewSet,
+    RecipePictureViewSet,
+    RecipeTagViewSet,
+    RecipeViewSet,
+)
 
 recipe_list = RecipeViewSet.as_view(
     {
@@ -77,24 +81,20 @@ recipe_picture = RecipePictureViewSet.as_view(
 
 urlpatterns = [
     path("", recipe_list),
-
     # Tags
     path("tags/", tag_list),
     path("tags/<int:pk>/delete/", tag_detail),
-
     # Recipes
     path("<int:pk>/", recipe_detail),
     path("<int:pk>/toggle-favorite/", toggle_favorite),
     path("<int:pk>/toggle-pin/", toggle_pin),
     path("<int:pk>/copy/", recipe_copy),
-
     # Ingredients
     path("<int:pk>/ingredients/", recipe_ingredients),
     path(
         "<int:pk>/ingredients/<int:ingredient_pk>/",
         recipe_ingredient_detail,
     ),
-
     # Picture
     path("<int:pk>/picture/", recipe_picture),
 ]
