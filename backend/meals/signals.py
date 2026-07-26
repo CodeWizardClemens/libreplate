@@ -13,25 +13,6 @@ from .defaults import get_default_meals
 from .models import DefaultMeal
 
 
-
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def create_unit_scope(sender, instance, created, **kwargs):
-    if not created:
-        return
-
-    DefaultMeal.objects.bulk_create(
-        [
-            DefaultMeal(
-                user=instance,
-                name=meal["name"],
-                order=meal["order"],
-                description=meal["description"],
-            )
-            for meal in DEFAULT_MEALS
-        ]
-    )
-
-
 @receiver(post_save, sender=User)
 def create_default_meals(sender, instance, created, **kwargs):
     if not created:
