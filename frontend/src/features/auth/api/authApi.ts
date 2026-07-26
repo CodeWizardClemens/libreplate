@@ -83,29 +83,18 @@ export async function logout(): Promise<void> {
 
 
 
-export async function getCurrentUser(): Promise<User> {
+export async function getCurrentUser(): Promise<User | null> {
+    const response = await fetch("/api/accounts/me/", {
+        credentials: "include",
+    });
 
-    const response = await fetch(
-        "/api/accounts/me/",
-        {
-            credentials: "include",
-        }
-    );
-
-
-    if (response.status === 401) {
-        throw new Error(
-            "Unauthorized"
-        );
+    if (response.status === 401 || response.status === 403) {
+        return null;
     }
-
 
     if (!response.ok) {
-        throw new Error(
-            "Unable to load user"
-        );
+        throw new Error(`Unable to load user (${response.status})`);
     }
-
 
     return response.json();
 }

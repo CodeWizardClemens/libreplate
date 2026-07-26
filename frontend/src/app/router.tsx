@@ -5,6 +5,8 @@ import {
 
 import AppLayout from "./AppLayout";
 
+import { requireAuth } from "../features/auth/requireAuth";
+
 import LoginPage from "../features/auth/pages/LoginPage";
 import RecipesPage from "../features/recipes/RecipePage";
 import RecipeEditPage from "../features/recipes/RecipeEditPage";
@@ -21,14 +23,16 @@ function Placeholder({ title }: { title: string }) {
     );
 }
 
-
 const router = createBrowserRouter([
+    // Public routes
     {
         path: "/login",
         element: <LoginPage />,
     },
 
+    // Protected routes
     {
+        loader: requireAuth,
         element: <AppLayout />,
         children: [
             {
@@ -67,6 +71,7 @@ const router = createBrowserRouter([
                     title: "Edit Recipe",
                 },
             },
+
             {
                 path: "foods/:id/edit",
                 element: <FoodEditPage />,
