@@ -1,24 +1,30 @@
-# default_meals/defaults.py
+from .models import DefaultMeal
 
-DEFAULT_MEALS = [
-    {
-        "name": "Breakfast",
-        "order": 1,
-        "description": "",
-    },
-    {
-        "name": "Lunch",
-        "order": 2,
-        "description": "",
-    },
-    {
-        "name": "Snack",
-        "order": 3,
-        "description": "",
-    },
-    {
-        "name": "Dinner",
-        "order": 4,
-        "description": "",
-    },
-]
+
+def get_default_meals(user):
+    return [
+        DefaultMeal(
+            user=user,
+            name="Breakfast",
+            order=1,
+            description="",
+        ),
+        DefaultMeal(
+            user=user,
+            name="Lunch",
+            order=2,
+            description="",
+        ),
+        DefaultMeal(
+            user=user,
+            name="Snack",
+            order=3,
+            description="",
+        ),
+        DefaultMeal(
+            user=user,
+            name="Dinner",
+            order=4,
+            description="",
+        ),
+    ]
