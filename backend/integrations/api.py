@@ -1,10 +1,12 @@
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from integrations.usda import USDAError, save_by_id, search
+from integrations import usda
+from integrations.usda import USDAError
 
 from .serializers import USDAFoodSearchSerializer, USDASaveSerializer
 
@@ -14,6 +16,35 @@ class USDASearchAPIView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="term",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=True,
+                description="Search term for USDA foods.",
+            ),
+            OpenApiParameter(
+                name="page_size",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Number of results per page. Default: 25. Maximum: 50.",
+            ),
+            OpenApiParameter(
+                name="page_number",
+                type=int,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Page number to retrieve. Default: 1.",
+            ),
+        ],
+        responses={
+            200: {"description": "USDA food search results."},
+            400: {"description": "Invalid search parameters or USDA error."},
+        },
+    )
     def get(self, request):
 
         serializer = USDAFoodSearchSerializer(data=request.query_params)
@@ -21,7 +52,7 @@ class USDASearchAPIView(APIView):
         serializer.is_valid(raise_exception=True)
 
         try:
-            result = search(
+            result = usda.search(
                 user=request.user,
                 **serializer.validated_data,
             )
@@ -55,6 +86,13 @@ class USDASaveAPIView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        request=USDASaveSerializer,
+        responses={
+            201: {"description": "Food successfully saved."},
+            400: {"description": "Invalid FDC ID or USDA error."},
+        },
+    )
     def post(self, request):
 
         serializer = USDASaveSerializer(data=request.data)
@@ -62,7 +100,7 @@ class USDASaveAPIView(APIView):
         serializer.is_valid(raise_exception=True)
 
         try:
-            food = save_by_id(
+            food = usda.save_by_id(
                 serializer.validated_data["fdc_id"],
                 user=request.user,
             )
