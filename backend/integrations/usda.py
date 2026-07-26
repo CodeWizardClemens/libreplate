@@ -13,7 +13,7 @@ from integrations.models import USDAAPISettings
 from nutrients.models import Nutrient
 from units.models import Unit, UnitScope
 
-BASE_URL = "https://api.nal.usda.gov/fdc/v1"
+USDA_API_BASE_URL = "https://api.nal.usda.gov/fdc/v1"
 
 MAX_PAGE_SIZE = 50
 MIN_PAGE_SIZE = 1
@@ -82,10 +82,13 @@ def _request(
     }
 
     response = requests.get(
-        f"{BASE_URL}/{endpoint}",
+        f"{USDA_API_BASE_URL}/{endpoint}",
         params=params,
         timeout=10,
     )
+
+    if not response.ok:
+        raise USDAError(f"USDA API error: {response.status_code} {response.text}")
 
     if response.status_code == 404:
         raise USDAError("Food not found.")
