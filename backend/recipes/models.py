@@ -1,11 +1,10 @@
-from decimal import Decimal
+from collections import defaultdict
+from decimal import ROUND_HALF_UP, Decimal
 
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
-from collections import defaultdict
 
-from decimal import Decimal, ROUND_HALF_UP
 
 class Recipe(models.Model):
     def get_nutrients(self, per_portion=True):

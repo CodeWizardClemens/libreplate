@@ -1,12 +1,7 @@
 from django.urls import path
 
-from .api import (
-    MealViewSet,
-    DefaultMealViewSet,
-    DayMealsAPIView,
-    MealFoodViewSet,
-)
-
+from .api import (DayMealsAPIView, DefaultMealViewSet, MealFoodViewSet,
+                  MealViewSet)
 
 urlpatterns = [
     path(

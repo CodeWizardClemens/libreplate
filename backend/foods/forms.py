@@ -1,5 +1,4 @@
 from django import forms
-
 from nutrients.models import Nutrient
 
 from .models import Food, FoodNutrient

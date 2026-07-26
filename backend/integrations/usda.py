@@ -7,12 +7,10 @@ from typing import Any
 import requests
 from django.contrib.auth.models import User
 from django.db import transaction
-
 from foods.models import Food, FoodNutrient
 from integrations.models import USDAAPISettings
 from nutrients.models import Nutrient
 from units.models import Unit, UnitScope
-
 
 BASE_URL = "https://api.nal.usda.gov/fdc/v1"
 

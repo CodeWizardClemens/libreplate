@@ -2,7 +2,6 @@ from django.urls import path
 
 from .api import FoodViewSet
 
-
 food_list = FoodViewSet.as_view(
     {
         "get": "list",

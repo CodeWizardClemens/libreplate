@@ -2,7 +2,6 @@ from django.urls import path
 
 from .api import NutrientViewSet
 
-
 nutrient_list = NutrientViewSet.as_view(
     {
         "get": "list",

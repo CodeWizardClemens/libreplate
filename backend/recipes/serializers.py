@@ -1,11 +1,6 @@
 from rest_framework import serializers
 
-from .models import (
-    Recipe,
-    RecipeTag,
-    RecipeIngredient,
-    RecipePicture,
-)
+from .models import Recipe, RecipeIngredient, RecipePicture, RecipeTag
 
 
 class RecipeTagSerializer(serializers.ModelSerializer):

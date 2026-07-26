@@ -1,12 +1,7 @@
 from django.urls import path
 
-from .api import (
-    RecipeViewSet,
-    RecipeTagViewSet,
-    RecipeIngredientViewSet,
-    RecipePictureViewSet,
-)
-
+from .api import (RecipeIngredientViewSet, RecipePictureViewSet,
+                  RecipeTagViewSet, RecipeViewSet)
 
 recipe_list = RecipeViewSet.as_view(
     {

@@ -1,27 +1,17 @@
+import mimetypes
+
 from django.http import FileResponse
 from django.utils import timezone
-
 from rest_framework import status, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
-import mimetypes
 
-from .models import (
-    Recipe,
-    RecipeIngredient,
-    RecipeTag,
-    RecipePicture,
-)
-
-from .serializers import (
-    RecipeSerializer,
-    RecipeTagSerializer,
-    RecipeIngredientSerializer,
-    RecipePictureSerializer,
-)
+from .models import Recipe, RecipeIngredient, RecipePicture, RecipeTag
+from .serializers import (RecipeIngredientSerializer, RecipePictureSerializer,
+                          RecipeSerializer, RecipeTagSerializer)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):

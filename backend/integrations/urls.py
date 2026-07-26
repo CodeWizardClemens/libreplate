@@ -1,10 +1,6 @@
 from django.urls import path
 
-from .api import (
-    USDASearchAPIView,
-    USDASaveAPIView,
-)
-
+from .api import USDASaveAPIView, USDASearchAPIView
 
 urlpatterns = [
     path(

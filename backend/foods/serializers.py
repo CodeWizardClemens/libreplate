@@ -1,7 +1,6 @@
 from django.db import transaction
-from rest_framework import serializers
-
 from nutrients.models import Nutrient
+from rest_framework import serializers
 
 from .models import Food, FoodNutrient
 

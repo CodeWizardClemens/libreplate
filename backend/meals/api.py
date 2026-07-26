@@ -1,21 +1,13 @@
-from rest_framework import viewsets
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from .serializers import MealFoodCreateSerializer
-from .models import (
-    Meal,
-    DefaultMeal,
-    MealFood,
-)
-
-from .serializers import (
-    MealSerializer,
-    DefaultMealSerializer,
-    DayMealSerializer,
-)
-from rest_framework import serializers
+from rest_framework import serializers, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .models import DefaultMeal, Meal, MealFood
+from .serializers import (DayMealSerializer, DefaultMealSerializer,
+                          MealFoodCreateSerializer, MealSerializer)
+
 
 class MealViewSet(viewsets.ModelViewSet):
     authentication_classes = [SessionAuthentication]
