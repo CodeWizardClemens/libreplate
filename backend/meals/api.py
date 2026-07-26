@@ -14,8 +14,12 @@ from .serializers import (
     DayMealSerializer,
 )
 from rest_framework import serializers
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 class MealViewSet(viewsets.ModelViewSet):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
     serializer_class = MealSerializer
 
     def get_queryset(self):
@@ -37,6 +41,8 @@ class MealViewSet(viewsets.ModelViewSet):
 
 
 class DefaultMealViewSet(viewsets.ModelViewSet):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
     serializer_class = DefaultMealSerializer
 
     def get_queryset(self):
@@ -51,6 +57,8 @@ class DefaultMealViewSet(viewsets.ModelViewSet):
 
 
 class DayMealsAPIView(APIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
     """
     Returns every meal slot for a given day.
 
@@ -127,7 +135,8 @@ class DayMealsAPIView(APIView):
 
 
 class MealFoodViewSet(viewsets.ModelViewSet):
-
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
     serializer_class = MealFoodCreateSerializer
 
 

@@ -71,7 +71,7 @@ def get_bool_env(name: str, default: bool = False) -> bool:
     return value == "true"
 
 
-IS_RELEASE = get_bool_env("RELEASE")
+IS_DEBUG = get_bool_env("DEBUG")
 
 
 @task
@@ -192,11 +192,11 @@ def serve(c: Context):
     """
     log("Running server")
 
-    if IS_RELEASE:
-        # TODO allow for gunicorn config to be passed as argument.
-        c.run("uv run gunicorn libreplate.wsgi:application")
-    else:
+    if IS_DEBUG:
         django_run(c, "runserver")
+        # TODO allow for gunicorn config to be passed as argument.
+    else:
+        c.run("uv run gunicorn libreplate.wsgi:application")
 
 
 @task

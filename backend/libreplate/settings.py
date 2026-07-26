@@ -3,16 +3,16 @@ from pathlib import Path
 import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = BASE_DIR.parent
 
 env = environ.Env(
     DEBUG=(bool, False),
 )
 
-# Load from root directory, now in 'backend'
-environ.Env.read_env(BASE_DIR.parent / ".env")
+# Load environment variables from the project root.
+environ.Env.read_env(PROJECT_ROOT / ".env")
 
 SECRET_KEY = env("SECRET_KEY")
-
 DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
@@ -76,11 +76,10 @@ TEMPLATES = [
 WSGI_APPLICATION = "libreplate.wsgi.application"
 
 DATABASES = {
-    "default": env.db(default="postgres://postgres:password@localhost:5432/libreplate")
+    "default": env.db(
+        default="postgres://postgres:password@localhost:5432/libreplate"
+    )
 }
-
-# Password validation
-# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -97,24 +96,28 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 LANGUAGE_CODE = "en-us"
+
 TIME_ZONE = "CET"
+
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+# Static & media
+
+FRONTEND_DIST = Path(env("FRONTEND_DIST"))
 
 STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    FRONTEND_DIST,
 ]
 
-STATIC_ROOT = Path(env("STATIC_ROOT", default=BASE_DIR / "staticfiles"))
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+MEDIA_URL = "/media/"
+MEDIA_ROOT = Path(env("MEDIA_ROOT")
+)
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -158,7 +161,8 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
     ],
-}
 
-MEDIA_ROOT = Path(env("MEDIA_ROOT"))
-MEDIA_URL = "/media/"
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+}

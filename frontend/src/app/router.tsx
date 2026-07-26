@@ -6,7 +6,6 @@ import {
 import AppLayout from "./AppLayout";
 
 import LoginPage from "../features/auth/pages/LoginPage";
-import GroceriesPage from "../features/groceries/pages/GroceriesPage";
 import RecipesPage from "../features/recipes/RecipePage";
 import RecipeEditPage from "../features/recipes/RecipeEditPage";
 import FoodEditPage from "../features/foods/FoodEditPage";
@@ -34,7 +33,7 @@ const router = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <Navigate to="/groceries" replace />,
+                element: <Navigate to="/diary" replace />,
             },
 
             {
@@ -47,7 +46,7 @@ const router = createBrowserRouter([
 
             {
                 path: "groceries",
-                element: <GroceriesPage />,
+                element: <Placeholder title="Groceries" />,
                 handle: {
                     title: "Groceries",
                 },
