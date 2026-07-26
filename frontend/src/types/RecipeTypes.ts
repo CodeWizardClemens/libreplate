@@ -12,11 +12,6 @@ export interface RecipeIngredient {
   order: number;
 }
 
-export interface RecipePicture {
-  id: number;
-  image: string;
-}
-
 interface RecipeFields {
   name: string;
   summary: string;
@@ -36,7 +31,7 @@ export interface Recipe extends RecipeFields {
   updated_at: string;
 
   tags: RecipeTag[];
-  picture: RecipePicture | null;
+  has_picture: boolean;
   ingredients: RecipeIngredient[];
   nutrients: RecipeNutrient[];
 }

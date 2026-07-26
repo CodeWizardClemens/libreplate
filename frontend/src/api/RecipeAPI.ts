@@ -14,7 +14,6 @@ import type {
   RecipeIngredient,
   RecipeIngredientCreate,
   RecipeIngredientUpdate,
-  RecipePicture,
   ToggleFavoriteResponse,
   TogglePinResponse,
 } from "@/types/RecipeTypes";
@@ -450,24 +449,6 @@ export function useDeleteRecipeIngredient() {
 // Recipe Picture
 // ========================
 
-export function useRecipePicture(recipeId: number) {
-  return useQuery({
-    queryKey: pictureKeys.detail(recipeId),
-
-    queryFn: async () => {
-      const { data } =
-        await api.get<RecipePicture>(
-          `${recipeId}/picture/`,
-        );
-
-      return data;
-    },
-
-    enabled: Boolean(recipeId),
-  });
-}
-
-
 export function useUploadRecipePicture() {
   const queryClient = useQueryClient();
 
@@ -499,6 +480,12 @@ export function useUploadRecipePicture() {
 
     onSuccess(_, variables) {
       queryClient.invalidateQueries({
+        queryKey: recipeKeys.detail(
+          variables.recipeId,
+        ),
+      });
+
+      queryClient.invalidateQueries({
         queryKey: pictureKeys.detail(
           variables.recipeId,
         ),
@@ -513,10 +500,16 @@ export function useDeleteRecipePicture() {
 
   return useMutation({
     mutationFn: async (recipeId: number) => {
-      await api.delete(`${recipeId}/picture/`);
+      await api.delete(
+        `${recipeId}/picture/`,
+      );
     },
 
     onSuccess(_, recipeId) {
+      queryClient.invalidateQueries({
+        queryKey: recipeKeys.detail(recipeId),
+      });
+
       queryClient.invalidateQueries({
         queryKey: pictureKeys.detail(recipeId),
       });

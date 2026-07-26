@@ -1,6 +1,6 @@
 import { useRef } from "react";
 
-import { useRecipePicture, useUploadRecipePicture } from "@/api/RecipeAPI";
+import { useUploadRecipePicture } from "@/api/RecipeAPI";
 
 interface Props {
   recipeId: number;
@@ -14,8 +14,6 @@ export default function RecipeCardPicture({
   height,
 }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const { data: picture } = useRecipePicture(recipeId);
 
   const uploadPicture = useUploadRecipePicture();
 
@@ -49,6 +47,8 @@ export default function RecipeCardPicture({
     event.target.value = "";
   }
 
+  const imageUrl = `/api/recipes/${recipeId}/picture/`;
+
   return (
     <div
       className="
@@ -62,33 +62,37 @@ export default function RecipeCardPicture({
         height: `${height}px`,
       }}
     >
-      {picture?.image ? (
-        <img
-          src={picture.image}
-          alt="Recipe"
-          className="
-            rounded
-            w-100
-            h-100
-            object-fit-cover
-          "
-        />
-      ) : (
-        <div
-          className="
-            bg-light
-            rounded
-            d-flex
-            align-items-center
-            justify-content-center
-            text-muted
-            w-100
-            h-100
-          "
-        >
-          No image
-        </div>
-      )}
+      <img
+        src={imageUrl}
+        alt="Recipe"
+        className="
+          rounded
+          w-100
+          h-100
+          object-fit-cover
+        "
+        onError={(event) => {
+          event.currentTarget.style.display = "none";
+        }}
+      />
+
+      <div
+        className="
+          bg-light
+          rounded
+          d-flex
+          align-items-center
+          justify-content-center
+          text-muted
+          w-100
+          h-100
+        "
+        style={{
+          display: "none",
+        }}
+      >
+        No image
+      </div>
 
       <button
         type="button"

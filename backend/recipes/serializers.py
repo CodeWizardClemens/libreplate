@@ -47,7 +47,6 @@ class RecipePictureSerializer(serializers.ModelSerializer):
         model = RecipePicture
         fields = [
             "id",
-            "image",
         ]
         read_only_fields = [
             "id",
@@ -57,13 +56,9 @@ class RecipePictureSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
 
     nutrients = serializers.SerializerMethodField()
-
+    has_picture = serializers.SerializerMethodField()
     tags = RecipeTagSerializer(
         many=True,
-        read_only=True,
-    )
-
-    picture = RecipePictureSerializer(
         read_only=True,
     )
 
@@ -99,7 +94,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             "updated_at",
             "tags",
             "tag_ids",
-            "picture",
+            "has_picture",
             "ingredients",
             "nutrients",
         )
@@ -123,10 +118,11 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         return attrs
 
+    def get_has_picture(self, obj):
+        return hasattr(obj, "picture")
+
     def get_nutrients(self, obj):
-
         nutrients = obj.get_nutrients()
-
         return [
             {
                 "id": nutrient.id,

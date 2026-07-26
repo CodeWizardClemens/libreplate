@@ -1,10 +1,13 @@
+from django.http import FileResponse
 from django.utils import timezone
 
 from rest_framework import status, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
+import mimetypes
 
 from .models import (
     Recipe,
@@ -241,7 +244,7 @@ class RecipeIngredientViewSet(viewsets.ModelViewSet):
 
 
 
-class RecipePictureViewSet(viewsets.ModelViewSet):
+class RecipePictureViewSet(viewsets.ViewSet):
 
     authentication_classes = [
         SessionAuthentication
@@ -251,7 +254,13 @@ class RecipePictureViewSet(viewsets.ModelViewSet):
         IsAuthenticated
     ]
 
+    parser_classes = [
+        MultiPartParser,
+        FormParser,
+    ]
+
     serializer_class = RecipePictureSerializer
+
 
     def get_recipe(self):
 
@@ -260,27 +269,96 @@ class RecipePictureViewSet(viewsets.ModelViewSet):
             user=self.request.user,
         )
 
-    def get_queryset(self):
 
-        return RecipePicture.objects.filter(
-            recipe=self.get_recipe()
+    def retrieve(self, request, pk=None):
+        """
+        GET /api/recipes/<recipe_id>/picture/
+
+        Returns private image file.
+        """
+
+        try:
+            picture = RecipePicture.objects.get(
+                recipe=self.get_recipe()
+            )
+
+        except RecipePicture.DoesNotExist:
+            return Response(
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+        content_type, _ = mimetypes.guess_type(
+            picture.image.name
         )
 
-    def get_object(self):
-
-        return RecipePicture.objects.get(
-            recipe=self.get_recipe()
+        return FileResponse(
+            picture.image.open("rb"),
+            content_type=content_type or "application/octet-stream",
         )
 
-    def perform_create(self, serializer):
 
-        picture = RecipePicture.objects.filter(
-            recipe=self.get_recipe()
-        ).first()
+    def create(self, request, pk=None):
+        """
+        POST /api/recipes/<recipe_id>/picture/
 
-        if picture:
-            picture.delete()
+        Upload or replace recipe picture.
+        """
+
+        recipe = self.get_recipe()
+
+
+        picture, created = RecipePicture.objects.get_or_create(
+            recipe=recipe
+        )
+
+
+        serializer = RecipePictureSerializer(
+            picture,
+            data=request.data,
+            partial=True,
+        )
+
+
+        serializer.is_valid(
+            raise_exception=True
+        )
+
 
         serializer.save(
-            recipe=self.get_recipe()
+            recipe=recipe
+        )
+
+
+        return Response(
+            {
+                "id": picture.id,
+            },
+            status=status.HTTP_201_CREATED
+            if created
+            else status.HTTP_200_OK,
+        )
+
+
+    def destroy(self, request, pk=None):
+        """
+        DELETE /api/recipes/<recipe_id>/picture/
+        """
+
+        try:
+            picture = RecipePicture.objects.get(
+                recipe=self.get_recipe()
+            )
+
+        except RecipePicture.DoesNotExist:
+            return Response(
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+        picture.delete()
+
+
+        return Response(
+            status=status.HTTP_204_NO_CONTENT
         )
