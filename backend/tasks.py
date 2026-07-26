@@ -132,6 +132,15 @@ def sync_default_data(c: Context):
 
 
 @task
+def remove_user(c, username: str):
+    """
+    Remove a user by username.
+    """
+    log(f"Removing user `{username}`")
+    django_run(c, "remove_user", username)
+
+
+@task
 def add_user(
     c: Context,
     username: str,
