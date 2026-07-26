@@ -7,6 +7,8 @@ export default defineConfig({
         react(),
     ],
 
+    base: process.env.VITE_BASE_PATH || "/",
+
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "./src"),
@@ -23,5 +25,9 @@ export default defineConfig({
                 secure: false,
             },
         },
+    },
+
+    build: {
+        assetsDir: "assets",
     },
 });
