@@ -68,18 +68,12 @@ export default function AddToMealModal({
             gap: "12px",
           }}
         >
-          <button
-            className="btn btn-outline-primary"
-            onClick={onRecipe}
-          >
+          <button className="btn btn-outline-primary" onClick={onRecipe}>
             <i className="bi bi-journal-text me-2" />
             Search Recipes
           </button>
 
-          <button
-            className="btn btn-outline-primary"
-            onClick={onFood}
-          >
+          <button className="btn btn-outline-primary" onClick={onFood}>
             <i className="bi bi-cake2 me-2" />
             Search Foods
           </button>

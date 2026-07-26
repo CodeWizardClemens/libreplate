@@ -15,11 +15,7 @@ interface Props {
   onToggleFavorite?: (id: number) => void;
 }
 
-export default function FoodCard({
-  food,
-  onDelete,
-  onToggleFavorite,
-}: Props) {
+export default function FoodCard({ food, onDelete, onToggleFavorite }: Props) {
   const updateFood = useUpdateFood();
 
   const [editingName, setEditingName] = useState(false);
@@ -40,7 +36,6 @@ export default function FoodCard({
     <div className="card shadow-sm">
       <div className="card-body">
         <div className="row g-3 align-items-start">
-
           <div className="col-auto order-2 ms-auto">
             <FoodCardActions
               food={food}
@@ -59,9 +54,7 @@ export default function FoodCard({
               setEditingDescription={setEditingDescription}
             />
 
-            <FoodCardNutrients
-              nutrients={food.nutrients}
-            />
+            <FoodCardNutrients nutrients={food.nutrients} />
 
             <div className="text-muted small mt-3">
               {food.brand && (
@@ -74,9 +67,7 @@ export default function FoodCard({
               {food.serving != null && (
                 <>
                   <i className="bi bi-egg-fried ms-2 me-1"></i>
-                  {food.serving}
-                  {" "}
-                  {food.unit}
+                  {food.serving} {food.unit}
                 </>
               )}
 
@@ -88,7 +79,6 @@ export default function FoodCard({
               )}
             </div>
           </div>
-
         </div>
       </div>
     </div>

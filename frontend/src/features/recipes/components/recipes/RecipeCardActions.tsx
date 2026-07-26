@@ -19,9 +19,7 @@ export default function RecipeCardActions({
 }: Props) {
   const navigate = useNavigate();
 
-  const stopCardClick = (
-    e: React.MouseEvent<HTMLButtonElement>
-  ) => {
+  const stopCardClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
   };
 
@@ -39,9 +37,7 @@ export default function RecipeCardActions({
     <>
       <button
         className={
-          recipe.is_pinned
-            ? "btn btn-primary"
-            : "btn btn-outline-secondary"
+          recipe.is_pinned ? "btn btn-primary" : "btn btn-outline-secondary"
         }
         onClick={(e) => {
           stopCardClick(e);
@@ -49,20 +45,12 @@ export default function RecipeCardActions({
         }}
         title="Pin"
       >
-        <i
-          className={
-            recipe.is_pinned
-              ? "bi bi-pin-fill"
-              : "bi bi-pin"
-          }
-        />
+        <i className={recipe.is_pinned ? "bi bi-pin-fill" : "bi bi-pin"} />
       </button>
 
       <button
         className={
-          recipe.is_favorite
-            ? "btn btn-primary"
-            : "btn btn-outline-secondary"
+          recipe.is_favorite ? "btn btn-primary" : "btn btn-outline-secondary"
         }
         onClick={(e) => {
           stopCardClick(e);
@@ -71,11 +59,7 @@ export default function RecipeCardActions({
         title="Favorite"
       >
         <i
-          className={
-            recipe.is_favorite
-              ? "bi bi-heart-fill"
-              : "bi bi-heart"
-          }
+          className={recipe.is_favorite ? "bi bi-heart-fill" : "bi bi-heart"}
         />
       </button>
 

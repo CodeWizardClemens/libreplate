@@ -12,11 +12,7 @@ export default function MealList({ meals, onAdd }: Props) {
   return (
     <div className="row g-3">
       {meals.map((meal) => (
-        <MealCard
-          key={meal.default_meal.id}
-          meal={meal}
-          onAdd={onAdd}
-        />
+        <MealCard key={meal.default_meal.id} meal={meal} onAdd={onAdd} />
       ))}
     </div>
   );

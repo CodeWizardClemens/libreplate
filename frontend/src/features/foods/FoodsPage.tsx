@@ -88,7 +88,6 @@ export default function FoodsPage() {
 
   return (
     <div className="container">
-
       <div className="text-start mb-2">
         <button
           type="button"

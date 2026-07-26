@@ -149,7 +149,9 @@ export default function FoodPickerModal({
                   background: isChecked ? "#f0f6ff" : "transparent",
                 }}
               >
-                <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span
+                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                >
                   <input
                     type="checkbox"
                     checked={isChecked}

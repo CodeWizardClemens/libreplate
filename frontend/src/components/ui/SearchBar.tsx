@@ -70,7 +70,9 @@ export default function SearchBar<TSort extends string, TagType extends Tag>({
               onClick={onToggleFavorites}
               title="Show favorites"
             >
-              <i className={showFavorites ? "bi bi-heart-fill" : "bi bi-heart"} />
+              <i
+                className={showFavorites ? "bi bi-heart-fill" : "bi bi-heart"}
+              />
             </button>
           </div>
         </div>

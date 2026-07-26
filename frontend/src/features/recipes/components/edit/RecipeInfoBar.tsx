@@ -72,20 +72,20 @@ export default function RecipeInfoBar({ recipe }: Props) {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-      <span>
-        <i className="bi bi-people me-1" />
-        {(portions ?? 0)} {portions === 1 ? "portion" : "portions"}
-      </span>
+        <span>
+          <i className="bi bi-people me-1" />
+          {portions ?? 0} {portions === 1 ? "portion" : "portions"}
+        </span>
 
-      <span>
-        <i className="bi bi-stopwatch me-1" />
-        {(cookingTime ?? 0)}m cook
-      </span>
+        <span>
+          <i className="bi bi-stopwatch me-1" />
+          {cookingTime ?? 0}m cook
+        </span>
 
-      <span>
-        <i className="bi bi-stopwatch me-1" />
-        {(preppingTime ?? 0)}m prep
-      </span>
+        <span>
+          <i className="bi bi-stopwatch me-1" />
+          {preppingTime ?? 0}m prep
+        </span>
 
         <i
           className="bi bi-pencil position-absolute end-0 me-3"
@@ -109,9 +109,7 @@ export default function RecipeInfoBar({ recipe }: Props) {
                 type="number"
                 min={1}
                 value={draftPortions}
-                onChange={(e) =>
-                  setDraftPortions(Number(e.target.value))
-                }
+                onChange={(e) => setDraftPortions(Number(e.target.value))}
               />
             </Form.Group>
 
@@ -121,9 +119,7 @@ export default function RecipeInfoBar({ recipe }: Props) {
                 type="number"
                 min={0}
                 value={draftCookingTime}
-                onChange={(e) =>
-                  setDraftCookingTime(Number(e.target.value))
-                }
+                onChange={(e) => setDraftCookingTime(Number(e.target.value))}
               />
             </Form.Group>
 
@@ -133,9 +129,7 @@ export default function RecipeInfoBar({ recipe }: Props) {
                 type="number"
                 min={0}
                 value={draftPreppingTime}
-                onChange={(e) =>
-                  setDraftPreppingTime(Number(e.target.value))
-                }
+                onChange={(e) => setDraftPreppingTime(Number(e.target.value))}
               />
             </Form.Group>
           </Form>

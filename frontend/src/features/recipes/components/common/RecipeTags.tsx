@@ -1,30 +1,20 @@
 import type { Recipe } from "@/types/RecipeTypes";
 
-import {
-  useRecipeTags,
-  useUpdateRecipe,
-} from "@/api/RecipeAPI";
+import { useRecipeTags, useUpdateRecipe } from "@/api/RecipeAPI";
 
 interface Props {
   recipe: Recipe;
 }
 
-export default function RecipeCardTags({
-  recipe,
-}: Props) {
+export default function RecipeCardTags({ recipe }: Props) {
   const { data: availableTags = [] } = useRecipeTags();
   const updateRecipe = useUpdateRecipe();
 
   const unusedTags = availableTags.filter(
-    (tag) =>
-      !recipe.tags.some(
-        (recipeTag) => recipeTag.id === tag.id,
-      ),
+    (tag) => !recipe.tags.some((recipeTag) => recipeTag.id === tag.id),
   );
 
-  function stopCardClick(
-    event: React.MouseEvent,
-  ) {
+  function stopCardClick(event: React.MouseEvent) {
     event.stopPropagation();
   }
 
@@ -38,17 +28,12 @@ export default function RecipeCardTags({
   }
 
   function addTag(tagId: number) {
-    updateRecipeData([
-      ...recipe.tags.map((tag) => tag.id),
-      tagId,
-    ]);
+    updateRecipeData([...recipe.tags.map((tag) => tag.id), tagId]);
   }
 
   function removeTag(tagId: number) {
     updateRecipeData(
-      recipe.tags
-        .filter((tag) => tag.id !== tagId)
-        .map((tag) => tag.id),
+      recipe.tags.filter((tag) => tag.id !== tagId).map((tag) => tag.id),
     );
   }
 

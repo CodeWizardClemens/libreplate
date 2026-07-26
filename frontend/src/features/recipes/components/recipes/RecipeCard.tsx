@@ -43,10 +43,7 @@ export default function RecipeCard({
   }
 
   function handleCopy() {
-    const name = window.prompt(
-      "New recipe name:",
-      `${recipe.name} Copy`
-    );
+    const name = window.prompt("New recipe name:", `${recipe.name} Copy`);
 
     if (name) {
       onCopy?.(recipe.id, name);
@@ -58,11 +55,7 @@ export default function RecipeCard({
       <div className="card-body">
         <div className="row g-3 align-items-start">
           <div className="col-auto order-1">
-            <RecipeCardPicture
-              recipeId={recipe.id}
-              height={150}
-              width={150}
-            />
+            <RecipeCardPicture recipeId={recipe.id} height={150} width={150} />
           </div>
 
           <div className="col-auto order-3 ms-auto">
@@ -85,13 +78,9 @@ export default function RecipeCard({
               setEditingSummary={setEditingSummary}
             />
 
-            <RecipeCardNutrients
-              nutrients={recipe.nutrients}
-            />
+            <RecipeCardNutrients nutrients={recipe.nutrients} />
 
-            <RecipeCardTags
-              recipe={recipe}
-            />
+            <RecipeCardTags recipe={recipe} />
 
             <div className="text-muted small mt-3">
               <i className="bi bi-people me-1"></i>

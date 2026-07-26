@@ -6,11 +6,7 @@ interface Props {
   onChange: (tags: number[]) => void;
 }
 
-export default function TagSelector({
-  tags,
-  selectedTags,
-  onChange,
-}: Props) {
+export default function TagSelector({ tags, selectedTags, onChange }: Props) {
   function toggleTag(id: number) {
     if (selectedTags.includes(id)) {
       onChange(selectedTags.filter((tagId) => tagId !== id));

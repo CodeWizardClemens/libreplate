@@ -15,9 +15,7 @@ export default function FoodCardActions({
 }: Props) {
   const navigate = useNavigate();
 
-  const stopCardClick = (
-    e: React.MouseEvent<HTMLButtonElement>
-  ) => {
+  const stopCardClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
   };
 
@@ -35,9 +33,7 @@ export default function FoodCardActions({
     <>
       <button
         className={
-          food.is_favorite
-            ? "btn btn-primary"
-            : "btn btn-outline-secondary"
+          food.is_favorite ? "btn btn-primary" : "btn btn-outline-secondary"
         }
         onClick={(e) => {
           stopCardClick(e);
@@ -45,13 +41,7 @@ export default function FoodCardActions({
         }}
         title="Favorite"
       >
-        <i
-          className={
-            food.is_favorite
-              ? "bi bi-heart-fill"
-              : "bi bi-heart"
-          }
-        />
+        <i className={food.is_favorite ? "bi bi-heart-fill" : "bi bi-heart"} />
       </button>
 
       <button

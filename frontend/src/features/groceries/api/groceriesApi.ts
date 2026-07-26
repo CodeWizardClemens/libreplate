@@ -1,115 +1,70 @@
-import type {
-    GroceryList,
-    GroceryItem,
-} from "@/types/GroceryTypes";
-
+import type { GroceryList, GroceryItem } from "@/types/GroceryTypes";
 
 const BASE_URL = "/api/groceries";
 
-
 const fetchOptions: RequestInit = {
-    credentials: "include",
-    headers: {
-        "Content-Type": "application/json",
-    },
+  credentials: "include",
+  headers: {
+    "Content-Type": "application/json",
+  },
 };
 
-
-
 export async function getGroceryLists(): Promise<GroceryList[]> {
+  const response = await fetch(`${BASE_URL}/`, fetchOptions);
 
-    const response = await fetch(
-        `${BASE_URL}/`,
-        fetchOptions
-    );
+  console.log("Groceries response:", response.status, response.statusText);
 
-    console.log("Groceries response:", response.status, response.statusText);
+  const body = await response.text();
+  console.log("Groceries body:", body);
 
-    const body = await response.text();
-    console.log("Groceries body:", body);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch grocery lists: ${response.status}`);
+  }
 
-    if (!response.ok) {
-        throw new Error(
-            `Failed to fetch grocery lists: ${response.status}`
-        );
-    }
-
-    return JSON.parse(body);
+  return JSON.parse(body);
 }
-
-
 
 export async function getGroceryItems(
-    groceryId: number
+  groceryId: number,
 ): Promise<GroceryItem[]> {
+  const response = await fetch(`${BASE_URL}/${groceryId}/items/`, fetchOptions);
 
+  if (!response.ok) {
+    throw new Error("Failed to fetch grocery items");
+  }
 
-    const response = await fetch(
-        `${BASE_URL}/${groceryId}/items/`,
-        fetchOptions
-    );
-
-
-    if (!response.ok) {
-        throw new Error(
-            "Failed to fetch grocery items"
-        );
-    }
-
-
-    return response.json();
+  return response.json();
 }
-
-
-
 
 export async function toggleGroceryItem(
-    groceryId: number,
-    itemId: number
+  groceryId: number,
+  itemId: number,
 ): Promise<GroceryItem> {
+  const response = await fetch(
+    `${BASE_URL}/${groceryId}/items/${itemId}/toggle/`,
+    {
+      ...fetchOptions,
+      method: "POST",
+    },
+  );
 
+  if (!response.ok) {
+    throw new Error("Failed to toggle item");
+  }
 
-    const response = await fetch(
-        `${BASE_URL}/${groceryId}/items/${itemId}/toggle/`,
-        {
-            ...fetchOptions,
-            method: "POST",
-        }
-    );
-
-
-    if (!response.ok) {
-        throw new Error(
-            "Failed to toggle item"
-        );
-    }
-
-
-    return response.json();
+  return response.json();
 }
 
-
-
-
-
 export async function deleteGroceryItem(
-    groceryId: number,
-    itemId: number
+  groceryId: number,
+  itemId: number,
 ): Promise<void> {
+  const response = await fetch(`${BASE_URL}/${groceryId}/items/${itemId}/`, {
+    ...fetchOptions,
+    method: "DELETE",
+  });
 
-
-    const response = await fetch(
-        `${BASE_URL}/${groceryId}/items/${itemId}/`,
-        {
-            ...fetchOptions,
-            method: "DELETE",
-        }
-    );
-
-
-    if (!response.ok) {
-        throw new Error(
-            "Failed to delete item"
-        );
-    }
+  if (!response.ok) {
+    throw new Error("Failed to delete item");
+  }
 }

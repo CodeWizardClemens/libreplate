@@ -51,10 +51,7 @@ export default function MealFoodItem({ item }: Props) {
       </li>
 
       {isEditOpen && (
-        <EditMealFoodModal
-          item={item}
-          onClose={() => setIsEditOpen(false)}
-        />
+        <EditMealFoodModal item={item} onClose={() => setIsEditOpen(false)} />
       )}
     </>
   );

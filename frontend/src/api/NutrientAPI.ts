@@ -4,17 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 
 import type { Nutrient } from "@/types/NutrientTypes";
 
-
 const api = axios.create({
   baseURL: "/api/nutrients/",
   withCredentials: true,
 });
 
-
 export const nutrientKeys = {
   all: ["nutrients"] as const,
 };
-
 
 // ========================
 // Nutrients

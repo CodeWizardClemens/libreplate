@@ -5,10 +5,7 @@ import SearchBar, { type SortOption } from "@/components/ui/SearchBar";
 import TagModal from "../common/TagModal";
 
 export type RecipeSortMethod =
-  | "created_at"
-  | "updated_at"
-  | "name"
-  | "last_used_at";
+  "created_at" | "updated_at" | "name" | "last_used_at";
 
 const SORT_OPTIONS: SortOption<RecipeSortMethod>[] = [
   { value: "created_at", label: "Created at" },

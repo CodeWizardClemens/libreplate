@@ -12,11 +12,9 @@ import {
 import { useFood } from "@/api/FoodAPI";
 import FoodPickerModal from "@/features/foods/components/FoodPickerModal";
 
-
 interface IngredientsCardProps {
   recipe: Recipe;
 }
-
 
 const nutrients = {
   energy: ["energy", "calories"],
@@ -24,7 +22,6 @@ const nutrients = {
   fat: ["fat", "total lipid"],
   carbohydrates: ["carbohydrate", "carbs"],
 };
-
 
 const headers = [
   "Food",
@@ -37,9 +34,7 @@ const headers = [
   "",
 ];
 
-
 type NutrientTotals = Record<keyof typeof nutrients, number>;
-
 
 function emptyTotals(): NutrientTotals {
   return {
@@ -50,17 +45,13 @@ function emptyTotals(): NutrientTotals {
   };
 }
 
-
 function getNutrient(food: Food, names: string[]) {
   return (
     food.nutrients.find((n) =>
-      names.some((name) =>
-        n.nutrient_name.toLowerCase().includes(name),
-      ),
+      names.some((name) => n.nutrient_name.toLowerCase().includes(name)),
     )?.amount ?? 0
   );
 }
-
 
 function calculateNutrients(
   food: Food,
@@ -77,7 +68,6 @@ function calculateNutrients(
     ]),
   ) as NutrientTotals;
 }
-
 
 function NumberInput({
   value,
@@ -97,11 +87,9 @@ function NumberInput({
   );
 }
 
-
 function NutrientCell({ value }: { value: number }) {
   return <td className="text-start text-muted">{Math.round(value)}</td>;
 }
-
 
 function IngredientRow({
   recipeId,
@@ -112,20 +100,15 @@ function IngredientRow({
   recipeId: number;
   ingredient: RecipeIngredient;
   onDelete: (id: number) => void;
-  onUpdate: (
-    id: number,
-    data: Partial<RecipeIngredient>,
-  ) => void;
+  onUpdate: (id: number, data: Partial<RecipeIngredient>) => void;
 }) {
   const { data: food } = useFood(ingredient.food);
   const updateMutation = useUpdateRecipeIngredient();
-
 
   const values = useMemo(
     () => (food ? calculateNutrients(food, ingredient) : emptyTotals()),
     [food, ingredient.number_of_servings, ingredient.serving_amount],
   );
-
 
   const update = (data: Partial<RecipeIngredient>) => {
     onUpdate(ingredient.id, data);
@@ -137,7 +120,6 @@ function IngredientRow({
     });
   };
 
-
   if (!food) {
     return (
       <tr>
@@ -148,7 +130,6 @@ function IngredientRow({
     );
   }
 
-
   return (
     <tr>
       <td className="fw-semibold">{food.name}</td>
@@ -156,18 +137,14 @@ function IngredientRow({
       <td>
         <NumberInput
           value={ingredient.number_of_servings}
-          onChange={(value) =>
-            update({ number_of_servings: value })
-          }
+          onChange={(value) => update({ number_of_servings: value })}
         />
       </td>
 
       <td>
         <NumberInput
           value={ingredient.serving_amount}
-          onChange={(value) =>
-            update({ serving_amount: value })
-          }
+          onChange={(value) => update({ serving_amount: value })}
         />
       </td>
 
@@ -187,35 +164,23 @@ function IngredientRow({
   );
 }
 
-
 function IngredientTotalsItem({
   ingredient,
   onChange,
 }: {
   ingredient: RecipeIngredient;
-  onChange: (
-    id: number,
-    values: NutrientTotals,
-  ) => void;
+  onChange: (id: number, values: NutrientTotals) => void;
 }) {
   const { data: food } = useFood(ingredient.food);
 
   useEffect(() => {
     if (!food) return;
 
-    onChange(
-      ingredient.id,
-      calculateNutrients(food, ingredient),
-    );
-  }, [
-    food,
-    ingredient.number_of_servings,
-    ingredient.serving_amount,
-  ]);
+    onChange(ingredient.id, calculateNutrients(food, ingredient));
+  }, [food, ingredient.number_of_servings, ingredient.serving_amount]);
 
   return null;
 }
-
 
 function IngredientTotals({
   ingredients,
@@ -225,7 +190,6 @@ function IngredientTotals({
   const [ingredientTotals, setIngredientTotals] = useState<
     Record<number, NutrientTotals>
   >({});
-
 
   useEffect(() => {
     // Remove deleted ingredients from totals
@@ -242,25 +206,18 @@ function IngredientTotals({
     });
   }, [ingredients]);
 
-
   const totals = useMemo(() => {
-    return ingredients.reduce<NutrientTotals>(
-      (sum, ingredient) => {
-        const values =
-          ingredientTotals[ingredient.id] ?? emptyTotals();
+    return ingredients.reduce<NutrientTotals>((sum, ingredient) => {
+      const values = ingredientTotals[ingredient.id] ?? emptyTotals();
 
-        return {
-          energy: sum.energy + values.energy,
-          protein: sum.protein + values.protein,
-          fat: sum.fat + values.fat,
-          carbohydrates:
-            sum.carbohydrates + values.carbohydrates,
-        };
-      },
-      emptyTotals(),
-    );
+      return {
+        energy: sum.energy + values.energy,
+        protein: sum.protein + values.protein,
+        fat: sum.fat + values.fat,
+        carbohydrates: sum.carbohydrates + values.carbohydrates,
+      };
+    }, emptyTotals());
   }, [ingredients, ingredientTotals]);
-
 
   return (
     <>
@@ -283,9 +240,7 @@ function IngredientTotals({
           <td colSpan={2} />
 
           {Object.values(totals).map((value, index) => (
-            <td key={index}>
-              {Math.round(value)}
-            </td>
+            <td key={index}>{Math.round(value)}</td>
           ))}
 
           <td />
@@ -295,35 +250,22 @@ function IngredientTotals({
   );
 }
 
-
-export default function IngredientsCard({
-  recipe,
-}: IngredientsCardProps) {
+export default function IngredientsCard({ recipe }: IngredientsCardProps) {
   const [ingredients, setIngredients] = useState(recipe.ingredients);
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const createMutation = useCreateRecipeIngredient();
   const deleteMutation = useDeleteRecipeIngredient();
 
-
   useEffect(() => {
     setIngredients(recipe.ingredients);
   }, [recipe.ingredients]);
 
-
-  const updateIngredient = (
-    id: number,
-    data: Partial<RecipeIngredient>,
-  ) => {
+  const updateIngredient = (id: number, data: Partial<RecipeIngredient>) => {
     setIngredients((items) =>
-      items.map((item) =>
-        item.id === id
-          ? { ...item, ...data }
-          : item,
-      ),
+      items.map((item) => (item.id === id ? { ...item, ...data } : item)),
     );
   };
-
 
   // FoodPickerModal supports selecting multiple foods at once (checkmarks +
   // "Add N foods"), so this now receives an array and creates one ingredient
@@ -351,11 +293,8 @@ export default function IngredientsCard({
     }
   };
 
-
   const removeIngredient = (id: number) => {
-    setIngredients((items) =>
-      items.filter((item) => item.id !== id),
-    );
+    setIngredients((items) => items.filter((item) => item.id !== id));
 
     deleteMutation.mutate({
       recipeId: recipe.id,
@@ -363,15 +302,11 @@ export default function IngredientsCard({
     });
   };
 
-
   return (
     <div className="card shadow-sm border-0">
       <div className="card-body">
-
         <div className="d-flex justify-content-between mb-4">
-          <h4 className="card-title mb-0">
-            Ingredients
-          </h4>
+          <h4 className="card-title mb-0">Ingredients</h4>
 
           <button
             className="btn btn-primary"
@@ -380,7 +315,6 @@ export default function IngredientsCard({
             Add ingredient
           </button>
         </div>
-
 
         <table className="table table-hover align-middle">
           <thead className="table-light">
@@ -415,7 +349,6 @@ export default function IngredientsCard({
             <IngredientTotals ingredients={ingredients} />
           )}
         </table>
-
       </div>
 
       <FoodPickerModal

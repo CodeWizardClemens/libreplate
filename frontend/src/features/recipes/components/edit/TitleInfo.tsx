@@ -48,10 +48,7 @@ function EditableText<T>({
   }
 
   return (
-    <span
-      onClick={() => edit.edit(field)}
-      style={{ cursor: "pointer" }}
-    >
+    <span onClick={() => edit.edit(field)} style={{ cursor: "pointer" }}>
       {children}
     </span>
   );
@@ -72,17 +69,13 @@ export default function TitleInfo({ recipe }: Props) {
   return (
     <div className="text-center">
       <EditableText field="name" edit={edit}>
-        <h1 className="display-5 text-break mb-2">
-          {recipe.name}
-        </h1>
+        <h1 className="display-5 text-break mb-2">{recipe.name}</h1>
       </EditableText>
 
       <hr className="mt-0" />
 
       <EditableText field="summary" edit={edit} multiline>
-        <p className="text-muted mb-0">
-          {recipe.summary}
-        </p>
+        <p className="text-muted mb-0">{recipe.summary}</p>
       </EditableText>
 
       <style>

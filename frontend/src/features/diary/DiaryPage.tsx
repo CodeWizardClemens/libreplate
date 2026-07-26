@@ -1,11 +1,7 @@
 import { useState } from "react";
 import DailyTotalsBar from "./components//DailyTotalsBar";
 
-import {
-  useDayMeals,
-  useCreateMeal,
-  useCreateMealFood,
-} from "@/api/MealAPI";
+import { useDayMeals, useCreateMeal, useCreateMealFood } from "@/api/MealAPI";
 
 import FoodPickerModal from "../foods/components/FoodPickerModal";
 import RecipePickerModal from "../recipes/components/common/Recipepickermodal";
@@ -33,11 +29,7 @@ export default function DiaryPage() {
 
   const [selectedMeal, setSelectedMeal] = useState<DayMeal | null>(null);
 
-  const {
-    data: meals = [],
-    isLoading,
-    isError,
-  } = useDayMeals(selectedDate);
+  const { data: meals = [], isLoading, isError } = useDayMeals(selectedDate);
 
   const createMeal = useCreateMeal();
   const createMealFood = useCreateMealFood();
@@ -113,8 +105,7 @@ export default function DiaryPage() {
         meal_id: mealId,
         food_id: ingredient.food,
         serving_size: ingredient.serving_amount,
-        number_of_servings:
-          ingredient.number_of_servings * servings,
+        number_of_servings: ingredient.number_of_servings * servings,
       });
     }
 
@@ -168,23 +159,16 @@ export default function DiaryPage() {
       />
 
       {isError && (
-        <div className="alert alert-danger">
-          Failed to load diary.
-        </div>
+        <div className="alert alert-danger">Failed to load diary.</div>
       )}
 
       {!isLoading && meals.length === 0 && (
-        <div className="alert alert-secondary">
-          No meal slots configured.
-        </div>
+        <div className="alert alert-secondary">No meal slots configured.</div>
       )}
 
       <DailyTotalsBar meals={meals} />
 
-      <MealList
-        meals={meals}
-        onAdd={openAddModal}
-      />
+      <MealList meals={meals} onAdd={openAddModal} />
     </div>
   );
 }

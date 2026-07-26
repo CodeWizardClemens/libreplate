@@ -34,9 +34,7 @@ export default function RecipeCardHeader({
       [field]: recipe[field],
     }));
 
-    field === "name"
-      ? setEditingName(true)
-      : setEditingSummary(true);
+    field === "name" ? setEditingName(true) : setEditingSummary(true);
   };
 
   const save = (field: Field) => {
@@ -44,9 +42,7 @@ export default function RecipeCardHeader({
       [field]: values[field],
     });
 
-    field === "name"
-      ? setEditingName(false)
-      : setEditingSummary(false);
+    field === "name" ? setEditingName(false) : setEditingSummary(false);
   };
 
   const cancel = (field: Field) => {
@@ -55,9 +51,7 @@ export default function RecipeCardHeader({
       [field]: recipe[field],
     }));
 
-    field === "name"
-      ? setEditingName(false)
-      : setEditingSummary(false);
+    field === "name" ? setEditingName(false) : setEditingSummary(false);
   };
 
   const nameKeyDown = useEditableFieldKeyboard({
@@ -81,10 +75,7 @@ export default function RecipeCardHeader({
     }));
   };
 
-  const renderEditButton = (
-    field: Field,
-    editing: boolean
-  ) =>
+  const renderEditButton = (field: Field, editing: boolean) =>
     !editing &&
     hoveredField === field && (
       <button
@@ -100,10 +91,7 @@ export default function RecipeCardHeader({
       </button>
     );
 
-  const renderField = (
-    field: Field,
-    editing: boolean
-  ) =>
+  const renderField = (field: Field, editing: boolean) =>
     editing ? (
       field === "name" ? (
         <input
@@ -114,9 +102,7 @@ export default function RecipeCardHeader({
           value={values[field]}
           autoFocus
           onClick={stopCardClick}
-          onChange={(e) =>
-            updateValue(field, e.target.value)
-          }
+          onChange={(e) => updateValue(field, e.target.value)}
           onKeyDown={nameKeyDown}
           onBlur={() => save(field)}
         />
@@ -131,27 +117,18 @@ export default function RecipeCardHeader({
           autoFocus
           rows={1}
           onClick={stopCardClick}
-          onChange={(e) =>
-            updateValue(field, e.target.value)
-          }
+          onChange={(e) => updateValue(field, e.target.value)}
           onKeyDown={summaryKeyDown}
           onBlur={() => save(field)}
         />
       )
     ) : field === "name" ? (
-      <h5 className="card-title mb-0">
-        {recipe[field]}
-      </h5>
+      <h5 className="card-title mb-0">{recipe[field]}</h5>
     ) : (
-      <p className="card-text mb-0">
-        {recipe[field]}
-      </p>
+      <p className="card-text mb-0">{recipe[field]}</p>
     );
 
-  const renderEditableRow = (
-    field: Field,
-    editing: boolean
-  ) => (
+  const renderEditableRow = (field: Field, editing: boolean) => (
     <div
       className="d-flex align-items-center gap-2 w-100"
       onMouseEnter={() => setHoveredField(field)}

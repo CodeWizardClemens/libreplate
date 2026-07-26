@@ -7,8 +7,8 @@ interface Props {
 export default function FoodCardNutrients({ nutrients }: Props) {
   const allowedNutrients = nutrients.filter((nutrient) =>
     ["energy", "protein", "carbohydrates", "fat", "fats"].includes(
-      nutrient.nutrient_name.toLowerCase()
-    )
+      nutrient.nutrient_name.toLowerCase(),
+    ),
   );
 
   if (allowedNutrients.length === 0) {

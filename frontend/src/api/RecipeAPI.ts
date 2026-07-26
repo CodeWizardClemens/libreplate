@@ -1,10 +1,6 @@
 import axios from "axios";
 
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import type {
   Recipe,
@@ -50,15 +46,12 @@ export const recipeKeys = {
 };
 
 export const ingredientKeys = {
-  all: (recipeId: number) =>
-    ["recipe-ingredients", recipeId] as const,
+  all: (recipeId: number) => ["recipe-ingredients", recipeId] as const,
 };
 
 export const pictureKeys = {
-  detail: (recipeId: number) =>
-    ["recipe-picture", recipeId] as const,
+  detail: (recipeId: number) => ["recipe-picture", recipeId] as const,
 };
-
 
 // ========================
 // Recipes
@@ -76,7 +69,6 @@ export function useRecipes() {
   });
 }
 
-
 export function useRecipe(id: number) {
   return useQuery({
     queryKey: recipeKeys.detail(id),
@@ -90,7 +82,6 @@ export function useRecipe(id: number) {
     enabled: Boolean(id),
   });
 }
-
 
 export function useCreateRecipe() {
   const queryClient = useQueryClient();
@@ -110,22 +101,12 @@ export function useCreateRecipe() {
   });
 }
 
-
 export function useUpdateRecipe() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      id,
-      data,
-    }: {
-      id: number;
-      data: RecipeUpdate;
-    }) => {
-      const { data: result } = await api.patch<Recipe>(
-        `${id}/`,
-        data,
-      );
+    mutationFn: async ({ id, data }: { id: number; data: RecipeUpdate }) => {
+      const { data: result } = await api.patch<Recipe>(`${id}/`, data);
 
       return result;
     },
@@ -141,7 +122,6 @@ export function useUpdateRecipe() {
     },
   });
 }
-
 
 export function useDeleteRecipe() {
   const queryClient = useQueryClient();
@@ -159,7 +139,6 @@ export function useDeleteRecipe() {
   });
 }
 
-
 // ========================
 // Favorite / Pin
 // ========================
@@ -169,10 +148,9 @@ export function useToggleFavorite() {
 
   return useMutation({
     mutationFn: async (id: number) => {
-      const { data } =
-        await api.post<ToggleFavoriteResponse>(
-          `${id}/toggle-favorite/`,
-        );
+      const { data } = await api.post<ToggleFavoriteResponse>(
+        `${id}/toggle-favorite/`,
+      );
 
       return data;
     },
@@ -188,17 +166,13 @@ export function useToggleFavorite() {
     },
   });
 }
-
 
 export function useTogglePin() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (id: number) => {
-      const { data } =
-        await api.post<TogglePinResponse>(
-          `${id}/toggle-pin/`,
-        );
+      const { data } = await api.post<TogglePinResponse>(`${id}/toggle-pin/`);
 
       return data;
     },
@@ -214,7 +188,6 @@ export function useTogglePin() {
     },
   });
 }
-
 
 // ========================
 // Copy Recipe
@@ -224,17 +197,8 @@ export function useCopyRecipe() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      id,
-      name,
-    }: {
-      id: number;
-      name: string;
-    }) => {
-      const { data } = await api.post<Recipe>(
-        `${id}/copy/`,
-        { name },
-      );
+    mutationFn: async ({ id, name }: { id: number; name: string }) => {
+      const { data } = await api.post<Recipe>(`${id}/copy/`, { name });
 
       return data;
     },
@@ -250,7 +214,6 @@ export function useCopyRecipe() {
     },
   });
 }
-
 
 // ========================
 // Tags
@@ -268,16 +231,12 @@ export function useRecipeTags() {
   });
 }
 
-
 export function useCreateRecipeTag() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (name: string) => {
-      const { data } = await api.post<RecipeTag>(
-        "tags/",
-        { name },
-      );
+      const { data } = await api.post<RecipeTag>("tags/", { name });
 
       return data;
     },
@@ -289,7 +248,6 @@ export function useCreateRecipeTag() {
     },
   });
 }
-
 
 export function useDeleteRecipeTag() {
   const queryClient = useQueryClient();
@@ -307,7 +265,6 @@ export function useDeleteRecipeTag() {
   });
 }
 
-
 // ========================
 // Ingredients
 // ========================
@@ -317,10 +274,9 @@ export function useRecipeIngredients(recipeId: number) {
     queryKey: ingredientKeys.all(recipeId),
 
     queryFn: async () => {
-      const { data } =
-        await api.get<RecipeIngredient[]>(
-          `${recipeId}/ingredients/`,
-        );
+      const { data } = await api.get<RecipeIngredient[]>(
+        `${recipeId}/ingredients/`,
+      );
 
       return data;
     },
@@ -329,22 +285,14 @@ export function useRecipeIngredients(recipeId: number) {
   });
 }
 
-
-export function useRecipeIngredient(
-  recipeId: number,
-  ingredientId: number,
-) {
+export function useRecipeIngredient(recipeId: number, ingredientId: number) {
   return useQuery({
-    queryKey: [
-      ...ingredientKeys.all(recipeId),
-      ingredientId,
-    ],
+    queryKey: [...ingredientKeys.all(recipeId), ingredientId],
 
     queryFn: async () => {
-      const { data } =
-        await api.get<RecipeIngredient>(
-          `${recipeId}/ingredients/${ingredientId}/`,
-        );
+      const { data } = await api.get<RecipeIngredient>(
+        `${recipeId}/ingredients/${ingredientId}/`,
+      );
 
       return data;
     },
@@ -352,7 +300,6 @@ export function useRecipeIngredient(
     enabled: Boolean(recipeId && ingredientId),
   });
 }
-
 
 export function useCreateRecipeIngredient() {
   const queryClient = useQueryClient();
@@ -365,25 +312,21 @@ export function useCreateRecipeIngredient() {
       recipeId: number;
       data: RecipeIngredientCreate;
     }) => {
-      const { data: result } =
-        await api.post<RecipeIngredient>(
-          `${recipeId}/ingredients/`,
-          data,
-        );
+      const { data: result } = await api.post<RecipeIngredient>(
+        `${recipeId}/ingredients/`,
+        data,
+      );
 
       return result;
     },
 
     onSuccess(_, variables) {
       queryClient.invalidateQueries({
-        queryKey: ingredientKeys.all(
-          variables.recipeId,
-        ),
+        queryKey: ingredientKeys.all(variables.recipeId),
       });
     },
   });
 }
-
 
 export function useUpdateRecipeIngredient() {
   const queryClient = useQueryClient();
@@ -398,25 +341,21 @@ export function useUpdateRecipeIngredient() {
       ingredientId: number;
       data: RecipeIngredientUpdate;
     }) => {
-      const { data: result } =
-        await api.patch<RecipeIngredient>(
-          `${recipeId}/ingredients/${ingredientId}/`,
-          data,
-        );
+      const { data: result } = await api.patch<RecipeIngredient>(
+        `${recipeId}/ingredients/${ingredientId}/`,
+        data,
+      );
 
       return result;
     },
 
     onSuccess(_, variables) {
       queryClient.invalidateQueries({
-        queryKey: ingredientKeys.all(
-          variables.recipeId,
-        ),
+        queryKey: ingredientKeys.all(variables.recipeId),
       });
     },
   });
 }
-
 
 export function useDeleteRecipeIngredient() {
   const queryClient = useQueryClient();
@@ -429,21 +368,16 @@ export function useDeleteRecipeIngredient() {
       recipeId: number;
       ingredientId: number;
     }) => {
-      await api.delete(
-        `${recipeId}/ingredients/${ingredientId}/`,
-      );
+      await api.delete(`${recipeId}/ingredients/${ingredientId}/`);
     },
 
     onSuccess(_, variables) {
       queryClient.invalidateQueries({
-        queryKey: ingredientKeys.all(
-          variables.recipeId,
-        ),
+        queryKey: ingredientKeys.all(variables.recipeId),
       });
     },
   });
 }
-
 
 // ========================
 // Recipe Picture
@@ -464,45 +398,37 @@ export function useUploadRecipePicture() {
 
       formData.append("image", file);
 
-      const { data } =
-        await api.post<RecipePicture>(
-          `${recipeId}/picture/`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
+      const { data } = await api.post<RecipePicture>(
+        `${recipeId}/picture/`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
           },
-        );
+        },
+      );
 
       return data;
     },
 
     onSuccess(_, variables) {
       queryClient.invalidateQueries({
-        queryKey: recipeKeys.detail(
-          variables.recipeId,
-        ),
+        queryKey: recipeKeys.detail(variables.recipeId),
       });
 
       queryClient.invalidateQueries({
-        queryKey: pictureKeys.detail(
-          variables.recipeId,
-        ),
+        queryKey: pictureKeys.detail(variables.recipeId),
       });
     },
   });
 }
-
 
 export function useDeleteRecipePicture() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (recipeId: number) => {
-      await api.delete(
-        `${recipeId}/picture/`,
-      );
+      await api.delete(`${recipeId}/picture/`);
     },
 
     onSuccess(_, recipeId) {

@@ -1,9 +1,5 @@
 import axios from "axios";
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import type {
   Meal,
@@ -104,7 +100,9 @@ export function useUpdateMeal() {
     },
     onSuccess(_, variables) {
       queryClient.invalidateQueries({ queryKey: mealKeys.all });
-      queryClient.invalidateQueries({ queryKey: mealKeys.detail(variables.id) });
+      queryClient.invalidateQueries({
+        queryKey: mealKeys.detail(variables.id),
+      });
     },
   });
 }
@@ -143,14 +141,11 @@ export function useCreateMealFood() {
 export function useUpdateMealFood() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({
-      id,
-      data,
-    }: {
-      id: number;
-      data: MealFoodUpdate;
-    }) => {
-      const { data: result } = await mealFoodApi.patch<MealFood>(`${id}/`, data);
+    mutationFn: async ({ id, data }: { id: number; data: MealFoodUpdate }) => {
+      const { data: result } = await mealFoodApi.patch<MealFood>(
+        `${id}/`,
+        data,
+      );
       return result;
     },
     onSuccess(data) {
@@ -208,8 +203,17 @@ export function useCreateDefaultMeal() {
 export function useUpdateDefaultMeal() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: DefaultMealUpdate }) => {
-      const { data: result } = await api.patch<DefaultMeal>(`defaults/${id}/`, data);
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: number;
+      data: DefaultMealUpdate;
+    }) => {
+      const { data: result } = await api.patch<DefaultMeal>(
+        `defaults/${id}/`,
+        data,
+      );
       return result;
     },
     onSuccess() {

@@ -2,10 +2,7 @@ import { useState } from "react";
 
 import type { RecipeTag } from "@/types/RecipeTypes";
 
-import {
-  useCreateRecipeTag,
-  useDeleteRecipeTag,
-} from "@/api/RecipeAPI";
+import { useCreateRecipeTag, useDeleteRecipeTag } from "@/api/RecipeAPI";
 
 interface Props {
   open: boolean;
@@ -13,11 +10,7 @@ interface Props {
   tags: RecipeTag[];
 }
 
-export default function TagModal({
-  open,
-  onClose,
-  tags,
-}: Props) {
+export default function TagModal({ open, onClose, tags }: Props) {
   const [newTag, setNewTag] = useState("");
 
   const createTag = useCreateRecipeTag();
@@ -43,10 +36,7 @@ export default function TagModal({
 
   return (
     <>
-      <div
-        className="modal-backdrop fade show"
-        onClick={onClose}
-      />
+      <div className="modal-backdrop fade show" onClick={onClose} />
 
       <div
         className="modal fade show d-block"
@@ -54,15 +44,10 @@ export default function TagModal({
         role="dialog"
         aria-modal="true"
       >
-        <div
-          className="modal-dialog modal-dialog-centered"
-          role="document"
-        >
+        <div className="modal-dialog modal-dialog-centered" role="document">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title">
-                Tags
-              </h5>
+              <h5 className="modal-title">Tags</h5>
 
               <button
                 type="button"
@@ -81,10 +66,7 @@ export default function TagModal({
                   placeholder="New tag"
                 />
 
-                <button
-                  className="btn btn-primary"
-                  onClick={handleCreate}
-                >
+                <button className="btn btn-primary" onClick={handleCreate}>
                   Add
                 </button>
               </div>
@@ -100,9 +82,7 @@ export default function TagModal({
                       align-items-center
                     "
                   >
-                    <span>
-                      {tag.name}
-                    </span>
+                    <span>{tag.name}</span>
 
                     <button
                       type="button"

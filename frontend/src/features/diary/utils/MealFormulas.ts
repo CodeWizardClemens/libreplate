@@ -1,4 +1,4 @@
-import type { MealFood } from "@/types/MealTypes"
+import type { MealFood } from "@/types/MealTypes";
 
 export function computeMealTotals(mealFoods: MealFood[]) {
   const totals = {
@@ -9,7 +9,7 @@ export function computeMealTotals(mealFoods: MealFood[]) {
   };
 
   for (const mf of mealFoods) {
-    const multiplier = mf.serving_size * mf.number_of_servings / 100;
+    const multiplier = (mf.serving_size * mf.number_of_servings) / 100;
 
     for (const n of mf.food.nutrients) {
       const amount = n.amount * multiplier;

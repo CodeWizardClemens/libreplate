@@ -12,7 +12,7 @@ export function useEditableFieldKeyboard({
   allowEnter = true,
 }: Options) {
   return (
-    event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     if (event.key === "Escape") {
       event.preventDefault();

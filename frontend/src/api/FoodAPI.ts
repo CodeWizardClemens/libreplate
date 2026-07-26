@@ -1,17 +1,8 @@
 import axios from "axios";
 
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import type {
-  Food,
-  FoodCreate,
-  FoodUpdate,
-} from "@/types/FoodTypes";
-
+import type { Food, FoodCreate, FoodUpdate } from "@/types/FoodTypes";
 
 function getCsrfToken() {
   const cookie = document.cookie
@@ -21,12 +12,10 @@ function getCsrfToken() {
   return cookie?.split("=")[1];
 }
 
-
 const api = axios.create({
   baseURL: "/api/foods/",
   withCredentials: true,
 });
-
 
 api.interceptors.request.use((config) => {
   const csrfToken = getCsrfToken();
@@ -38,13 +27,11 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-
 export const foodKeys = {
   all: ["foods"] as const,
 
   detail: (id: number) => ["foods", id] as const,
 };
-
 
 // ========================
 // Foods
@@ -62,7 +49,6 @@ export function useFoods() {
   });
 }
 
-
 export function useFood(id: number) {
   return useQuery({
     queryKey: foodKeys.detail(id),
@@ -74,7 +60,6 @@ export function useFood(id: number) {
     },
   });
 }
-
 
 export function useCreateFood() {
   const queryClient = useQueryClient();
@@ -94,22 +79,12 @@ export function useCreateFood() {
   });
 }
 
-
 export function useUpdateFood() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      id,
-      data,
-    }: {
-      id: number;
-      data: FoodUpdate;
-    }) => {
-      const { data: result } = await api.patch<Food>(
-        `${id}/`,
-        data,
-      );
+    mutationFn: async ({ id, data }: { id: number; data: FoodUpdate }) => {
+      const { data: result } = await api.patch<Food>(`${id}/`, data);
 
       return result;
     },
@@ -125,7 +100,6 @@ export function useUpdateFood() {
     },
   });
 }
-
 
 export function useDeleteFood() {
   const queryClient = useQueryClient();

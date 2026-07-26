@@ -8,11 +8,7 @@ interface Props {
   height?: number;
 }
 
-export default function RecipeCardPicture({
-  recipeId,
-  width,
-  height,
-}: Props) {
+export default function RecipeCardPicture({ recipeId, width, height }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const uploadPicture = useUploadRecipePicture();
@@ -21,16 +17,12 @@ export default function RecipeCardPicture({
     event.stopPropagation();
   }
 
-  function handleEditClick(
-    event: React.MouseEvent<HTMLButtonElement>
-  ) {
+  function handleEditClick(event: React.MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
     fileInputRef.current?.click();
   }
 
-  function handleFileChange(
-    event: React.ChangeEvent<HTMLInputElement>
-  ) {
+  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     event.stopPropagation();
 
     const file = event.target.files?.[0];
@@ -110,10 +102,7 @@ export default function RecipeCardPicture({
         onClick={handleEditClick}
         title="Change picture"
       >
-        <i
-          className="bi bi-pencil"
-          aria-hidden="true"
-        />
+        <i className="bi bi-pencil" aria-hidden="true" />
       </button>
 
       <input

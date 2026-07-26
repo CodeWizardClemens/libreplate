@@ -10,11 +10,7 @@ interface Props {
   onToggleFavorite?: (id: number) => void;
 }
 
-export default function FoodList({
-  foods,
-  onDelete,
-  onToggleFavorite,
-}: Props) {
+export default function FoodList({ foods, onDelete, onToggleFavorite }: Props) {
   return (
     <div className="d-flex flex-column gap-3">
       {foods.map((food) => (

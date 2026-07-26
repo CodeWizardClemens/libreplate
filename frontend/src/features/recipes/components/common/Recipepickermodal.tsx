@@ -59,23 +59,21 @@ export default function RecipePickerModal({
       >
         <h2 className="mb-3">Select recipe</h2>
 
-          <div className="mb-3">
-            <input
-              type="text"
-              className="form-control rounded-2"
-              placeholder="Search recipes..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
+        <div className="mb-3">
+          <input
+            type="text"
+            className="form-control rounded-2"
+            placeholder="Search recipes..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
 
         {/* {isLoading && (
           <p className="text-muted">Loading recipes...</p>
         )} */}
 
-        {isError && (
-          <p className="text-danger">Failed to load recipes.</p>
-        )}
+        {isError && <p className="text-danger">Failed to load recipes.</p>}
 
         <div
           className="list-group overflow-auto flex-grow-1"
@@ -105,17 +103,12 @@ export default function RecipePickerModal({
           ))}
 
           {!isLoading && filteredRecipes.length === 0 && (
-            <p className="text-muted mt-3">
-              No recipes found.
-            </p>
+            <p className="text-muted mt-3">No recipes found.</p>
           )}
         </div>
 
         <div className="mt-3 d-flex justify-content-end">
-          <button
-            className="btn btn-secondary"
-            onClick={handleClose}
-          >
+          <button className="btn btn-secondary" onClick={handleClose}>
             Cancel
           </button>
         </div>

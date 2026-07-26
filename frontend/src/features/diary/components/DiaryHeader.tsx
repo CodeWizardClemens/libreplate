@@ -41,13 +41,12 @@ export default function DiaryHeader({
       month: "long",
       day: "numeric",
       year: "numeric",
-    }
+    },
   );
 
   return (
     <div className="d-flex justify-content-center mb-3">
       <div className="d-flex flex-wrap justify-content-center align-items-center gap-2">
-
         <button
           onClick={onPrevious}
           className="btn btn-outline-secondary d-flex align-items-center gap-1 flex-shrink-0"
@@ -58,7 +57,10 @@ export default function DiaryHeader({
         </button>
 
         {/* Date picker button */}
-        <div className="position-relative flex-shrink-0" style={{ minWidth: "170px" }}>
+        <div
+          className="position-relative flex-shrink-0"
+          style={{ minWidth: "170px" }}
+        >
           {/* Hidden native input - positioned absolutely but below the button */}
           <input
             ref={dateInputRef}
@@ -74,7 +76,7 @@ export default function DiaryHeader({
             }}
             tabIndex={-1}
           />
-          
+
           <button
             onClick={handleButtonClick}
             type="button"

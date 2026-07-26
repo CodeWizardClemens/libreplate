@@ -30,7 +30,7 @@ export default function FoodCardHeader({
   const [hoveredField, setHoveredField] = useState<Field | null>(null);
 
   const currentValue = (field: Field) =>
-    field === "name" ? food.name : food.description ?? "";
+    field === "name" ? food.name : (food.description ?? "");
 
   const edit = (field: Field) => {
     setValues((v) => ({
@@ -38,9 +38,7 @@ export default function FoodCardHeader({
       [field]: currentValue(field),
     }));
 
-    field === "name"
-      ? setEditingName(true)
-      : setEditingDescription(true);
+    field === "name" ? setEditingName(true) : setEditingDescription(true);
   };
 
   const save = (field: Field) => {
@@ -48,9 +46,7 @@ export default function FoodCardHeader({
       [field]: values[field],
     });
 
-    field === "name"
-      ? setEditingName(false)
-      : setEditingDescription(false);
+    field === "name" ? setEditingName(false) : setEditingDescription(false);
   };
 
   const cancel = (field: Field) => {
@@ -59,9 +55,7 @@ export default function FoodCardHeader({
       [field]: currentValue(field),
     }));
 
-    field === "name"
-      ? setEditingName(false)
-      : setEditingDescription(false);
+    field === "name" ? setEditingName(false) : setEditingDescription(false);
   };
 
   const nameKeyDown = useEditableFieldKeyboard({
@@ -85,10 +79,7 @@ export default function FoodCardHeader({
     }));
   };
 
-  const renderEditButton = (
-    field: Field,
-    editing: boolean
-  ) =>
+  const renderEditButton = (field: Field, editing: boolean) =>
     !editing &&
     hoveredField === field && (
       <button
@@ -104,10 +95,7 @@ export default function FoodCardHeader({
       </button>
     );
 
-  const renderField = (
-    field: Field,
-    editing: boolean
-  ) =>
+  const renderField = (field: Field, editing: boolean) =>
     editing ? (
       field === "name" ? (
         <input
@@ -118,9 +106,7 @@ export default function FoodCardHeader({
           value={values[field]}
           autoFocus
           onClick={stopCardClick}
-          onChange={(e) =>
-            updateValue(field, e.target.value)
-          }
+          onChange={(e) => updateValue(field, e.target.value)}
           onKeyDown={nameKeyDown}
           onBlur={() => save(field)}
         />
@@ -135,27 +121,20 @@ export default function FoodCardHeader({
           autoFocus
           rows={1}
           onClick={stopCardClick}
-          onChange={(e) =>
-            updateValue(field, e.target.value)
-          }
+          onChange={(e) => updateValue(field, e.target.value)}
           onKeyDown={descriptionKeyDown}
           onBlur={() => save(field)}
         />
       )
     ) : field === "name" ? (
-      <h5 className="card-title mb-0">
-        {food.name}
-      </h5>
+      <h5 className="card-title mb-0">{food.name}</h5>
     ) : (
       <p className="card-text mb-0 text-muted">
         {food.description || "No description"}
       </p>
     );
 
-  const renderEditableRow = (
-    field: Field,
-    editing: boolean
-  ) => (
+  const renderEditableRow = (field: Field, editing: boolean) => (
     <div
       className="d-flex align-items-center gap-2 w-100"
       onMouseEnter={() => setHoveredField(field)}

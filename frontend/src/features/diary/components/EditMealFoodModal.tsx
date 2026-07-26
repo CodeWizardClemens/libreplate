@@ -82,7 +82,9 @@ export default function EditMealFoodModal({ item, onClose }: Props) {
           />
         </div>
 
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+        <div
+          style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}
+        >
           <button className="btn btn-secondary" onClick={onClose}>
             Cancel
           </button>

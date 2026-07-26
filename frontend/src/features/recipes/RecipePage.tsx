@@ -90,14 +90,12 @@ export default function RecipePage() {
 
         case "created_at":
           return (
-            new Date(b.created_at).getTime() -
-            new Date(a.created_at).getTime()
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
           );
 
         case "updated_at":
           return (
-            new Date(b.updated_at).getTime() -
-            new Date(a.updated_at).getTime()
+            new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
           );
 
         case "last_used_at":
@@ -116,7 +114,6 @@ export default function RecipePage() {
 
   return (
     <div className="container">
-
       <div className="text-start mb-2">
         <button
           type="button"
