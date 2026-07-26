@@ -77,7 +77,7 @@ WSGI_APPLICATION = "libreplate.wsgi.application"
 
 DATABASES = {
     "default": env.db(
-        default="postgres://postgres:password@localhost:5432/libreplate"
+        "DATABASE_URL"
     )
 }
 
@@ -149,12 +149,14 @@ LOGGING = {
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "https://libreplate.alwaysdata.net",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
+    "https://libreplate.alwaysdata.net",
 ]
 
 REST_FRAMEWORK = {
@@ -166,3 +168,6 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ],
 }
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
