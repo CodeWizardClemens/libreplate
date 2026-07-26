@@ -20,7 +20,7 @@ export interface Food {
 
 export interface FoodCreate {
   name: string;
-  serving?: number | null;
+  serving?: number;
   unitID: string;
   barcode?: string | null;
   brand?: string | null;
