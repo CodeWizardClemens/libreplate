@@ -69,9 +69,9 @@ export default function RecipePickerModal({
             />
           </div>
 
-        {isLoading && (
+        {/* {isLoading && (
           <p className="text-muted">Loading recipes...</p>
-        )}
+        )} */}
 
         {isError && (
           <p className="text-danger">Failed to load recipes.</p>

@@ -167,12 +167,6 @@ export default function DiaryPage() {
         onToday={() => setSelectedDate(todayString)}
       />
 
-      {isLoading && (
-        <div className="alert alert-info">
-          Loading meals...
-        </div>
-      )}
-
       {isError && (
         <div className="alert alert-danger">
           Failed to load diary.

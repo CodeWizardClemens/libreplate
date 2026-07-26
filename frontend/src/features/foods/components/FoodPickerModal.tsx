@@ -125,7 +125,7 @@ export default function FoodPickerModal({
           }}
         />
 
-        {isLoading && <p>Loading foods...</p>}
+        {/* {isLoading && <p>Loading foods...</p>} */}
 
         {isError && <p>Failed to load foods.</p>}
 
