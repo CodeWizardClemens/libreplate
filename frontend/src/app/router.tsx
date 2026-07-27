@@ -2,9 +2,7 @@ import { createBrowserRouter, Navigate, redirect } from "react-router-dom";
 
 import AppLayout from "./AppLayout";
 
-import {
-  accountsMeRetrieve,
-} from "@/api/generated/sdk.gen";
+import { accountsMeRetrieve } from "@/api/generated/sdk.gen";
 
 import LoginPage from "../features/auth/LoginPage";
 import RecipesPage from "../features/recipes/RecipePage";
@@ -23,13 +21,17 @@ function Placeholder({ title }: { title: string }) {
 }
 
 async function authLoader() {
-  try {
-    const response = await accountsMeRetrieve();
+  // The generated client does NOT throw on error responses by default -
+  // it resolves with { data, error, response }. A try/catch here would
+  // never fire on a 401, so unauthenticated users would never be
+  // redirected. Check `error` explicitly instead.
+  const { data, error } = await accountsMeRetrieve();
 
-    return response.data;
-  } catch {
+  if (error || !data) {
     throw redirect("/login");
   }
+
+  return data;
 }
 
 const router = createBrowserRouter([
