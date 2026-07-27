@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import type { Recipe, RecipeIngredient } from "@/types/RecipeTypes";
-import {
-  type Food,
-  foodsRetrieve,
-} from "@/api/generated";
+import { type Food, foodsRetrieve } from "@/api/generated";
 
 import {
   useCreateRecipeIngredient,

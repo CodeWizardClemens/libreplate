@@ -55,13 +55,7 @@ export default function FoodsPage() {
   });
 
   const updateFood = useMutation({
-    mutationFn: ({
-      id,
-      data,
-    }: {
-      id: number;
-      data: Partial<FoodWritable>;
-    }) =>
+    mutationFn: ({ id, data }: { id: number; data: Partial<FoodWritable> }) =>
       foodsPartialUpdate({
         path: {
           id,
@@ -163,9 +157,7 @@ export default function FoodsPage() {
           onSearchChange={setSearch}
           foodCount={filteredFoods.length}
           showFavorites={showFavorites}
-          onToggleFavorites={() =>
-            setShowFavorites(!showFavorites)
-          }
+          onToggleFavorites={() => setShowFavorites(!showFavorites)}
           sortMethod={sortMethod}
           onSortChange={setSortMethod}
         />

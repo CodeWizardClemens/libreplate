@@ -14,7 +14,6 @@ from integrations.models import USDAAPISettings
 from nutrients.models import Nutrient
 from units.models import Unit, UnitScope
 
-
 USDA_API_BASE_URL = "https://api.nal.usda.gov/fdc/v1"
 
 MIN_PAGE_SIZE = 1
@@ -96,9 +95,7 @@ def _get_api_key() -> str:
     try:
         return USDAAPISettings.objects.get().key
     except USDAAPISettings.DoesNotExist as exc:
-        raise USDAError(
-            "USDA API key is not configured."
-        ) from exc
+        raise USDAError("USDA API key is not configured.") from exc
 
 
 def _request(
@@ -119,9 +116,7 @@ def _request(
         raise USDAError("Food not found.")
 
     if not response.ok:
-        raise USDAError(
-            f"USDA API error: {response.status_code} {response.text}"
-        )
+        raise USDAError(f"USDA API error: {response.status_code} {response.text}")
 
     return response.json()
 
@@ -185,10 +180,7 @@ def _create_usda_food(
 
     data.update(
         brand=_extract_brand(food_data),
-        description=(
-            food_data.get("ingredients")
-            or food_data.get("description")
-        ),
+        description=(food_data.get("ingredients") or food_data.get("description")),
     )
 
     return USDAFood(**data)
@@ -232,9 +224,7 @@ def _save_nutrients(
         if not nutrient:
             continue
 
-        db_nutrient = nutrient_map.get(
-            str(nutrient.get("number"))
-        )
+        db_nutrient = nutrient_map.get(str(nutrient.get("number")))
 
         if not db_nutrient:
             continue
@@ -242,9 +232,7 @@ def _save_nutrients(
         FoodNutrient.objects.create(
             food=food,
             nutrient=db_nutrient,
-            amount=Decimal(
-                str(item.get("amount", 0))
-            ),
+            amount=Decimal(str(item.get("amount", 0))),
         )
 
 

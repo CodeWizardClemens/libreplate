@@ -1,6 +1,5 @@
 //  TODO this file should be deleted, generated API has to be used instead.
 
-
 import axios from "axios";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";

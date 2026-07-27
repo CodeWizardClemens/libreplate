@@ -22,10 +22,7 @@ export default function FoodCard({ food, onDelete, onToggleFavorite }: Props) {
     return null;
   }
 
-  async function updateFoodData(data: {
-    name?: string;
-    description?: string;
-  }) {
+  async function updateFoodData(data: { name?: string; description?: string }) {
     await foodsPartialUpdate({
       path: {
         id: food.id,

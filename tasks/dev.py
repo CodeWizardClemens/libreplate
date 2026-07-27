@@ -25,6 +25,14 @@ from .utils import (
     uv_run,
 )
 
+QUALITY_CHECK_EXCLUDED_PATHS = [
+    BASE_DIR / "frontend/src/app/api/generated",
+]
+
+
+def QUALITY_CHECK_EXCLUDED_PATHS_args() -> str:
+    return " ".join(f"--exclude {path}" for path in QUALITY_CHECK_EXCLUDED_PATHS)
+
 
 def isort_cmd(check_only: bool = False) -> str:
     args = [
@@ -36,6 +44,9 @@ def isort_cmd(check_only: bool = False) -> str:
         "backend/pyproject.toml",
     ]
 
+    for path in QUALITY_CHECK_EXCLUDED_PATHS:
+        args.extend(["--skip", str(path)])
+
     if check_only:
         args.insert(2, "--check-only")
 
@@ -43,7 +54,14 @@ def isort_cmd(check_only: bool = False) -> str:
 
 
 def black_cmd() -> str:
-    return f"black {BASE_DIR} --check --exclude '(/\\.venv/)'"
+    excludes = [
+        r"/\.venv/",
+        *[
+            str(path).replace(str(BASE_DIR), "").replace("\\", "/")
+            for path in QUALITY_CHECK_EXCLUDED_PATHS
+        ],
+    ]
+    return f"black {BASE_DIR} --check --exclude '({'|'.join(excludes)})'"
 
 
 def ruff_check_cmd(fix: bool = False, exit_zero: bool = False) -> str:
@@ -52,7 +70,7 @@ def ruff_check_cmd(fix: bool = False, exit_zero: bool = False) -> str:
         "check",
         str(BASE_DIR),
         "--exclude",
-        str(VENV_DIR),
+        ",".join(str(path) for path in [VENV_DIR, *QUALITY_CHECK_EXCLUDED_PATHS]),
     ]
 
     if fix:
@@ -101,8 +119,14 @@ def code_check(c: Context, verbose: bool = False) -> None:
     uv_run(c, isort_cmd(check_only=True), quiet_stdout=not verbose)
     uv_run(c, black_cmd(), quiet_stdout=not verbose)
     uv_run(c, ruff_check_cmd(fix=True), quiet_stdout=not verbose)
-    npx_run(c, "oxlint .", quiet_stdout=not verbose)
-    npx_run(c, "prettier --check .", quiet_stdout=not verbose)
+    npx_run(
+        c, f"oxlint . {QUALITY_CHECK_EXCLUDED_PATHS_args()}", quiet_stdout=not verbose
+    )
+    npx_run(
+        c,
+        f"prettier --check . {QUALITY_CHECK_EXCLUDED_PATHS_args()}",
+        quiet_stdout=not verbose,
+    )
 
     print_success(message="Succesfully ran all code checks")
 
@@ -116,10 +140,18 @@ def code_format(c: Context, verbose: bool = False) -> None:
     if verbose:
         info("Formatting codebase.")
 
-    npx_run(c, "prettier --write .", quiet_stdout=not verbose)
+    npx_run(
+        c,
+        f"prettier --write . {QUALITY_CHECK_EXCLUDED_PATHS_args()}",
+        quiet_stdout=not verbose,
+    )
     uv_run(c, isort_cmd(), quiet_stdout=not verbose)
     uv_run(c, black_cmd().replace("--check", ""), quiet_stdout=not verbose)
-    uv_run(c, f"ruff format {BASE_DIR} --exclude {VENV_DIR}", quiet_stdout=not verbose)
+    uv_run(
+        c,
+        f"ruff format {BASE_DIR} --exclude {','.join(str(path) for path in [VENV_DIR, *QUALITY_CHECK_EXCLUDED_PATHS])}",
+        quiet_stdout=not verbose,
+    )
     uv_run(c, ruff_check_cmd(fix=True, exit_zero=True), quiet_stdout=not verbose)
 
     print_success(message="Succesfully ran all formatters")

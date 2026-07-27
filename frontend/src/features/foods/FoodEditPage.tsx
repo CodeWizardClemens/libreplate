@@ -114,9 +114,7 @@ export default function FoodEditPage() {
     const relevantNutrients = availableNutrients.filter(
       (nutrient: Nutrient) =>
         nutrient.show_in_food_edit ||
-        food.nutrients?.some(
-          (n) => n.nutrient_id === nutrient.id,
-        ),
+        food.nutrients?.some((n) => n.nutrient_id === nutrient.id),
     );
 
     const merged: FoodNutrient[] = relevantNutrients.map(
@@ -256,9 +254,7 @@ export default function FoodEditPage() {
                 value={serving}
                 onChange={(e) =>
                   setServing(
-                    e.target.value === ""
-                      ? ""
-                      : Number(e.target.value),
+                    e.target.value === "" ? "" : Number(e.target.value),
                   )
                 }
               />
@@ -269,9 +265,7 @@ export default function FoodEditPage() {
               <input
                 className="form-control"
                 value={unitID}
-                onChange={(e) =>
-                  setUnit(Number(e.target.value))
-                }
+                onChange={(e) => setUnit(Number(e.target.value))}
               />
             </div>
 
@@ -291,15 +285,10 @@ export default function FoodEditPage() {
                   className="form-check-input"
                   id="isFavorite"
                   checked={isFavorite}
-                  onChange={(e) =>
-                    setIsFavorite(e.target.checked)
-                  }
+                  onChange={(e) => setIsFavorite(e.target.checked)}
                 />
 
-                <label
-                  className="form-check-label"
-                  htmlFor="isFavorite"
-                >
+                <label className="form-check-label" htmlFor="isFavorite">
                   Favorite
                 </label>
               </div>
@@ -311,9 +300,7 @@ export default function FoodEditPage() {
           <h5 className="mb-3">Nutrients</h5>
 
           {nutrients.length === 0 && (
-            <p className="text-muted">
-              No nutrients configured.
-            </p>
+            <p className="text-muted">No nutrients configured.</p>
           )}
 
           {nutrients.map((nutrient, index) => (
@@ -338,16 +325,11 @@ export default function FoodEditPage() {
                 }}
                 value={nutrient.amount}
                 onChange={(e) =>
-                  updateNutrientAmount(
-                    index,
-                    Number(e.target.value),
-                  )
+                  updateNutrientAmount(index, Number(e.target.value))
                 }
               />
 
-              <span className="text-muted">
-                {nutrient.nutrient_unit}
-              </span>
+              <span className="text-muted">{nutrient.nutrient_unit}</span>
             </div>
           ))}
 

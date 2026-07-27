@@ -23,10 +23,7 @@ class Recipe(models.Model):
 
         if per_portion and self.portions:
             divisor = Decimal(str(self.portions))
-            totals = {
-                nutrient: amount / divisor
-                for nutrient, amount in totals.items()
-            }
+            totals = {nutrient: amount / divisor for nutrient, amount in totals.items()}
 
         totals = {
             nutrient: amount.quantize(Decimal("1"), rounding=ROUND_HALF_UP)

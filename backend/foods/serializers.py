@@ -115,9 +115,7 @@ class FoodSerializer(serializers.ModelSerializer):
         ]
 
     def _set_nutrients(self, food, nutrients):
-        FoodNutrient.objects.filter(
-            food=food
-        ).delete()
+        FoodNutrient.objects.filter(food=food).delete()
 
         FoodNutrient.objects.bulk_create(
             [
@@ -137,9 +135,7 @@ class FoodSerializer(serializers.ModelSerializer):
             [],
         )
 
-        food = Food.objects.create(
-            **validated_data
-        )
+        food = Food.objects.create(**validated_data)
 
         self._set_nutrients(
             food,

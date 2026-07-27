@@ -102,9 +102,7 @@ export default function FoodPickerModal({
   }
 
   function handleConfirm() {
-    const selectedFoods = foods.filter((food) =>
-      selectedIds.has(food.id),
-    );
+    const selectedFoods = foods.filter((food) => selectedIds.has(food.id));
 
     if (selectedFoods.length === 0) {
       return;
