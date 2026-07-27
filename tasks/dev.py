@@ -11,6 +11,7 @@ including:
 """
 
 import shlex
+
 from invoke import Context, task
 
 from .utils import (
@@ -86,6 +87,7 @@ def user_add_dummy(c: Context):
         f"{shlex.quote(password)} "
         "--skip-password-validation",
     )
+
 
 @task(help={"verbose": "Show stdout output from commands."})
 def code_check(c: Context, verbose: bool = False) -> None:
