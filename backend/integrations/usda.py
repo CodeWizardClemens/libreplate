@@ -7,59 +7,98 @@ from typing import Any
 import requests
 from django.contrib.auth.models import User
 from django.db import transaction
+from pydantic import BaseModel, ConfigDict, Field
 
 from foods.models import Food, FoodNutrient
 from integrations.models import USDAAPISettings
 from nutrients.models import Nutrient
 from units.models import Unit, UnitScope
 
+
 USDA_API_BASE_URL = "https://api.nal.usda.gov/fdc/v1"
 
-MAX_PAGE_SIZE = 50
 MIN_PAGE_SIZE = 1
-
-MAX_PAGE_NUMBER = 1000
+MAX_PAGE_SIZE = 50
 MIN_PAGE_NUMBER = 1
+MAX_PAGE_NUMBER = 1000
 
 
 class USDAError(Exception):
     """Raised when the USDA API cannot be queried successfully."""
 
 
+class USDAFoodNutrient(BaseModel):
+    amount: Decimal = Decimal("0")
+    nutrient_number: str | None = Field(None, alias="number")
+    nutrient_name: str | None = Field(None, alias="name")
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class USDAFood(BaseModel):
+    name: str = Field(alias="description")
+    serving: float = 100
+    unit_name: str = "g"
+
+    brand: str | None = None
+    description: str | None = None
+
+    fdc_id: int | None = Field(None, alias="fdcId")
+    data_type: str | None = Field(None, alias="dataType")
+
+    food_nutrients: list[dict[str, Any]] = Field(
+        default_factory=list,
+        alias="foodNutrients",
+    )
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    def to_food(
+        self,
+        *,
+        user: User,
+        unit: Unit | None,
+    ) -> Food:
+        return Food(
+            user=user,
+            name=_normalize_text(self.name) or "Unknown food",
+            serving=self.serving,
+            unit=unit,
+            brand=self.brand,
+            description=self.description,
+            usda_fdc_id=self.fdc_id,
+        )
+
+
 def _validate_pagination(
     page_size: int,
     page_number: int,
 ) -> None:
-    if page_size < MIN_PAGE_SIZE:
-        raise USDAError("page_size must be greater than zero.")
+    if not MIN_PAGE_SIZE <= page_size <= MAX_PAGE_SIZE:
+        raise USDAError(
+            f"page_size must be between {MIN_PAGE_SIZE} and {MAX_PAGE_SIZE}."
+        )
 
-    if page_size > MAX_PAGE_SIZE:
-        raise USDAError(f"page_size cannot exceed {MAX_PAGE_SIZE}.")
-
-    if page_number < MIN_PAGE_NUMBER:
-        raise USDAError("page_number must start at 1.")
-
-    if page_number > MAX_PAGE_NUMBER:
-        raise USDAError(f"page_number cannot exceed {MAX_PAGE_NUMBER}.")
+    if not MIN_PAGE_NUMBER <= page_number <= MAX_PAGE_NUMBER:
+        raise USDAError(
+            f"page_number must be between {MIN_PAGE_NUMBER} and {MAX_PAGE_NUMBER}."
+        )
 
 
-def _normalize_food_name(name: str) -> str:
-    """
-    Fix USDA names that are entirely uppercase.
+def _normalize_text(value: str | None) -> str | None:
+    if not value:
+        return None
 
-    A lot of USDA food names are stored like this and look ugly.
-    """
-    if name.isupper():
-        return name.capitalize()
-
-    return name
+    return value.capitalize() if value.isupper() else value
 
 
 def _get_api_key() -> str:
     try:
         return USDAAPISettings.objects.get().key
     except USDAAPISettings.DoesNotExist as exc:
-        raise USDAError("USDA API key is not configured.") from exc
+        raise USDAError(
+            "USDA API key is not configured."
+        ) from exc
 
 
 def _request(
@@ -67,16 +106,12 @@ def _request(
     *,
     params: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    api_key = _get_api_key()
-
-    params = {
-        **(params or {}),
-        "api_key": api_key,
-    }
-
     response = requests.get(
         f"{USDA_API_BASE_URL}/{endpoint}",
-        params=params,
+        params={
+            **(params or {}),
+            "api_key": _get_api_key(),
+        },
         timeout=10,
     )
 
@@ -98,13 +133,6 @@ def _search_foods(
     page_size: int = 25,
     page_number: int = 1,
 ) -> dict[str, Any]:
-    """
-    Fetch raw food records from USDA FoodData Central.
-
-    The USDA API returns JSON objects. These objects are converted into
-    Django Food model instances by `search()`.
-    """
-
     return _request(
         "foods/search",
         params={
@@ -117,24 +145,11 @@ def _search_foods(
 
 @lru_cache(maxsize=128)
 def _get_food(fdc_id: int) -> dict[str, Any]:
-    """
-    Fetch a single raw USDA food record by FDC ID.
-    """
     return _request(f"food/{fdc_id}")
 
 
 def _get_global_unit(name: str) -> Unit | None:
-    """
-    USDA units are mapped only against global units.
-    """
-    try:
-        scope = UnitScope.objects.get(user=None)
-    except UnitScope.DoesNotExist:
-        return None
-
-    normalized = name.lower()
-
-    mapping = {
+    mappings = {
         "g": "Gram",
         "gram": "Gram",
         "grams": "Gram",
@@ -143,9 +158,14 @@ def _get_global_unit(name: str) -> Unit | None:
         "milliliters": "Milliliter",
     }
 
-    unit_name = mapping.get(normalized)
+    unit_name = mappings.get(name.lower())
 
     if not unit_name:
+        return None
+
+    try:
+        scope = UnitScope.objects.get(user=None)
+    except UnitScope.DoesNotExist:
         return None
 
     return Unit.objects.filter(
@@ -155,77 +175,43 @@ def _get_global_unit(name: str) -> Unit | None:
 
 
 def _extract_brand(food: dict[str, Any]) -> str | None:
-    return food.get("brandOwner") or food.get("brandName") or None
+    return food.get("brandOwner") or food.get("brandName")
 
 
-def _create_unsaved_food(
+def _create_usda_food(
     food_data: dict[str, Any],
-    *,
-    user: User,
-) -> Food:
-    """
-    Convert a USDA food JSON object into an unsaved Django Food object.
+) -> USDAFood:
+    data = food_data.copy()
 
-    The returned Food instance is not stored in the database until saved.
-    """
-
-    serving = Decimal("100")
-
-    unit = _get_global_unit("g")
-
-    name = food_data.get(
-        "description",
-        "Unknown food",
-    )
-
-    return Food(
-        user=user,
-        name=_normalize_food_name(name),
-        serving=serving,
-        unit=unit,
+    data.update(
         brand=_extract_brand(food_data),
-        description=food_data.get("ingredients"),
-        usda_fdc_id=food_data.get("fdcId"),
+        description=(
+            food_data.get("ingredients")
+            or food_data.get("description")
+        ),
     )
+
+    return USDAFood(**data)
 
 
 def search(
     term: str,
     *,
-    user: User,
     page_size: int = 25,
     page_number: int = 1,
-) -> list[Food]:
-    """
-    Search USDA FoodData Central and return Food objects.
-
-    The USDA API returns raw food JSON records. Each record is converted
-    into an unsaved Django Food instance.
-
-    Returns:
-        list[Food]:
-            A list of unsaved Food objects.
-
-    The returned Food objects are not saved to the database.
-    """
-
+) -> list[USDAFood]:
     _validate_pagination(
         page_size,
         page_number,
     )
 
-    data = _search_foods(
-        term,
-        page_size=page_size,
-        page_number=page_number,
-    )
-
     return [
-        _create_unsaved_food(
-            food,
-            user=user,
-        )
-        for food in data.get("foods", [])
+        _create_usda_food(food)
+        for food in _search_foods(
+            term,
+            page_size=page_size,
+            page_number=page_number,
+        ).get("foods", [])
     ]
 
 
@@ -233,17 +219,11 @@ def _save_nutrients(
     food: Food,
     nutrient_data: list[dict[str, Any]],
 ) -> None:
-    """
-    Attach USDA nutrients to a saved Food.
-    """
-
-    nutrients = Nutrient.objects.filter(
-        usda_nutrient_number__isnull=False,
-    )
-
     nutrient_map = {
         nutrient.usda_nutrient_number: nutrient
-        for nutrient in nutrients
+        for nutrient in Nutrient.objects.filter(
+            usda_nutrient_number__isnull=False,
+        )
     }
 
     for item in nutrient_data:
@@ -252,22 +232,19 @@ def _save_nutrients(
         if not nutrient:
             continue
 
-        nutrient_number = str(nutrient.get("number"))
-
-        db_nutrient = nutrient_map.get(nutrient_number)
+        db_nutrient = nutrient_map.get(
+            str(nutrient.get("number"))
+        )
 
         if not db_nutrient:
             continue
 
-        amount = item.get("amount")
-
-        if amount is None:
-            amount = 0
-
         FoodNutrient.objects.create(
             food=food,
             nutrient=db_nutrient,
-            amount=Decimal(str(amount)),
+            amount=Decimal(
+                str(item.get("amount", 0))
+            ),
         )
 
 
@@ -276,23 +253,20 @@ def save_by_id(
     *,
     user: User,
 ) -> Food:
-    """
-    Fetch a USDA food by FDC ID and save it locally.
-    """
+    raw_food = _get_food(fdc_id)
 
-    food_data = _get_food(fdc_id)
+    usda_food = _create_usda_food(raw_food)
 
-    food = _create_unsaved_food(
-        food_data,
+    food = usda_food.to_food(
         user=user,
+        unit=_get_global_unit(usda_food.unit_name),
     )
 
     with transaction.atomic():
         food.save()
-
         _save_nutrients(
             food,
-            food_data.get("foodNutrients", []),
+            usda_food.food_nutrients,
         )
 
     return food
