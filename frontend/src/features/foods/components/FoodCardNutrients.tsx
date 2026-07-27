@@ -1,11 +1,11 @@
-import type { Food } from "@/types/FoodTypes";
+import type { Food } from "@/api/generated";
 
 interface Props {
   nutrients: Food["nutrients"];
 }
 
 export default function FoodCardNutrients({ nutrients }: Props) {
-  const allowedNutrients = nutrients.filter((nutrient) =>
+  const allowedNutrients = nutrients?.filter((nutrient) =>
     ["energy", "protein", "carbohydrates", "fat", "fats"].includes(
       nutrient.nutrient_name.toLowerCase(),
     ),

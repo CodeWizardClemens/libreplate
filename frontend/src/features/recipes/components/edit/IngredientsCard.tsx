@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import type { Recipe, RecipeIngredient } from "@/types/RecipeTypes";
-import type { Food } from "@/types/FoodTypes";
+import type { Food } from "@/api/generated";
 
 import {
   useCreateRecipeIngredient,
@@ -47,7 +47,7 @@ function emptyTotals(): NutrientTotals {
 
 function getNutrient(food: Food, names: string[]) {
   return (
-    food.nutrients.find((n) =>
+    food.nutrients?.find((n) =>
       names.some((name) => n.nutrient_name.toLowerCase().includes(name)),
     )?.amount ?? 0
   );

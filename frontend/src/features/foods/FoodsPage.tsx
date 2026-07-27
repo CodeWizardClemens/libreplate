@@ -6,18 +6,74 @@ import FoodSearchBar, {
 } from "@/features/foods/components/FoodSearchBar";
 
 import {
-  useCreateFood,
-  useDeleteFood,
-  useFoods,
-  useUpdateFood,
-} from "@/api/FoodAPI";
+  foodsCreate,
+  foodsDestroy,
+  foodsList,
+  foodsPartialUpdate,
+} from "@/api/generated/sdk.gen";
+
+import type { FoodWritable } from "@/api/generated/types.gen";
+
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function FoodsPage() {
-  const foodsQuery = useFoods();
+  const queryClient = useQueryClient();
 
-  const deleteFood = useDeleteFood();
-  const updateFood = useUpdateFood();
-  const createFood = useCreateFood();
+  const foodsQuery = useQuery({
+    queryKey: ["foods"],
+    queryFn: async () => {
+      const response = await foodsList();
+
+      return response.data;
+    },
+  });
+
+  const createFood = useMutation({
+    mutationFn: (data: FoodWritable) =>
+      foodsCreate({
+        body: data,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["foods"],
+      });
+    },
+  });
+
+  const deleteFood = useMutation({
+    mutationFn: (id: number) =>
+      foodsDestroy({
+        path: {
+          id,
+        },
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["foods"],
+      });
+    },
+  });
+
+  const updateFood = useMutation({
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: number;
+      data: Partial<FoodWritable>;
+    }) =>
+      foodsPartialUpdate({
+        path: {
+          id,
+        },
+        body: data,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["foods"],
+      });
+    },
+  });
 
   const [search, setSearch] = useState("");
   const [showFavorites, setShowFavorites] = useState(false);
@@ -31,13 +87,13 @@ export default function FoodsPage() {
     return <div className="container py-3">Failed to load foods.</div>;
   }
 
-  const foods = foodsQuery.data;
+  const foods = foodsQuery.data ?? [];
 
   function handleAddFood() {
     createFood.mutate({
       name: "New food",
-      unitID: "g",
-      serving: 0,
+      unit_id: 1, // TODO hard coded gram and 100 serving!!!!
+      serving: 100,
       barcode: null,
       brand: null,
       description: "",
@@ -56,7 +112,9 @@ export default function FoodsPage() {
 
     updateFood.mutate({
       id,
-      data: { is_favorite: !food.is_favorite },
+      data: {
+        is_favorite: !food.is_favorite,
+      },
     });
   }
 
@@ -105,7 +163,9 @@ export default function FoodsPage() {
           onSearchChange={setSearch}
           foodCount={filteredFoods.length}
           showFavorites={showFavorites}
-          onToggleFavorites={() => setShowFavorites(!showFavorites)}
+          onToggleFavorites={() =>
+            setShowFavorites(!showFavorites)
+          }
           sortMethod={sortMethod}
           onSortChange={setSortMethod}
         />

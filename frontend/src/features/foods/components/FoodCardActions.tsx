@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-import type { Food } from "@/types/FoodTypes";
+import type { Food } from "@/api/generated";
 
 interface Props {
   food: Food;

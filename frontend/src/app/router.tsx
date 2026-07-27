@@ -1,10 +1,12 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter, Navigate, redirect } from "react-router-dom";
 
 import AppLayout from "./AppLayout";
 
-import { requireAuth } from "../features/auth/requireAuth";
+import {
+  accountsMeRetrieve,
+} from "@/api/generated/sdk.gen";
 
-import LoginPage from "../features/auth/pages/LoginPage";
+import LoginPage from "../features/auth/LoginPage";
 import RecipesPage from "../features/recipes/RecipePage";
 import RecipeEditPage from "../features/recipes/RecipeEditPage";
 import FoodEditPage from "../features/foods/FoodEditPage";
@@ -20,16 +22,24 @@ function Placeholder({ title }: { title: string }) {
   );
 }
 
+async function authLoader() {
+  try {
+    const response = await accountsMeRetrieve();
+
+    return response.data;
+  } catch {
+    throw redirect("/login");
+  }
+}
+
 const router = createBrowserRouter([
-  // Public routes
   {
     path: "/login",
     element: <LoginPage />,
   },
 
-  // Protected routes
   {
-    loader: requireAuth,
+    loader: authLoader,
     element: <AppLayout />,
     children: [
       {

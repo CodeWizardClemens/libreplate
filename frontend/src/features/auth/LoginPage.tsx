@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { login } from "../api/authApi";
+
+import {
+  accountsCsrfRetrieve,
+  accountsLoginCreate,
+} from "@/api/generated/sdk.gen";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -18,9 +22,15 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await login({
-        username,
-        password,
+      // Get CSRF cookie first
+      await accountsCsrfRetrieve();
+
+      // Login and receive sessionid cookie
+      await accountsLoginCreate({
+        body: {
+          username,
+          password,
+        },
       });
 
       navigate("/diary");

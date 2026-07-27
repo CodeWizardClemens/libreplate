@@ -11,7 +11,7 @@ import DiaryHeader from "./components/DiaryHeader";
 import MealList from "./components/MealList";
 
 import type { DayMeal } from "@/types/MealTypes";
-import type { Food } from "@/types/FoodTypes";
+import type { Food } from "@/api/generated";
 import type { Recipe } from "@/types/RecipeTypes";
 
 function formatDate(date: Date) {

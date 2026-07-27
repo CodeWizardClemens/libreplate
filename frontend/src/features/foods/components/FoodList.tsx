@@ -1,6 +1,6 @@
 import FoodCard from "./FoodCard";
 
-import type { Food } from "@/types/FoodTypes";
+import type { Food } from "@/api/generated";
 
 interface Props {
   foods: Food[];

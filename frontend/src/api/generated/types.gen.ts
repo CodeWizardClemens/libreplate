@@ -4,6 +4,25 @@ export type ClientOptions = {
     baseUrl: 'http://localhost:8000' | (string & {});
 };
 
+export type Csrf = {
+    csrfToken: string;
+};
+
+/**
+ * Serializer representing a meal slot for a specific day.
+ *
+ * If meal_id is null, the slot has not yet been persisted.
+ */
+export type DayMeal = {
+    meal_id: number | null;
+    default_meal: DefaultMeal;
+    name: string;
+    date: string;
+    note: string;
+    order: number;
+    meal_foods: Array<MealFood>;
+};
+
 export type DefaultMeal = {
     readonly id: number;
     name: string;
@@ -14,21 +33,20 @@ export type DefaultMeal = {
 export type Food = {
     readonly id: number;
     name: string;
-    serving: string;
-    unit?: string | null;
+    serving: number;
+    unit_id: number;
+    readonly unit_name: string;
     barcode?: string | null;
     brand?: string | null;
     description?: string | null;
     is_favorite?: boolean;
     usda_fdc_id?: number | null;
-    nutrients?: Array<FoodNutrient>;
+    nutrients?: Array<FoodNutrientCreate>;
 };
 
-export type FoodNutrient = {
+export type FoodNutrientCreate = {
     nutrient_id: number;
-    readonly nutrient_name: string;
-    readonly nutrient_unit: string;
-    amount: string;
+    amount: number;
 };
 
 export type GroceryList = {
@@ -44,8 +62,12 @@ export type GroceryListFood = {
     readonly id: number;
     food: number;
     readonly food_name: string;
-    amount: string;
+    amount: number;
     readonly on_hand: boolean;
+};
+
+export type Login = {
+    username: string;
 };
 
 export type Meal = {
@@ -71,6 +93,10 @@ export type MealFoodCreate = {
     food_id: number;
     serving_size: number;
     number_of_servings: number;
+};
+
+export type Message = {
+    detail: string;
 };
 
 export type Nutrient = {
@@ -124,21 +150,22 @@ export type PatchedDefaultMeal = {
 export type PatchedFood = {
     readonly id?: number;
     name?: string;
-    serving?: string;
-    unit?: string | null;
+    serving?: number;
+    unit_id?: number;
+    readonly unit_name?: string;
     barcode?: string | null;
     brand?: string | null;
     description?: string | null;
     is_favorite?: boolean;
     usda_fdc_id?: number | null;
-    nutrients?: Array<FoodNutrient>;
+    nutrients?: Array<FoodNutrientCreate>;
 };
 
 export type PatchedGroceryListFood = {
     readonly id?: number;
     food?: number;
     readonly food_name?: string;
-    amount?: string;
+    amount?: number;
     readonly on_hand?: boolean;
 };
 
@@ -178,9 +205,9 @@ export type PatchedRecipe = {
     readonly created_at?: string;
     readonly updated_at?: string;
     readonly tags?: Array<RecipeTag>;
-    readonly has_picture?: string;
+    readonly has_picture?: boolean;
     readonly ingredients?: Array<RecipeIngredient>;
-    readonly nutrients?: string;
+    readonly nutrients?: Array<RecipeNutrient>;
 };
 
 export type PatchedRecipeIngredient = {
@@ -210,9 +237,9 @@ export type Recipe = {
     readonly created_at: string;
     readonly updated_at: string;
     readonly tags: Array<RecipeTag>;
-    readonly has_picture: string;
+    readonly has_picture: boolean;
     readonly ingredients: Array<RecipeIngredient>;
-    readonly nutrients: string;
+    readonly nutrients: Array<RecipeNutrient>;
 };
 
 export type RecipeIngredient = {
@@ -222,6 +249,12 @@ export type RecipeIngredient = {
     number_of_servings?: number;
     serving_amount?: number;
     order?: number;
+};
+
+export type RecipeNutrient = {
+    id: number;
+    name: string;
+    amount: number;
 };
 
 export type RecipePicture = {
@@ -237,6 +270,34 @@ export type UsdaSave = {
     fdc_id: number;
 };
 
+export type Unit = {
+    readonly id: number;
+    name: string;
+    description?: string;
+    abbreviation?: string;
+};
+
+export type User = {
+    id: number;
+    username: string;
+    email: string;
+};
+
+/**
+ * Serializer representing a meal slot for a specific day.
+ *
+ * If meal_id is null, the slot has not yet been persisted.
+ */
+export type DayMealWritable = {
+    meal_id: number | null;
+    default_meal: DefaultMealWritable;
+    name: string;
+    date: string;
+    note: string;
+    order: number;
+    meal_foods: Array<MealFoodWritable>;
+};
+
 export type DefaultMealWritable = {
     name: string;
     description?: string;
@@ -245,19 +306,14 @@ export type DefaultMealWritable = {
 
 export type FoodWritable = {
     name: string;
-    serving: string;
-    unit?: string | null;
+    serving: number;
+    unit_id: number;
     barcode?: string | null;
     brand?: string | null;
     description?: string | null;
     is_favorite?: boolean;
     usda_fdc_id?: number | null;
-    nutrients?: Array<FoodNutrientWritable>;
-};
-
-export type FoodNutrientWritable = {
-    nutrient_id: number;
-    amount: string;
+    nutrients?: Array<FoodNutrientCreate>;
 };
 
 export type GroceryListWritable = {
@@ -268,7 +324,12 @@ export type GroceryListWritable = {
 
 export type GroceryListFoodWritable = {
     food: number;
-    amount: string;
+    amount: number;
+};
+
+export type LoginWritable = {
+    username: string;
+    password: string;
 };
 
 export type MealWritable = {
@@ -301,19 +362,19 @@ export type PatchedDefaultMealWritable = {
 
 export type PatchedFoodWritable = {
     name?: string;
-    serving?: string;
-    unit?: string | null;
+    serving?: number;
+    unit_id?: number;
     barcode?: string | null;
     brand?: string | null;
     description?: string | null;
     is_favorite?: boolean;
     usda_fdc_id?: number | null;
-    nutrients?: Array<FoodNutrientWritable>;
+    nutrients?: Array<FoodNutrientCreate>;
 };
 
 export type PatchedGroceryListFoodWritable = {
     food?: number;
-    amount?: string;
+    amount?: number;
 };
 
 export type PatchedMealWritable = {
@@ -384,6 +445,12 @@ export type RecipeTagWritable = {
     name: string;
 };
 
+export type UnitWritable = {
+    name: string;
+    description?: string;
+    abbreviation?: string;
+};
+
 export type AccountsCsrfRetrieveData = {
     body?: never;
     path?: never;
@@ -392,25 +459,29 @@ export type AccountsCsrfRetrieveData = {
 };
 
 export type AccountsCsrfRetrieveResponses = {
-    /**
-     * No response body
-     */
-    200: unknown;
+    200: Csrf;
 };
 
+export type AccountsCsrfRetrieveResponse = AccountsCsrfRetrieveResponses[keyof AccountsCsrfRetrieveResponses];
+
 export type AccountsLoginCreateData = {
-    body?: never;
+    body: LoginWritable;
     path?: never;
     query?: never;
     url: '/api/accounts/login/';
 };
 
-export type AccountsLoginCreateResponses = {
-    /**
-     * No response body
-     */
-    200: unknown;
+export type AccountsLoginCreateErrors = {
+    401: Message;
 };
+
+export type AccountsLoginCreateError = AccountsLoginCreateErrors[keyof AccountsLoginCreateErrors];
+
+export type AccountsLoginCreateResponses = {
+    200: Message;
+};
+
+export type AccountsLoginCreateResponse = AccountsLoginCreateResponses[keyof AccountsLoginCreateResponses];
 
 export type AccountsLogoutCreateData = {
     body?: never;
@@ -420,11 +491,10 @@ export type AccountsLogoutCreateData = {
 };
 
 export type AccountsLogoutCreateResponses = {
-    /**
-     * No response body
-     */
-    200: unknown;
+    200: Message;
 };
+
+export type AccountsLogoutCreateResponse = AccountsLogoutCreateResponses[keyof AccountsLogoutCreateResponses];
 
 export type AccountsMeRetrieveData = {
     body?: never;
@@ -434,11 +504,10 @@ export type AccountsMeRetrieveData = {
 };
 
 export type AccountsMeRetrieveResponses = {
-    /**
-     * No response body
-     */
-    200: unknown;
+    200: User;
 };
+
+export type AccountsMeRetrieveResponse = AccountsMeRetrieveResponses[keyof AccountsMeRetrieveResponses];
 
 export type FoodsListData = {
     body?: never;
@@ -813,21 +882,23 @@ export type MealsUpdateResponses = {
 
 export type MealsUpdateResponse = MealsUpdateResponses[keyof MealsUpdateResponses];
 
-export type MealsDayRetrieveData = {
+export type MealsDayListData = {
     body?: never;
     path: {
+        /**
+         * Date to retrieve meals for.
+         */
         day: string;
     };
     query?: never;
     url: '/api/meals/day/{day}/';
 };
 
-export type MealsDayRetrieveResponses = {
-    /**
-     * No response body
-     */
-    200: unknown;
+export type MealsDayListResponses = {
+    200: Array<DayMeal>;
 };
+
+export type MealsDayListResponse = MealsDayListResponses[keyof MealsDayListResponses];
 
 export type MealsDefaultsListData = {
     body?: never;
@@ -1347,3 +1418,16 @@ export type SchemaRetrieveResponses = {
 };
 
 export type SchemaRetrieveResponse = SchemaRetrieveResponses[keyof SchemaRetrieveResponses];
+
+export type UnitsListData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/units/';
+};
+
+export type UnitsListResponses = {
+    200: Array<Unit>;
+};
+
+export type UnitsListResponse = UnitsListResponses[keyof UnitsListResponses];

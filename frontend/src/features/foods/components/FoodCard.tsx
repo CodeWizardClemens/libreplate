@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import type { Food } from "@/types/FoodTypes";
+import type { Food } from "@/api/generated";
 
 import { useUpdateFood } from "@/api/FoodAPI";
 

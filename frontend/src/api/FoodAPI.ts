@@ -2,7 +2,7 @@ import axios from "axios";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import type { Food, FoodCreate, FoodUpdate } from "@/types/FoodTypes";
+import type { Food, FoodCreate, FoodUpdate } from "@/api/generated";
 
 function getCsrfToken() {
   const cookie = document.cookie

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import type { FoodNutrient } from "@/types/FoodTypes";
+import type { FoodNutrientCreate } from "@/api/generated";
 
 import { useDeleteFood, useFood, useUpdateFood } from "@/api/FoodAPI";
 import { useNutrients } from "@/api/NutrientAPI";
@@ -20,10 +20,10 @@ export default function FoodEditPage() {
   const [brand, setBrand] = useState("");
   const [description, setDescription] = useState("");
   const [serving, setServing] = useState<number | "">("");
-  const [unitID, setUnit] = useState("");
+  const [unitID, setUnit] = useState<number | "">("");
   const [barcode, setBarcode] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
-  const [nutrients, setNutrients] = useState<FoodNutrient[]>([]);
+  const [nutrients, setNutrients] = useState<FoodNutrientCreate[]>([]);
 
   useEffect(() => {
     if (!foodQuery.data) {
@@ -36,9 +36,9 @@ export default function FoodEditPage() {
     setBrand(food.brand ?? "");
     setDescription(food.description ?? "");
     setServing(food.serving ?? "");
-    setUnit(food.unit);
+    setUnit(food.unit_id);
     setBarcode(food.barcode ?? "");
-    setIsFavorite(food.is_favorite);
+    setIsFavorite(food.is_favorite ?? false);
   }, [foodQuery.data]);
 
   useEffect(() => {
@@ -53,11 +53,11 @@ export default function FoodEditPage() {
     const relevantNutrients = nutrientsQuery.data.filter(
       (nutrient) =>
         nutrient.show_in_food_edit ||
-        food.nutrients.some((n) => n.nutrient_id === nutrient.id),
+        food.nutrients?.some((n) => n.nutrient_id === nutrient.id),
     );
 
-    const merged: FoodNutrient[] = relevantNutrients.map((nutrient) => {
-      const existing = food.nutrients.find(
+    const merged: FoodNutrientCreate[] = relevantNutrients.map((nutrient) => {
+      const existing = food.nutrients?.find(
         (n) => n.nutrient_id === nutrient.id,
       );
 
@@ -195,7 +195,9 @@ export default function FoodEditPage() {
               <input
                 className="form-control"
                 value={unitID}
-                onChange={(e) => setUnit(e.target.value)}
+                onChange={(e) =>
+                  setUnit(e.target.value === "" ? "" : Number(e.target.value))
+                }
               />
             </div>
 
@@ -239,7 +241,7 @@ export default function FoodEditPage() {
             >
               <div className="col-12 col-md-6">
                 <span className="form-control-plaintext">
-                  {nutrient.nutrient_name}
+                  {nutrient.nutrient_id}
                 </span>
               </div>
 
@@ -256,7 +258,7 @@ export default function FoodEditPage() {
 
               <div className="col-4 col-md-2">
                 <span className="form-control-plaintext text-muted">
-                  {nutrient.nutrient_unit}
+                  {nutrient.nutrient_id}
                 </span>
               </div>
             </div>
