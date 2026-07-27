@@ -11,10 +11,6 @@ export default function FoodCardNutrients({ nutrients }: Props) {
     ),
   );
 
-  if (allowedNutrients.length === 0) {
-    return null;
-  }
-
   return (
     <div
       className="
@@ -23,7 +19,7 @@ export default function FoodCardNutrients({ nutrients }: Props) {
         mb-3
       "
     >
-      {allowedNutrients.map((nutrient, index) => (
+      {allowedNutrients?.map((nutrient, index) => (
         <div
           key={nutrient.nutrient_id ?? index}
           className="

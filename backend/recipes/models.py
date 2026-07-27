@@ -8,7 +8,6 @@ from django.utils import timezone
 
 class Recipe(models.Model):
     def get_nutrients(self, per_portion=True):
-
         totals = defaultdict(lambda: Decimal("0"))
 
         ingredients = self.ingredients.select_related("food").prefetch_related(
@@ -19,17 +18,22 @@ class Recipe(models.Model):
             multiplier = Decimal(str(ingredient.serving_amount))
 
             for food_nutrient in ingredient.food.food_nutrients.all():
-                totals[food_nutrient.nutrient] += food_nutrient.amount * multiplier
+                nutrient_amount = Decimal(str(food_nutrient.amount))
+                totals[food_nutrient.nutrient] += nutrient_amount * multiplier
 
         if per_portion and self.portions:
             divisor = Decimal(str(self.portions))
-            totals = {nutrient: amount / divisor for nutrient, amount in totals.items()}
+            totals = {
+                nutrient: amount / divisor
+                for nutrient, amount in totals.items()
+            }
 
-        # Round to 0 decimal places
         totals = {
             nutrient: amount.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
             for nutrient, amount in totals.items()
         }
+
+        return totals
 
         return totals
 

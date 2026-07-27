@@ -66,17 +66,10 @@ export default function FoodCard({ food, onDelete, onToggleFavorite }: Props) {
 
               {food.serving != null && (
                 <>
-                  <i className="bi bi-egg-fried ms-2 me-1"></i>
-                  {food.serving} {food.unit}
+                  {food.serving} {food.unit_name}
                 </>
               )}
 
-              {food.barcode && (
-                <>
-                  <i className="bi bi-upc-scan ms-2 me-1"></i>
-                  {food.barcode}
-                </>
-              )}
             </div>
           </div>
         </div>
