@@ -47,14 +47,7 @@ def _normalize_food_name(name: str) -> str:
     """
     Fix USDA names that are entirely uppercase.
 
-    A lot of them are named like that and it is quite ugly.
-    The capitalization in their database is also inconsistent.
-
-    Examples:
-        BANANA -> Banana
-        CHICKEN BREAST -> Chicken breast
-        Apple -> Apple
-        Vitamin C -> Vitamin C
+    A lot of USDA food names are stored like this and look ugly.
     """
     if name.isupper():
         return name.capitalize()
@@ -87,14 +80,13 @@ def _request(
         timeout=10,
     )
 
-    if not response.ok:
-        raise USDAError(f"USDA API error: {response.status_code} {response.text}")
-
     if response.status_code == 404:
         raise USDAError("Food not found.")
 
     if not response.ok:
-        raise USDAError(f"USDA API error: {response.status_code} {response.text}")
+        raise USDAError(
+            f"USDA API error: {response.status_code} {response.text}"
+        )
 
     return response.json()
 
@@ -107,9 +99,10 @@ def _search_foods(
     page_number: int = 1,
 ) -> dict[str, Any]:
     """
-    Search USDA FoodData Central with pagination.
+    Fetch raw food records from USDA FoodData Central.
 
-    page_number is 1-based.
+    The USDA API returns JSON objects. These objects are converted into
+    Django Food model instances by `search()`.
     """
 
     return _request(
@@ -124,6 +117,9 @@ def _search_foods(
 
 @lru_cache(maxsize=128)
 def _get_food(fdc_id: int) -> dict[str, Any]:
+    """
+    Fetch a single raw USDA food record by FDC ID.
+    """
     return _request(f"food/{fdc_id}")
 
 
@@ -168,7 +164,9 @@ def _create_unsaved_food(
     user: User,
 ) -> Food:
     """
-    Creates a Food instance but does not save it with django to the database.
+    Convert a USDA food JSON object into an unsaved Django Food object.
+
+    The returned Food instance is not stored in the database until saved.
     """
 
     serving = Decimal("100")
@@ -180,7 +178,7 @@ def _create_unsaved_food(
         "Unknown food",
     )
 
-    food = Food(
+    return Food(
         user=user,
         name=_normalize_food_name(name),
         serving=serving,
@@ -190,8 +188,6 @@ def _create_unsaved_food(
         usda_fdc_id=food_data.get("fdcId"),
     )
 
-    return food
-
 
 def search(
     term: str,
@@ -199,26 +195,20 @@ def search(
     user: User,
     page_size: int = 25,
     page_number: int = 1,
-) -> dict[str, Any]:
+) -> list[Food]:
     """
-    Search USDA FoodData Central.
+    Search USDA FoodData Central and return Food objects.
 
-    Returns unsaved Food objects plus pagination metadata.
+    The USDA API returns raw food JSON records. Each record is converted
+    into an unsaved Django Food instance.
 
-    page_size:
-        Number of results returned per request.
+    Returns:
+        list[Food]:
+            A list of unsaved Food objects.
 
-    page_number:
-        Page number to retrieve (1-based).
-
-    Example:
-        search(
-            "banana",
-            user=user,
-            page_size=25,
-            page_number=2,
-        )
+    The returned Food objects are not saved to the database.
     """
+
     _validate_pagination(
         page_size,
         page_number,
@@ -230,35 +220,13 @@ def search(
         page_number=page_number,
     )
 
-    foods = [
+    return [
         _create_unsaved_food(
             food,
             user=user,
         )
         for food in data.get("foods", [])
     ]
-
-    return {
-        "foods": foods,
-        "pagination": {
-            "page_size": data.get(
-                "pageSize",
-                page_size,
-            ),
-            "page_number": data.get(
-                "currentPage",
-                page_number,
-            ),
-            "total_hits": data.get(
-                "totalHits",
-                0,
-            ),
-            "total_pages": data.get(
-                "totalPages",
-                0,
-            ),
-        },
-    }
 
 
 def _save_nutrients(
@@ -273,7 +241,10 @@ def _save_nutrients(
         usda_nutrient_number__isnull=False,
     )
 
-    nutrient_map = {nutrient.usda_nutrient_number: nutrient for nutrient in nutrients}
+    nutrient_map = {
+        nutrient.usda_nutrient_number: nutrient
+        for nutrient in nutrients
+    }
 
     for item in nutrient_data:
         nutrient = item.get("nutrient")

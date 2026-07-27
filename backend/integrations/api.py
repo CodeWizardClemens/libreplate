@@ -25,20 +25,6 @@ class USDASearchAPIView(APIView):
                 required=True,
                 description="Search term for USDA foods.",
             ),
-            OpenApiParameter(
-                name="page_size",
-                type=int,
-                location=OpenApiParameter.QUERY,
-                required=False,
-                description="Number of results per page. Default: 25. Maximum: 50.",
-            ),
-            OpenApiParameter(
-                name="page_number",
-                type=int,
-                location=OpenApiParameter.QUERY,
-                required=False,
-                description="Page number to retrieve. Default: 1.",
-            ),
         ],
         responses={
             200: {"description": "USDA food search results."},
@@ -47,12 +33,14 @@ class USDASearchAPIView(APIView):
     )
     def get(self, request):
 
-        serializer = USDAFoodSearchSerializer(data=request.query_params)
+        serializer = USDAFoodSearchSerializer(
+            data=request.query_params,
+        )
 
         serializer.is_valid(raise_exception=True)
 
         try:
-            result = usda.search(
+            foods = usda.search(
                 user=request.user,
                 **serializer.validated_data,
             )
@@ -63,20 +51,17 @@ class USDASearchAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        foods = [
-            {
-                "name": food.name,
-                "brand": food.brand,
-                "fdc_id": food.usda_fdc_id,
-                "description": food.description,
-            }
-            for food in result["foods"]
-        ]
-
         return Response(
             {
-                "foods": foods,
-                "pagination": result["pagination"],
+                "foods": [
+                    {
+                        "name": food.name,
+                        "brand": food.brand,
+                        "fdc_id": food.usda_fdc_id,
+                        "description": food.description,
+                    }
+                    for food in foods
+                ],
             }
         )
 
