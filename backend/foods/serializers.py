@@ -5,6 +5,7 @@ from nutrients.models import Nutrient
 from units.models import Unit
 
 from .models import Food, FoodNutrient
+from integrations.usda import USDAFood
 
 
 class FoodNutrientSerializer(serializers.ModelSerializer):
@@ -75,16 +76,12 @@ class FoodSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
 
-        from integrations.usda import USDAFood
-
         if isinstance(instance, USDAFood):
-            return self._serialize_usda_food(
-                instance,
-            )
+            return self._serialize_usda_food(instance)
 
         return super().to_representation(instance)
 
-    def _serialize_usda_food(self, food):
+    def _serialize_usda_food(self, food: USDAFood):
 
         return {
             "id": None,
