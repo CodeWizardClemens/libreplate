@@ -43,8 +43,8 @@ class USDAFood(BaseModel):
     brand: str | None = None
     description: str | None = None
 
-    fdc_id: int | None = Field(None, alias="fdcId")
-    data_type: str | None = Field(None, alias="dataType")
+    fdc_id: int | None = Field(None)
+    data_type: str | None = Field(None)
 
     food_nutrients: list[dict[str, Any]] = Field(
         default_factory=list,
@@ -64,7 +64,7 @@ class USDAFood(BaseModel):
             name=_normalize_text(self.name) or "Unknown food",
             serving=self.serving,
             unit=unit,
-            brand=self.brand,
+            brand=_normalize_text(self.brand),
             description=self.description,
             usda_fdc_id=self.fdc_id,
         )

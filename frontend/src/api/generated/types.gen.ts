@@ -268,6 +268,10 @@ export type RecipeTag = {
     name: string;
 };
 
+export type UsdaFoodSearchResponse = {
+    foods: Array<Food>;
+};
+
 export type UsdaSave = {
     fdc_id: number;
 };
@@ -450,6 +454,10 @@ export type RecipeIngredientWritable = {
 
 export type RecipeTagWritable = {
     name: string;
+};
+
+export type UsdaFoodSearchResponseWritable = {
+    foods: Array<FoodWritable>;
 };
 
 export type UnitWritable = {
@@ -786,11 +794,10 @@ export type IntegrationsUsdaSearchRetrieveErrors = {
 };
 
 export type IntegrationsUsdaSearchRetrieveResponses = {
-    /**
-     * USDA food search results.
-     */
-    200: unknown;
+    200: UsdaFoodSearchResponse;
 };
+
+export type IntegrationsUsdaSearchRetrieveResponse = IntegrationsUsdaSearchRetrieveResponses[keyof IntegrationsUsdaSearchRetrieveResponses];
 
 export type MealsListData = {
     body?: never;

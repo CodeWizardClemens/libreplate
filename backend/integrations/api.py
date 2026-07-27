@@ -5,10 +5,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from foods.serializers import FoodSerializer
 from integrations import usda
 from integrations.usda import USDAError
 
-from .serializers import USDAFoodSearchSerializer, USDASaveSerializer
+from .serializers import (
+    USDAFoodSearchResponseSerializer,
+    USDAFoodSearchSerializer,
+    USDASaveSerializer,
+)
 
 
 class USDASearchAPIView(APIView):
@@ -27,7 +32,7 @@ class USDASearchAPIView(APIView):
             ),
         ],
         responses={
-            200: {"description": "USDA food search results."},
+            200: USDAFoodSearchResponseSerializer,
             400: {"description": "Invalid search parameters or USDA error."},
         },
     )
@@ -41,27 +46,23 @@ class USDASearchAPIView(APIView):
 
         try:
             foods = usda.search(
-                user=request.user,
                 **serializer.validated_data,
             )
 
         except USDAError as exc:
             return Response(
-                {"error": str(exc)},
+                {
+                    "error": str(exc),
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         return Response(
             {
-                "foods": [
-                    {
-                        "name": food.name,
-                        "brand": food.brand,
-                        "fdc_id": food.usda_fdc_id,
-                        "description": food.description,
-                    }
-                    for food in foods
-                ],
+                "foods": FoodSerializer(
+                    foods,
+                    many=True,
+                ).data,
             }
         )
 
@@ -97,9 +98,6 @@ class USDASaveAPIView(APIView):
             )
 
         return Response(
-            {
-                "id": food.id,
-                "name": food.name,
-            },
+            FoodSerializer(food).data,
             status=status.HTTP_201_CREATED,
         )

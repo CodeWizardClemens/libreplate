@@ -73,6 +73,47 @@ class FoodSerializer(serializers.ModelSerializer):
             "unit_name",
         ]
 
+    def to_representation(self, instance):
+
+        from integrations.usda import USDAFood
+
+        if isinstance(instance, USDAFood):
+            return self._serialize_usda_food(
+                instance,
+            )
+
+        return super().to_representation(instance)
+
+    def _serialize_usda_food(self, food):
+
+        return {
+            "id": None,
+            "name": food.name,
+            "serving": food.serving,
+            "unit_id": None,
+            "unit_name": food.unit_name,
+            "barcode": None,
+            "brand": food.brand,
+            "description": food.description,
+            "is_favorite": False,
+            "usda_fdc_id": food.fdc_id,
+            "nutrients": self._serialize_usda_nutrients(
+                food.food_nutrients,
+            ),
+        }
+
+    def _serialize_usda_nutrients(self, nutrients):
+
+        return [
+            {
+                "nutrient_id": None,
+                "nutrient_name": nutrient.get("name"),
+                "nutrient_unit": nutrient.get("unitName"),
+                "amount": nutrient.get("amount", 0),
+            }
+            for nutrient in nutrients
+        ]
+
     def _set_nutrients(self, food, nutrients):
         FoodNutrient.objects.filter(
             food=food
