@@ -19,7 +19,11 @@ def init(c: Context):
     sync_default_data(c)
 
 
-@task(name="user_add")
+@task(
+    help={
+        "skip-password-validation": "Skip password validation.",
+    }
+)
 def user_add(
     c: Context,
     username: str,
@@ -27,34 +31,35 @@ def user_add(
     last_name: str,
     email: str,
     password: str,
+    skip_password_validation: bool = False,
 ):
     """
     Create a new LibrePlate user account.
     """
     info(f"Adding new user `{username}`")
 
-    django_run(
-        c,
+    command = (
         "add_user "
         f"{shlex.quote(username)} "
         f"{shlex.quote(first_name)} "
         f"{shlex.quote(last_name)} "
         f"{shlex.quote(email)} "
-        f"{shlex.quote(password)}",
+        f"{shlex.quote(password)}"
     )
 
+    if skip_password_validation:
+        command += " --skip-password-validation"
 
-@task(name="remove-user")
+    django_run(c, command)
+
+
+@task()
 def user_remove(c: Context, username: str):
     """
     Remove an existing LibrePlate user account.
     """
     info(f"Removing user `{username}`")
-
-    django_run(
-        c,
-        f'remove_user "{username}"',
-    )
+    django_run(c, f'remove_user "{username}"')
 
 
 @task(name="add-usda-api-key")

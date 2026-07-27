@@ -10,6 +10,7 @@ including:
 - Starting the development or production web server
 """
 
+import shlex
 from invoke import Context, task
 
 from .utils import (
@@ -61,6 +62,30 @@ def ruff_check_cmd(fix: bool = False, exit_zero: bool = False) -> str:
 
     return " ".join(args)
 
+
+@task()
+def user_add_dummy(c: Context):
+    """
+    Create a dummy LibrePlate user account.
+    """
+    username = "dummy"
+    first_name = "Dummy"
+    last_name = "User"
+    email = "dummy@example.com"
+    password = "dummy"
+
+    info(f"Adding dummy user `{username}`")
+
+    django_run(
+        c,
+        "add_user "
+        f"{shlex.quote(username)} "
+        f"{shlex.quote(first_name)} "
+        f"{shlex.quote(last_name)} "
+        f"{shlex.quote(email)} "
+        f"{shlex.quote(password)} "
+        "--skip-password-validation",
+    )
 
 @task(help={"verbose": "Show stdout output from commands."})
 def code_check(c: Context, verbose: bool = False) -> None:
