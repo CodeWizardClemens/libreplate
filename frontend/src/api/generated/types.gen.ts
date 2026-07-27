@@ -771,14 +771,6 @@ export type IntegrationsUsdaSearchRetrieveData = {
     path?: never;
     query: {
         /**
-         * Page number to retrieve. Default: 1.
-         */
-        page_number?: number;
-        /**
-         * Number of results per page. Default: 25. Maximum: 50.
-         */
-        page_size?: number;
-        /**
          * Search term for USDA foods.
          */
         term: string;

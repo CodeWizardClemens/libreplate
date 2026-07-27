@@ -92,7 +92,7 @@ export default function FoodsPage() {
   function handleAddFood() {
     createFood.mutate({
       name: "New food",
-      unit_id: 1, // TODO hard coded gram and 100 serving!!!!
+      unit_id: 1, // TODO hard coded gram and 100 serving. fix later
       serving: 100,
       barcode: null,
       brand: null,

@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 
 import type { Recipe, RecipeIngredient } from "@/types/RecipeTypes";
-import type { Food } from "@/api/generated";
+import {
+  type Food,
+  foodsRetrieve,
+} from "@/api/generated";
 
 import {
   useCreateRecipeIngredient,
@@ -9,7 +12,7 @@ import {
   useUpdateRecipeIngredient,
 } from "@/api/RecipeAPI";
 
-import { useFood } from "@/api/FoodAPI";
+import { useQuery } from "@tanstack/react-query";
 import FoodPickerModal from "@/features/foods/components/FoodPickerModal";
 
 interface IngredientsCardProps {
@@ -67,6 +70,21 @@ function calculateNutrients(
       getNutrient(food, names) * multiplier,
     ]),
   ) as NutrientTotals;
+}
+
+function useFood(id: number) {
+  return useQuery({
+    queryKey: ["food", id],
+    queryFn: async () => {
+      const response = await foodsRetrieve({
+        path: {
+          id,
+        },
+      });
+
+      return response.data;
+    },
+  });
 }
 
 function NumberInput({
@@ -192,7 +210,6 @@ function IngredientTotals({
   >({});
 
   useEffect(() => {
-    // Remove deleted ingredients from totals
     setIngredientTotals((current) => {
       const next = { ...current };
 
@@ -267,9 +284,6 @@ export default function IngredientsCard({ recipe }: IngredientsCardProps) {
     );
   };
 
-  // FoodPickerModal supports selecting multiple foods at once (checkmarks +
-  // "Add N foods"), so this now receives an array and creates one ingredient
-  // per food, adding each sequentially so `order` stays correct.
   const addFood = async (foods: Food[]) => {
     setPickerOpen(false);
 

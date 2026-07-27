@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
 import type { Food } from "@/api/generated";
-import { useFoods } from "@/api/FoodAPI";
+import { foodsList } from "@/api/generated";
 
 interface FoodPickerModalProps {
   isOpen: boolean;
@@ -40,14 +41,39 @@ export default function FoodPickerModal({
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
-  const { data: foods, isLoading, isError } = useFoods();
+  const [foods, setFoods] = useState<Food[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    async function loadFoods() {
+      setIsLoading(true);
+      setIsError(false);
+
+      try {
+        const response = await foodsList();
+
+        setFoods(response.data ?? []);
+      } catch {
+        setIsError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadFoods();
+  }, [isOpen]);
 
   if (!isOpen) {
     return null;
   }
 
   const filteredFoods =
-    foods?.filter((food) =>
+    foods.filter((food) =>
       food.name.toLowerCase().includes(search.toLowerCase()),
     ) ?? [];
 
@@ -76,7 +102,7 @@ export default function FoodPickerModal({
   }
 
   function handleConfirm() {
-    const selectedFoods = (foods ?? []).filter((food) =>
+    const selectedFoods = foods.filter((food) =>
       selectedIds.has(food.id),
     );
 
@@ -125,7 +151,7 @@ export default function FoodPickerModal({
           }}
         />
 
-        {/* {isLoading && <p>Loading foods...</p>} */}
+        {isLoading && <p>Loading foods...</p>}
 
         {isError && <p>Failed to load foods.</p>}
 
@@ -150,13 +176,18 @@ export default function FoodPickerModal({
                 }}
               >
                 <span
-                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                  }}
                 >
                   <input
                     type="checkbox"
                     checked={isChecked}
                     onChange={() => toggleFood(food.id)}
                   />
+
                   <span>{food.name}</span>
                 </span>
 

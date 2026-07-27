@@ -1,8 +1,7 @@
 import { useState } from "react";
 
 import type { Food } from "@/api/generated";
-
-import { useUpdateFood } from "@/api/FoodAPI";
+import { foodsPartialUpdate } from "@/api/generated";
 
 import FoodCardActions from "./FoodCardActions";
 import FoodCardHeader from "./FoodCardHeader";
@@ -16,8 +15,6 @@ interface Props {
 }
 
 export default function FoodCard({ food, onDelete, onToggleFavorite }: Props) {
-  const updateFood = useUpdateFood();
-
   const [editingName, setEditingName] = useState(false);
   const [editingDescription, setEditingDescription] = useState(false);
 
@@ -25,10 +22,15 @@ export default function FoodCard({ food, onDelete, onToggleFavorite }: Props) {
     return null;
   }
 
-  function updateFoodData(data: { name?: string; description?: string }) {
-    updateFood.mutate({
-      id: food.id,
-      data,
+  async function updateFoodData(data: {
+    name?: string;
+    description?: string;
+  }) {
+    await foodsPartialUpdate({
+      path: {
+        id: food.id,
+      },
+      body: data,
     });
   }
 
@@ -69,7 +71,6 @@ export default function FoodCard({ food, onDelete, onToggleFavorite }: Props) {
                   {food.serving} {food.unit_name}
                 </>
               )}
-
             </div>
           </div>
         </div>
