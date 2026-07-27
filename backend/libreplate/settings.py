@@ -172,5 +172,19 @@ REST_FRAMEWORK = {
     ],
 }
 
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "LibrePlate API",
+    "VERSION": "0.0.0",
+    "APPEND_COMPONENTS": {
+        "securitySchemes": {
+            "cookieAuth": {
+                "type": "apiKey",
+                "in": "cookie",
+                "name": "sessionid",
+            }
+        }
+    },
+}

@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from .models import Recipe, RecipeIngredient, RecipePicture, RecipeTag
@@ -45,9 +46,16 @@ class RecipePictureSerializer(serializers.ModelSerializer):
         ]
 
 
+class RecipeNutrientSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    amount = serializers.FloatField()
+
+
 class RecipeSerializer(serializers.ModelSerializer):
     nutrients = serializers.SerializerMethodField()
     has_picture = serializers.SerializerMethodField()
+
     tags = RecipeTagSerializer(
         many=True,
         read_only=True,
@@ -91,7 +99,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, attrs):
-
         request = self.context.get("request")
 
         if request and "tags" in attrs:
@@ -105,9 +112,11 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         return attrs
 
-    def get_has_picture(self, obj):
+    @extend_schema_field(serializers.BooleanField)
+    def get_has_picture(self, obj) -> bool:
         return hasattr(obj, "picture")
 
+    @extend_schema_field(RecipeNutrientSerializer(many=True))
     def get_nutrients(self, obj):
         nutrients = obj.get_nutrients()
         return [

@@ -1,5 +1,3 @@
-# units/signals.py
-
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -8,6 +6,6 @@ from .models import UnitScope
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def create_unit_scope(sender, instance, created, **kwargs):
+def create_user_unit_scope(sender, instance, created, **kwargs):
     if created:
         UnitScope.objects.create(user=instance)

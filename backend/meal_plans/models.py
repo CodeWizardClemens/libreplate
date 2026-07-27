@@ -62,8 +62,8 @@ class MealPlanFood(models.Model):
         choices=WeekDay.choices,
     )
 
-    serving_size = models.DecimalField(max_digits=10, decimal_places=2)
-    number_of_servings = models.DecimalField(max_digits=10, decimal_places=2)
+    serving_size = models.FloatField()
+    number_of_servings = models.FloatField(default=1)
 
     def __str__(self):
         return f"{self.food.name} - {self.get_day_display()} - {self.meal.name}"
@@ -91,8 +91,8 @@ class MealPlanRecipe(models.Model):
         choices=WeekDay.choices,
     )
 
-    serving_size = models.DecimalField(max_digits=10, decimal_places=2, default=1)
-    number_of_servings = models.DecimalField(max_digits=10, decimal_places=2, default=1)
+    serving_size = models.FloatField(default=100)
+    number_of_servings = models.FloatField(default=1)
 
     def __str__(self):
         return f"{self.recipe.name} - {self.get_day_display()} - {self.meal.name}"

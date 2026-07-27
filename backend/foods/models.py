@@ -5,7 +5,7 @@ from django.db import models
 class Food(models.Model):
     name = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="foods")
-    serving = models.DecimalField(max_digits=6, decimal_places=2)
+    serving = models.FloatField()
     unit = models.ForeignKey(
         "units.Unit", on_delete=models.CASCADE, null=True, blank=True
     )
@@ -47,7 +47,7 @@ class FoodNutrient(models.Model):
 
     nutrient = models.ForeignKey("nutrients.Nutrient", on_delete=models.CASCADE)
 
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.FloatField()
 
     class Meta:
         unique_together = ("food", "nutrient")

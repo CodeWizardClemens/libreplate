@@ -1,4 +1,3 @@
-from uuid import uuid4
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -18,11 +17,8 @@ class UnitScope(models.Model):
     # has already defined one. This will have to be handled properly whenupdating
     # the server via proper migrations.
 
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid4,
-        editable=False,
-    )
+    # TODO UUID should be secondary key, instead of the primary one. UUID as
+    # primary key is ugly. Look into "stripe"
 
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -65,12 +61,6 @@ class Unit(models.Model):
     - Different users may share the same private unit name, provided it does
       not exist globally.
     """
-
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid4,
-        editable=False,
-    )
 
     scope = models.ForeignKey(
         UnitScope,

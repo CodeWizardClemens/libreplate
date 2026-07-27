@@ -11,7 +11,8 @@ class FoodViewSet(ModelViewSet):
 
     def get_queryset(self):
         return Food.objects.filter(user=self.request.user).prefetch_related(
-            "food_nutrients__nutrient"
+            "food_nutrients__nutrient",
+            "unit",
         )
 
     def perform_create(self, serializer):

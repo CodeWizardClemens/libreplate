@@ -1,5 +1,3 @@
-# units/services.py
-
 from .defaults import DEFAULT_UNITS
 from .models import Unit, UnitScope
 
@@ -11,5 +9,8 @@ def sync_default_units():
         Unit.objects.get_or_create(
             scope=global_scope,
             name=unit.name,
-            defaults=unit.model_dump(exclude={"name"}),
+            defaults={
+                "abbreviation": unit.abbreviation,
+                "description": unit.description,
+            },
         )

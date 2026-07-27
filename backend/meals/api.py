@@ -1,3 +1,5 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import serializers, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -23,7 +25,9 @@ class MealViewSet(viewsets.ModelViewSet):
             Meal.objects.filter(
                 user=self.request.user,
             )
-            .select_related("default_meal")
+            .select_related(
+                "default_meal",
+            )
             .prefetch_related(
                 "meal_foods__food",
                 "meal_foods__food__unit",
@@ -55,16 +59,24 @@ class DefaultMealViewSet(viewsets.ModelViewSet):
 class DayMealsAPIView(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
-    """
-    Returns every meal slot for a given day.
 
-    Each slot corresponds to a DefaultMeal.
-
-    If a Meal exists for that slot, meal_id is populated.
-
-    Otherwise meal_id is null and the frontend can create it.
-    """
-
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="day",
+                type=OpenApiTypes.DATE,
+                location=OpenApiParameter.PATH,
+                description="Date to retrieve meals for.",
+            )
+        ],
+        responses=DayMealSerializer(many=True),
+        description=(
+            "Returns every meal slot for a given day. "
+            "Each slot corresponds to a DefaultMeal. "
+            "If a Meal exists for that slot, meal_id is populated. "
+            "Otherwise meal_id is null."
+        ),
+    )
     def get(self, request, day):
         defaults = list(
             DefaultMeal.objects.filter(
@@ -77,7 +89,9 @@ class DayMealsAPIView(APIView):
                 user=request.user,
                 date=day,
             )
-            .select_related("default_meal")
+            .select_related(
+                "default_meal",
+            )
             .prefetch_related(
                 "meal_foods__food",
                 "meal_foods__food__unit",
@@ -103,6 +117,7 @@ class DayMealsAPIView(APIView):
                         "meal_foods": meal.meal_foods.all(),
                     }
                 )
+
             else:
                 response.append(
                     {
@@ -133,11 +148,15 @@ class MealFoodViewSet(viewsets.ModelViewSet):
     serializer_class = MealFoodCreateSerializer
 
     def get_queryset(self):
-
-        return MealFood.objects.filter(meal__user=self.request.user)
+        return MealFood.objects.filter(
+            meal__user=self.request.user,
+        ).select_related(
+            "meal",
+            "food",
+            "food__unit",
+        )
 
     def perform_create(self, serializer):
-
         meal = serializer.validated_data["meal"]
 
         if meal.user != self.request.user:

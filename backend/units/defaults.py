@@ -1,29 +1,22 @@
-from pydantic import BaseModel
-
-
-class UnitSchema(BaseModel):
-    name: str
-    abbreviation: str = ""
-    description: str = ""
-
+from .models import Unit
 
 DEFAULT_UNITS = [
-    UnitSchema(
+    Unit(
         name="Gram",
         abbreviation="g",
         description="SI unit of mass.",
     ),
-    UnitSchema(
+    Unit(
         name="Milliliter",
         abbreviation="ml",
         description="SI unit of volume.",
     ),
-    UnitSchema(
+    Unit(
         name="Piece",
         abbreviation="",
         description="A piece of something.",
     ),
-    UnitSchema(
+    Unit(
         name="Scoop",
         abbreviation="",
         description="A scoop of something.",

@@ -19,7 +19,7 @@ class GoalGroup(models.Model):
 
 class GoalNutrient(models.Model):
     nutrient = models.ForeignKey("nutrients.Nutrient", on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.FloatField()
     goal_group = models.ForeignKey(
         GoalGroup,
         on_delete=models.CASCADE,
@@ -35,7 +35,7 @@ class GoalBodyMetric(models.Model):
         "body_metrics.BodyMetric",
         on_delete=models.CASCADE,
     )
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.FloatField()
     goal_group = models.ForeignKey(
         GoalGroup,
         on_delete=models.CASCADE,

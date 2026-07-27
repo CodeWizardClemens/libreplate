@@ -14,23 +14,15 @@ def react_app(request):
 
 
 urlpatterns = [
-    # =========================
-    # API routes
-    # =========================
     path("api/accounts/", include("accounts.api_urls")),
     path("api/foods/", include("foods.api_urls")),
     path("api/groceries/", include("groceries.api_urls")),
-    path("api/recipes/", include("recipes.urls")),
+    path("api/integrations/", include("integrations.urls")),
     path("api/meals/", include("meals.urls")),
     path("api/nutrients/", include("nutrients.urls")),
-    path("api/integrations/", include("integrations.urls")),
+    path("api/units/", include("units.urls")),
+    path("api/recipes/", include("recipes.urls")),
 ]
-
-
-# =========================
-# API documentation
-# Only enabled in development
-# =========================
 
 if settings.DEBUG:
     urlpatterns += [
@@ -52,10 +44,7 @@ if settings.DEBUG:
     ]
 
 
-# =========================
 # React frontend assets
-# =========================
-
 urlpatterns += [
     re_path(
         r"^assets/(?P<path>.*)$",

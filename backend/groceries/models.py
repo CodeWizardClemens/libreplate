@@ -30,7 +30,7 @@ class GroceryListFood(models.Model):
 
     food = models.ForeignKey(Food, on_delete=models.CASCADE)
 
-    amount = models.DecimalField(max_digits=8, decimal_places=2)
+    amount = models.FloatField()
 
     on_hand = models.BooleanField(default=False)
 
