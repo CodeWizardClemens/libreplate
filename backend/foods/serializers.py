@@ -1,5 +1,4 @@
 from django.db import transaction
-from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from nutrients.models import Nutrient
@@ -8,24 +7,10 @@ from units.models import Unit
 from .models import Food, FoodNutrient
 
 
-class FoodNutrientCreateSerializer(serializers.ModelSerializer):
+class FoodNutrientSerializer(serializers.ModelSerializer):
     nutrient_id = serializers.PrimaryKeyRelatedField(
         queryset=Nutrient.objects.all(),
         source="nutrient",
-    )
-
-    class Meta:
-        model = FoodNutrient
-        fields = [
-            "nutrient_id",
-            "amount",
-        ]
-
-
-class FoodNutrientSerializer(serializers.ModelSerializer):
-    nutrient_id = serializers.IntegerField(
-        source="nutrient.id",
-        read_only=True,
     )
 
     nutrient_name = serializers.CharField(
@@ -54,7 +39,6 @@ class FoodSerializer(serializers.ModelSerializer):
     unit_id = serializers.PrimaryKeyRelatedField(
         queryset=Unit.objects.all(),
         source="unit",
-        required=True,
     )
 
     unit_name = serializers.CharField(
@@ -62,7 +46,7 @@ class FoodSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
-    nutrients = FoodNutrientCreateSerializer(
+    nutrients = FoodNutrientSerializer(
         many=True,
         required=False,
         source="food_nutrients",
@@ -70,7 +54,6 @@ class FoodSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Food
-
         fields = [
             "id",
             "name",
@@ -91,7 +74,9 @@ class FoodSerializer(serializers.ModelSerializer):
         ]
 
     def _set_nutrients(self, food, nutrients):
-        FoodNutrient.objects.filter(food=food).delete()
+        FoodNutrient.objects.filter(
+            food=food
+        ).delete()
 
         FoodNutrient.objects.bulk_create(
             [
@@ -111,7 +96,9 @@ class FoodSerializer(serializers.ModelSerializer):
             [],
         )
 
-        food = Food.objects.create(**validated_data)
+        food = Food.objects.create(
+            **validated_data
+        )
 
         self._set_nutrients(
             food,
@@ -143,17 +130,3 @@ class FoodSerializer(serializers.ModelSerializer):
             )
 
         return instance
-
-    @extend_schema_field(FoodNutrientSerializer(many=True))
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-
-        representation["nutrients"] = FoodNutrientSerializer(
-            instance.food_nutrients.select_related(
-                "nutrient",
-            ),
-            many=True,
-            context=self.context,
-        ).data
-
-        return representation

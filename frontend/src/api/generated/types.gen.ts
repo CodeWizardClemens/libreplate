@@ -41,11 +41,13 @@ export type Food = {
     description?: string | null;
     is_favorite?: boolean;
     usda_fdc_id?: number | null;
-    nutrients?: Array<FoodNutrientCreate>;
+    nutrients?: Array<FoodNutrient>;
 };
 
-export type FoodNutrientCreate = {
+export type FoodNutrient = {
     nutrient_id: number;
+    readonly nutrient_name: string;
+    readonly nutrient_unit: string;
     amount: number;
 };
 
@@ -158,7 +160,7 @@ export type PatchedFood = {
     description?: string | null;
     is_favorite?: boolean;
     usda_fdc_id?: number | null;
-    nutrients?: Array<FoodNutrientCreate>;
+    nutrients?: Array<FoodNutrient>;
 };
 
 export type PatchedGroceryListFood = {
@@ -313,7 +315,12 @@ export type FoodWritable = {
     description?: string | null;
     is_favorite?: boolean;
     usda_fdc_id?: number | null;
-    nutrients?: Array<FoodNutrientCreate>;
+    nutrients?: Array<FoodNutrientWritable>;
+};
+
+export type FoodNutrientWritable = {
+    nutrient_id: number;
+    amount: number;
 };
 
 export type GroceryListWritable = {
@@ -369,7 +376,7 @@ export type PatchedFoodWritable = {
     description?: string | null;
     is_favorite?: boolean;
     usda_fdc_id?: number | null;
-    nutrients?: Array<FoodNutrientCreate>;
+    nutrients?: Array<FoodNutrientWritable>;
 };
 
 export type PatchedGroceryListFoodWritable = {

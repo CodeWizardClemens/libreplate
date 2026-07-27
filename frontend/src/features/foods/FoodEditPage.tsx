@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import type { FoodNutrientCreate } from "@/api/generated";
+import type { FoodNutrient } from "@/api/generated";
 
 import { useDeleteFood, useFood, useUpdateFood } from "@/api/FoodAPI";
 import { useNutrients } from "@/api/NutrientAPI";
@@ -23,7 +23,7 @@ export default function FoodEditPage() {
   const [unitID, setUnit] = useState<number | "">("");
   const [barcode, setBarcode] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
-  const [nutrients, setNutrients] = useState<FoodNutrientCreate[]>([]);
+  const [nutrients, setNutrients] = useState<FoodNutrient[]>([]);
 
   useEffect(() => {
     if (!foodQuery.data) {
@@ -48,15 +48,15 @@ export default function FoodEditPage() {
 
     const food = foodQuery.data;
 
-    // Show every nutrient meant for the food-edit screen, plus any
-    // nutrient already on this food even if it's since been hidden there.
     const relevantNutrients = nutrientsQuery.data.filter(
       (nutrient) =>
         nutrient.show_in_food_edit ||
-        food.nutrients?.some((n) => n.nutrient_id === nutrient.id),
+        food.nutrients?.some(
+          (n) => n.nutrient_id === nutrient.id,
+        ),
     );
 
-    const merged: FoodNutrientCreate[] = relevantNutrients.map((nutrient) => {
+    const merged: FoodNutrient[] = relevantNutrients.map((nutrient) => {
       const existing = food.nutrients?.find(
         (n) => n.nutrient_id === nutrient.id,
       );
@@ -82,7 +82,14 @@ export default function FoodEditPage() {
 
   function updateNutrientAmount(index: number, amount: number) {
     setNutrients((prev) =>
-      prev.map((n, i) => (i === index ? { ...n, amount } : n)),
+      prev.map((n, i) =>
+        i === index
+          ? {
+              ...n,
+              amount,
+            }
+          : n,
+      ),
     );
   }
 
@@ -99,7 +106,7 @@ export default function FoodEditPage() {
           barcode: barcode || null,
           is_favorite: isFavorite,
           nutrients: nutrients.map((n) => ({
-            nutrient_id: n.nutrient_id!,
+            nutrient_id: n.nutrient_id,
             amount: n.amount,
           })),
         },
@@ -184,7 +191,9 @@ export default function FoodEditPage() {
                 value={serving}
                 onChange={(e) =>
                   setServing(
-                    e.target.value === "" ? "" : Number(e.target.value),
+                    e.target.value === ""
+                      ? ""
+                      : Number(e.target.value),
                   )
                 }
               />
@@ -196,7 +205,11 @@ export default function FoodEditPage() {
                 className="form-control"
                 value={unitID}
                 onChange={(e) =>
-                  setUnit(e.target.value === "" ? "" : Number(e.target.value))
+                  setUnit(
+                    e.target.value === ""
+                      ? ""
+                      : Number(e.target.value),
+                  )
                 }
               />
             </div>
@@ -219,7 +232,10 @@ export default function FoodEditPage() {
                   checked={isFavorite}
                   onChange={(e) => setIsFavorite(e.target.checked)}
                 />
-                <label className="form-check-label" htmlFor="isFavorite">
+                <label
+                  className="form-check-label"
+                  htmlFor="isFavorite"
+                >
                   Favorite
                 </label>
               </div>
@@ -231,36 +247,43 @@ export default function FoodEditPage() {
           <h5 className="mb-3">Nutrients</h5>
 
           {nutrients.length === 0 && (
-            <p className="text-muted">No nutrients configured.</p>
+            <p className="text-muted">
+              No nutrients configured.
+            </p>
           )}
 
           {nutrients.map((nutrient, index) => (
             <div
-              key={nutrient.nutrient_id ?? index}
-              className="row g-2 align-items-center mb-2"
+              key={nutrient.nutrient_id}
+              className="d-flex align-items-center gap-2 mb-2"
             >
-              <div className="col-12 col-md-6">
-                <span className="form-control-plaintext">
-                  {nutrient.nutrient_id}
-                </span>
+              <div
+                className="text-truncate"
+                style={{
+                  width: "160px",
+                }}
+              >
+                {nutrient.nutrient_name}
               </div>
 
-              <div className="col-8 col-md-4">
-                <input
-                  type="number"
-                  className="form-control"
-                  value={nutrient.amount}
-                  onChange={(e) =>
-                    updateNutrientAmount(index, Number(e.target.value))
-                  }
-                />
-              </div>
+              <input
+                type="number"
+                className="form-control form-control-sm text-end"
+                style={{
+                  width: "90px",
+                }}
+                value={nutrient.amount}
+                onChange={(e) =>
+                  updateNutrientAmount(
+                    index,
+                    Number(e.target.value),
+                  )
+                }
+              />
 
-              <div className="col-4 col-md-2">
-                <span className="form-control-plaintext text-muted">
-                  {nutrient.nutrient_id}
-                </span>
-              </div>
+              <span className="text-muted">
+                {nutrient.nutrient_unit}
+              </span>
             </div>
           ))}
 
