@@ -7,7 +7,7 @@ from typing import Any
 import requests
 from django.contrib.auth.models import User
 from django.db import transaction
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 from foods.models import Food, FoodNutrient
 from integrations.models import USDAAPISettings
@@ -42,8 +42,15 @@ class USDAFood(BaseModel):
     brand: str | None = None
     description: str | None = None
 
-    fdc_id: int | None = Field(None)
-    data_type: str | None = Field(None)
+    # Camelcase alias is defined to match FDC API.
+    fdc_id: int | None = Field(
+        None,
+        validation_alias=AliasChoices("fdc_id", "fdcId"),
+    )
+    data_type: str | None = Field(
+        None,
+        validation_alias=AliasChoices("data_type", "dataType"),
+    )
 
     food_nutrients: list[dict[str, Any]] = Field(
         default_factory=list,
@@ -118,6 +125,7 @@ def _request(
     if not response.ok:
         raise USDAError(f"USDA API error: {response.status_code} {response.text}")
 
+    print(response.json())
     return response.json()
 
 
