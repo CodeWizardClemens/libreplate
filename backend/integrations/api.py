@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from foods.serializers import FoodSerializer
-from integrations import usda
-from integrations.usda import USDAError
+from integrations import usda_client
+from integrations.usda_client import USDAError
 
 from .serializers import (
     USDAFoodSearchResponseSerializer,
@@ -45,7 +45,7 @@ class USDASearchAPIView(APIView):
         serializer.is_valid(raise_exception=True)
 
         try:
-            foods = usda.search(
+            foods = usda_client.search(
                 **serializer.validated_data,
             )
 
@@ -86,7 +86,7 @@ class USDASaveAPIView(APIView):
         serializer.is_valid(raise_exception=True)
 
         try:
-            food = usda.save_by_id(
+            food = usda_client.save_by_id(
                 serializer.validated_data["fdc_id"],
                 user=request.user,
             )

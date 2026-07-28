@@ -9,6 +9,7 @@ class Nutrient(models.Model):
     description = models.TextField(blank=True, null=True)
     abbreviation = models.CharField(max_length=100, blank=True, null=True)
 
+    # TODO user unit model not chars!
     unit = models.CharField(
         max_length=20,
         blank=True,
@@ -56,6 +57,8 @@ class Nutrient(models.Model):
         null=True,
         blank=True,
     )
+
+    # TODO this should be an int!!!
     usda_nutrient_number = models.CharField(
         max_length=10,
         blank=True,

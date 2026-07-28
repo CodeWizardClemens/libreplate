@@ -5,8 +5,11 @@ from nutrients.models import Nutrient
 from units.models import Unit
 
 from .models import Food, FoodNutrient
-from integrations.usda import USDAFood
+from integrations.usda_client import USDAFood
 
+from integrations import usda_client
+
+from typing import Final
 
 class FoodNutrientSerializer(serializers.ModelSerializer):
     nutrient_id = serializers.PrimaryKeyRelatedField(
@@ -83,12 +86,17 @@ class FoodSerializer(serializers.ModelSerializer):
 
     def _serialize_usda_food(self, food: USDAFood):
 
+        try:
+            GRAM: Final = Unit.objects.get(name="Gram")
+        except Unit.DoesNotExist:
+            raise ValueError("Required unit 'Gram' does not exist.")
+
         return {
             "id": None,
             "name": food.name,
             "serving": food.serving,
-            "unit_id": None,
-            "unit_name": food.unit_name,
+            "unit_id": GRAM.id,
+            "unit_name": GRAM.name,
             "barcode": None,
             "brand": food.brand,
             "description": food.description,
@@ -100,15 +108,25 @@ class FoodSerializer(serializers.ModelSerializer):
         }
 
     def _serialize_usda_nutrients(self, nutrients):
+    
+        usda_ids = [
+            nutrient.get("nutrientId")
+            for nutrient in nutrients
+        ]
+
+        db_nutrients = Nutrient.objects.filter(user=None)
 
         return [
             {
-                "nutrient_id": None,
-                "nutrient_name": nutrient.get("name"),
-                "nutrient_unit": nutrient.get("unitName"),
-                "amount": nutrient.get("amount", 0),
+                "nutrient_id": db_nutrient.id if db_nutrient else None,
+                "nutrient_name": db_nutrient.name,
+                "nutrient_unit": db_nutrient.unit,
+                "amount": nutrient.get("value", 0),
             }
             for nutrient in nutrients
+            for db_nutrient in [
+                db_nutrients.get(nutrient.get("nutrientId"))
+            ]
         ]
 
     def _set_nutrients(self, food, nutrients):

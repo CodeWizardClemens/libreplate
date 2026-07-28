@@ -27,10 +27,10 @@ class USDAError(Exception):
 
 
 class USDAFoodNutrient(BaseModel):
-    amount: Decimal = Decimal("0")
-    nutrient_number: str | None = Field(None, alias="number")
-    nutrient_name: str | None = Field(None, alias="name")
-
+    value: Decimal = Decimal("0")
+    id: str = Field(None, alias="number")
+    unit: str
+    nutrient_name: str = Field(None, alias="name")
     model_config = ConfigDict(populate_by_name=True)
 
 
@@ -71,7 +71,7 @@ class USDAFood(BaseModel):
             serving=self.serving,
             unit=unit,
             brand=_normalize_text(self.brand),
-            description=self.description,
+            description=_normalize_text(self.description),
             usda_fdc_id=self.fdc_id,
         )
 
