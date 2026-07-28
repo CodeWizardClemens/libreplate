@@ -24,6 +24,6 @@ def sync_default_data(c: Context):
     for command in [
         "sync_nutrients",
         "sync_units",
-        "sync_body_metrics",
+        "sync_default_body_metrics",
     ]:
         django_run(c, command)

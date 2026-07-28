@@ -16,10 +16,10 @@ from invoke import Context, task
 
 from .utils import (
     BASE_DIR,
-    IS_DEBUG,
     VENV_DIR,
     django_run,
     info,
+    npm_run,
     npx_run,
     print_success,
     uv_run,
@@ -64,6 +64,16 @@ def ruff_check_cmd(fix: bool = False, exit_zero: bool = False) -> str:
     return " ".join(args)
 
 
+@task(help={"verbose": "Show stdout output from commands."})
+def verify(c: Context, verbose: bool = False) -> None:
+    """
+    Run all code quality checks and tests.
+    """
+
+    check(c, verbose)
+    test(c, verbose)
+
+
 @task()
 def user_add_dummy(c: Context):
     """
@@ -90,7 +100,7 @@ def user_add_dummy(c: Context):
 
 
 @task(help={"verbose": "Show stdout output from commands."})
-def code_check(c: Context, verbose: bool = False) -> None:
+def check(c: Context, verbose: bool = False) -> None:
     """
     Run code quality checks.
     """
@@ -112,7 +122,7 @@ def code_check(c: Context, verbose: bool = False) -> None:
 
 
 @task(help={"verbose": "Show stdout output from commands."})
-def code_format(c: Context, verbose: bool = False) -> None:
+def format(c: Context, verbose: bool = False) -> None:
     """
     Automatically format the codebase.
     """
@@ -147,13 +157,38 @@ def test(c: Context, verbose: bool = False) -> None:
 
 
 @task
-def serve(c: Context):
+def serve_backend(c: Context) -> None:
     """
-    Start the LibrePlate web server.
+    Start the backend development server.
     """
-    info("Running server")
+    info("Running backend server")
 
-    if IS_DEBUG:
-        django_run(c, "runserver")
-    else:
-        c.run("uv run gunicorn libreplate.wsgi:application")
+    django_run(c, "runserver")
+
+
+@task
+def serve_frontend(c: Context) -> None:
+    """
+    Start the frontend development server.
+    """
+    info("Running frontend server")
+
+    npm_run(c, "run dev")
+
+
+@task
+def generate_api(c: Context) -> None:
+    """
+    Generate the frontend API client from the Django OpenAPI schema.
+    """
+    schema_path = BASE_DIR / "frontend" / "openapi.yaml"
+
+    with c.cd(BASE_DIR / "backend"):
+        uv_run(
+            c,
+            f"python manage.py spectacular --file {schema_path}",
+        )
+
+    npm_run(c, "run api:generate")
+
+    print_success("Frontend API generated")

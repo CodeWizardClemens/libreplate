@@ -66,10 +66,18 @@ def django_run(c: Context, command: str, quiet_stdout: bool = False) -> None:
 
 def npx_run(c: Context, command: str, quiet_stdout: bool = False) -> None:
     """
-    Run a Node command.
+    Run a Node command with npx.
     """
     with c.cd(BASE_DIR / "frontend"):
         run_command(c, f"npx {command}", quiet_stdout)
+
+
+def npm_run(c: Context, command: str, quiet_stdout: bool = False) -> None:
+    """
+    Run a Node command with npx.
+    """
+    with c.cd(BASE_DIR / "frontend"):
+        run_command(c, f"npm {command}", quiet_stdout)
 
 
 def get_bool_env(name: str, default: bool = False) -> bool:
