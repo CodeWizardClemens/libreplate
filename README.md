@@ -12,21 +12,12 @@ LibrePlate uses [Python UV](https://docs.astral.sh/uv/getting-started/installati
 
 To install LibrePlate run:
 
-```
-uv sync
-uv run invoke init
-```
-
-To update LibrePlate and all its dependencies run:
-```
-uv run invoke update
-```
-
-
-To see how to do other things with the server, type:
+To see how to use the serve run the following command:
 ```
 uv run invoke --help
 ```
+
+Or check out the generated manual here: [Invoke Task Manual](INVOKE_MANUAL.md).
 
 ### Configuration
 
@@ -35,22 +26,4 @@ on how to configure it further.
 
 ```
 cp .env_example .env
-```
-
-### Running the server
-
-The `serve` task starts the LibrePlate website server.
-
-- In development mode, it runs Django's development server.
-- In release mode, it runs the production Gunicorn WSGI server. A reverse proxy
-  is still required in front of Gunicorn to serve public traffic.
-
-Run:
-```
-uv run invoke serve
-```
-
-Run dev for React:
-```
-npm run dev
 ```

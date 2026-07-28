@@ -17,6 +17,7 @@ from pathlib import Path
 
 from invoke import Context, task
 
+from .docs import generate_invoke_manual
 from .utils import (
     BASE_DIR,
     VENV_DIR,
@@ -74,6 +75,7 @@ def verify(c: Context, verbose: bool = False) -> None:
     Run all code quality checks and tests.
     """
 
+    generate_invoke_manual(c, check=True)
     generate_api(c, check=True)
     check(c, verbose)
     test(c, verbose)
