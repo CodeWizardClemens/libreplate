@@ -28,21 +28,21 @@ def info(message: str) -> None:
     """
     Pretty print an informational message.
     """
-    console.print(f"[bold]INFO:[/bold] {message}")
+    console.print(f"[bold]INFO[/bold] {message}")
 
 
 def print_success(message: str) -> None:
     """
     Pretty print a success message.
     """
-    console.print(f"[bold green]SUCCESS:[/bold green] {message}")
+    console.print(f"[bold green]SUCCESS[/bold green] {message}")
 
 
 def print_error(message: str) -> None:
     """
     Pretty print an error message.
     """
-    console.print(f"[bold red]ERROR:[/bold red] {message}")
+    console.print(f"[bold red]ERROR[/bold red] {message}")
 
 
 def run_command(c: Context, command: str, quiet_stdout: bool = False) -> None:
