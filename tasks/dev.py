@@ -10,7 +10,10 @@ including:
 - Starting the development or production web server
 """
 
+import filecmp
 import shlex
+import tempfile
+from pathlib import Path
 
 from invoke import Context, task
 
@@ -21,6 +24,7 @@ from .utils import (
     info,
     npm_run,
     npx_run,
+    print_error,
     print_success,
     uv_run,
 )
@@ -70,6 +74,7 @@ def verify(c: Context, verbose: bool = False) -> None:
     Run all code quality checks and tests.
     """
 
+    generate_api(c, check=True)
     check(c, verbose)
     test(c, verbose)
 
@@ -118,7 +123,7 @@ def check(c: Context, verbose: bool = False) -> None:
         quiet_stdout=not verbose,
     )
 
-    print_success(message="Succesfully ran all code checks")
+    print_success(message="Code checks passed")
 
 
 @task(help={"verbose": "Show stdout output from commands."})
@@ -140,7 +145,7 @@ def format(c: Context, verbose: bool = False) -> None:
     uv_run(c, f"ruff format {BASE_DIR} --exclude {VENV_DIR}", quiet_stdout=not verbose)
     uv_run(c, ruff_check_cmd(fix=True, exit_zero=True), quiet_stdout=not verbose)
 
-    print_success(message="Succesfully ran all formatters")
+    print_success(message="Code formatters passed")
 
 
 @task(help={"verbose": "Show stdout output from commands."})
@@ -153,7 +158,7 @@ def test(c: Context, verbose: bool = False) -> None:
         info("Running tests")
     django_run(c, "test", quiet_stdout=not verbose)
 
-    print_success(message="Succesfully ran all tests")
+    print_success(message="All tests passed")
 
 
 @task
@@ -176,12 +181,41 @@ def serve_frontend(c: Context) -> None:
     npm_run(c, "run dev")
 
 
-@task
-def generate_api(c: Context) -> None:
+def api_changed(c: Context) -> bool:
+    schema_path = BASE_DIR / "frontend" / "openapi.yaml"
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_schema = Path(tmp_dir) / "openapi.yaml"
+
+        with c.cd(BASE_DIR / "backend"):
+            uv_run(
+                c,
+                f"python manage.py spectacular --file {tmp_schema}",
+            )
+
+        return not filecmp.cmp(
+            tmp_schema,
+            schema_path,
+            shallow=False,
+        )
+
+
+@task(aliases=["apigen"])
+def generate_api(c: Context, check: bool = False) -> None:
     """
     Generate the frontend API client from the Django OpenAPI schema.
+
+    Use --check to fail if generated files would change.
     """
     schema_path = BASE_DIR / "frontend" / "openapi.yaml"
+
+    if check:
+        if api_changed(c):
+            print_error("API client is out of date. Run `invoke dev.generate-api`.")
+            raise SystemExit(1)
+
+        print_success("API client is up to date")
+        return
 
     with c.cd(BASE_DIR / "backend"):
         uv_run(

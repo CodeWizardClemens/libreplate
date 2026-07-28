@@ -1,3 +1,7 @@
+"""
+Invoke utility functions and configuration helpers for project automation tasks.
+"""
+
 from __future__ import annotations
 
 import os
@@ -7,6 +11,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from invoke import Context
 from invoke.exceptions import Failure
+from rich.console import Console
 
 BASE_DIR = Path(__file__).parent.parent.resolve()
 VENV_DIR = BASE_DIR / "backend" / ".venv"
@@ -14,23 +19,30 @@ VENV_DIR = BASE_DIR / "backend" / ".venv"
 load_dotenv(BASE_DIR / ".env")
 
 
-GREEN = "\033[92m"
-BOLD = "\033[1m"
-RESET = "\033[0m"
+# Rich console handles terminal output, colors, and formatting.
+# It automatically detects terminal capabilities and falls back gracefully.
+console = Console()
 
 
 def info(message: str) -> None:
     """
-    Pretty print a message.
+    Pretty print an informational message.
     """
-    print(f"{BOLD}INFO:{RESET} {message}")
+    console.print(f"[bold]INFO:[/bold] {message}")
 
 
 def print_success(message: str) -> None:
     """
     Pretty print a success message.
     """
-    print(f"{GREEN}{BOLD}SUCCESS:{RESET} {GREEN}{message}{RESET}")
+    console.print(f"[bold green]SUCCESS:[/bold green] {message}")
+
+
+def print_error(message: str) -> None:
+    """
+    Pretty print an error message.
+    """
+    console.print(f"[bold red]ERROR:[/bold red] {message}")
 
 
 def run_command(c: Context, command: str, quiet_stdout: bool = False) -> None:
@@ -40,7 +52,7 @@ def run_command(c: Context, command: str, quiet_stdout: bool = False) -> None:
     if quiet_stdout:
         result = c.run(command, hide=True, warn=True)
 
-        # Only show stderr when the command failed
+        # Only show stderr when the command failed.
         if result.exited != 0:
             sys.stderr.write(result.stderr or "")
             raise Failure(result)
@@ -74,7 +86,7 @@ def npx_run(c: Context, command: str, quiet_stdout: bool = False) -> None:
 
 def npm_run(c: Context, command: str, quiet_stdout: bool = False) -> None:
     """
-    Run a Node command with npx.
+    Run a Node command with npm.
     """
     with c.cd(BASE_DIR / "frontend"):
         run_command(c, f"npm {command}", quiet_stdout)
