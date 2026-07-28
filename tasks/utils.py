@@ -60,7 +60,7 @@ def django_run(c: Context, command: str, quiet_stdout: bool = False) -> None:
     """
     Run a Django command.
     """
-    with c.cd("backend"):
+    with c.cd(BASE_DIR / "backend"):
         uv_run(c, f"python manage.py {command}", quiet_stdout)
 
 
@@ -68,7 +68,7 @@ def npx_run(c: Context, command: str, quiet_stdout: bool = False) -> None:
     """
     Run a Node command.
     """
-    with c.cd("frontend"):
+    with c.cd(BASE_DIR / "frontend"):
         run_command(c, f"npx {command}", quiet_stdout)
 
 
