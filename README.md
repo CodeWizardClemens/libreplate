@@ -6,18 +6,7 @@ librePlate exists because many existing food tracking services are closed source
 
 ## Getting Started
 
-### Install
-
-LibrePlate uses [Python UV](https://docs.astral.sh/uv/getting-started/installation/) to manage its updates and instalation.
-
-To install LibrePlate run:
-
-To see how to use the serve run the following command:
-```
-uv run invoke --help
-```
-
-Or check out the generated manual here: [Invoke Task Manual](INVOKE_MANUAL.md).
+LibrePlate uses invoke to manage everything from dev tools to installing. See the manual for the tasks here: [Invoke Task Manual](INVOKE_MANUAL.md).
 
 ### Configuration
 

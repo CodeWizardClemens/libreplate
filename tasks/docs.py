@@ -12,7 +12,7 @@ MANUAL_HEADER = """
 # Invoke tasks documentation
 
 To use invoke you will have to create a virtual environment first, and use its
-python shell. I recommand install uv and run:
+python shell. Install [Python UV](https://docs.astral.sh/uv/getting-started/installation/) and run.
 ```
 cd backend && uv sync
 source ./venv/bin/activate
