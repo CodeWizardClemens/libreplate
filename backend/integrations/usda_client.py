@@ -13,6 +13,8 @@ from foods.models import Food, FoodNutrient
 from integrations.models import USDAAPISettings
 from nutrients.models import Nutrient
 from units.models import Unit, UnitScope
+from pydantic import field_validator
+from typing import Any, Literal
 
 USDA_API_BASE_URL = "https://api.nal.usda.gov/fdc/v1"
 
@@ -27,11 +29,22 @@ class USDAError(Exception):
 
 
 class USDAFoodNutrient(BaseModel):
+    id: int = Field(alias="nutrientId")
+    # Can also be None or a sub number, so has to be a decimal and None.
+    # This is not stated in document above.
+    number: Decimal | None = Field(default=None, alias="nutrientNumber")
+    name: str = Field(alias="nutrientName")
+    unit_name: str = Field(alias="unitName")
     value: Decimal = Decimal("0")
-    id: str = Field(None, alias="number")
-    unit: str
-    nutrient_name: str = Field(None, alias="name")
+
     model_config = ConfigDict(populate_by_name=True)
+
+    @field_validator("number", mode="before")
+    @classmethod
+    def empty_string_to_none(cls, value):
+        if value == "":
+            return None
+        return value
 
 
 class USDAFood(BaseModel):
@@ -39,10 +52,9 @@ class USDAFood(BaseModel):
     serving: float = 100
     unit_name: str = "g"
 
-    brand: str | None = None
+    brand: str | None = Field(None, validation_alias="brandName")
     description: str | None = None
 
-    # Camelcase alias is defined to match FDC API.
     fdc_id: int | None = Field(
         None,
         validation_alias=AliasChoices("fdc_id", "fdcId"),
@@ -52,19 +64,14 @@ class USDAFood(BaseModel):
         validation_alias=AliasChoices("data_type", "dataType"),
     )
 
-    food_nutrients: list[dict[str, Any]] = Field(
+    food_nutrients: list[USDAFoodNutrient] = Field(
         default_factory=list,
         alias="foodNutrients",
     )
 
     model_config = ConfigDict(populate_by_name=True)
 
-    def to_food(
-        self,
-        *,
-        user: User,
-        unit: Unit | None,
-    ) -> Food:
+    def to_food(self, *, user: User, unit: Unit | None) -> Food:
         return Food(
             user=user,
             name=_normalize_text(self.name) or "Unknown food",
@@ -187,6 +194,7 @@ def _create_usda_food(
     data = food_data.copy()
 
     data.update(
+        name=food_data.get("description"),
         brand=_extract_brand(food_data),
         description=(food_data.get("ingredients") or food_data.get("description")),
     )
@@ -217,7 +225,7 @@ def search(
 
 def _save_nutrients(
     food: Food,
-    nutrient_data: list[dict[str, Any]],
+    nutrient_data: list[USDAFoodNutrient],
 ) -> None:
     nutrient_map = {
         nutrient.usda_nutrient_number: nutrient
@@ -226,22 +234,17 @@ def _save_nutrients(
         )
     }
 
-    for item in nutrient_data:
-        nutrient = item.get("nutrient")
-
-        if not nutrient:
-            continue
-
-        db_nutrient = nutrient_map.get(str(nutrient.get("number")))
-
-        if not db_nutrient:
-            continue
-
-        FoodNutrient.objects.create(
+    food_nutrients = [
+        FoodNutrient(
             food=food,
-            nutrient=db_nutrient,
-            amount=Decimal(str(item.get("amount", 0))),
+            nutrient=nutrient_map[item.number],
+            amount=item.value,
         )
+        for item in nutrient_data
+        if item.number is not None and item.number in nutrient_map
+    ]
+
+    FoodNutrient.objects.bulk_create(food_nutrients)
 
 
 def save_by_id(

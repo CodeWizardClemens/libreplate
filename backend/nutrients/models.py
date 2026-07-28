@@ -58,9 +58,7 @@ class Nutrient(models.Model):
         blank=True,
     )
 
-    # TODO this should be an int!!!
-    usda_nutrient_number = models.CharField(
-        max_length=10,
+    usda_nutrient_number = models.IntegerField(
         blank=True,
         null=True,
         unique=True,

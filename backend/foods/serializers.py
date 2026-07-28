@@ -10,6 +10,11 @@ from integrations.usda_client import USDAFood
 from integrations import usda_client
 
 from typing import Final
+from integrations.usda_client import USDAFood, USDAFoodNutrient
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 class FoodNutrientSerializer(serializers.ModelSerializer):
     nutrient_id = serializers.PrimaryKeyRelatedField(
@@ -107,26 +112,35 @@ class FoodSerializer(serializers.ModelSerializer):
             ),
         }
 
-    def _serialize_usda_nutrients(self, nutrients):
-    
-        usda_ids = [
-            nutrient.get("nutrientId")
-            for nutrient in nutrients
-        ]
+    def _serialize_usda_nutrients(self, usda_nutrients: list[USDAFoodNutrient]):
+        """
+        Serialize USDA nutrients into the application's nutrient format.
 
-        db_nutrients = Nutrient.objects.filter(user=None)
+        Not all USDA nutrients are supported. Only nutrients that exist in the
+        database are included in the serialized output; unsupported nutrients are
+        ignored.
+        """
+        usda_nutrient_map = {
+            nutrient.number: nutrient
+            for nutrient in usda_nutrients
+            if nutrient.number is not None
+        }
+
+        global_nutrients = {
+            nutrient.usda_nutrient_number: nutrient
+            for nutrient in Nutrient.objects.filter(
+                usda_nutrient_number__in=usda_nutrient_map.keys(),
+            )
+        }
 
         return [
             {
-                "nutrient_id": db_nutrient.id if db_nutrient else None,
-                "nutrient_name": db_nutrient.name,
-                "nutrient_unit": db_nutrient.unit,
-                "amount": nutrient.get("value", 0),
+                "nutrient_id": nutrient.id,
+                "nutrient_name": nutrient.name,
+                "nutrient_unit": nutrient.unit,
+                "amount": usda_nutrient_map[nutrient.usda_nutrient_number].value,
             }
-            for nutrient in nutrients
-            for db_nutrient in [
-                db_nutrients.get(nutrient.get("nutrientId"))
-            ]
+            for nutrient in global_nutrients.values()
         ]
 
     def _set_nutrients(self, food, nutrients):
