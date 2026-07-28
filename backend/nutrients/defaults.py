@@ -283,7 +283,6 @@ DEFAULT_NUTRIENTS = [
         description="Added vitamin B12 content.",
         usda_nutrient_number=578,
     ),
-
     # Fatty acids
     NutrientSchema(
         name="Trans Fat",

@@ -1,20 +1,17 @@
+import logging
+from typing import Final
+
 from django.db import transaction
 from rest_framework import serializers
 
+from integrations.usda_client import USDAFood, USDAFoodNutrient
 from nutrients.models import Nutrient
 from units.models import Unit
 
 from .models import Food, FoodNutrient
-from integrations.usda_client import USDAFood
-
-from integrations import usda_client
-
-from typing import Final
-from integrations.usda_client import USDAFood, USDAFoodNutrient
-
-import logging
 
 logger = logging.getLogger(__name__)
+
 
 class FoodNutrientSerializer(serializers.ModelSerializer):
     nutrient_id = serializers.PrimaryKeyRelatedField(

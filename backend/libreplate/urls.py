@@ -2,7 +2,6 @@ from django.conf import settings
 from django.http import FileResponse
 from django.urls import include, path, re_path
 from django.views.static import serve
-
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,

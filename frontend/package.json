@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "api:generate": "openapi-ts -i http://localhost:8000/api/schema/ -o src/api/generated",
-    "dev": "npm run api:generate && vite",
-    "build": "npm run api:generate && tsc -b && vite build",
+    "api:generate": "openapi-ts",
+    "dev": "vite",
+    "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview"
   },

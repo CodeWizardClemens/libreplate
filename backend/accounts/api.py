@@ -1,7 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import ensure_csrf_cookie
-
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers, status
 from rest_framework.decorators import api_view, permission_classes
@@ -36,9 +35,7 @@ class UserSerializer(serializers.Serializer):
 @permission_classes([AllowAny])
 @ensure_csrf_cookie
 def csrf_view(request):
-    return Response(
-        {"csrfToken": get_token(request)}
-    )
+    return Response({"csrfToken": get_token(request)})
 
 
 @extend_schema(

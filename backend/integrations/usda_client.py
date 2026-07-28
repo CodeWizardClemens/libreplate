@@ -19,7 +19,7 @@ from pydantic import (
 from foods.models import Food, FoodNutrient
 from integrations.models import USDAAPISettings
 from nutrients.models import Nutrient
-from units.models import Unit, UnitScope
+from units.models import Unit
 
 USDA_API_BASE_URL = "https://api.nal.usda.gov/fdc/v1"
 
@@ -251,12 +251,8 @@ def _get_global_unit(name: str) -> Unit | None:
     unit_name = mappings.get(name.lower())
     if not unit_name:
         return None
-    try:
-        scope = UnitScope.objects.get(user=None)
-    except UnitScope.DoesNotExist:
-        return None
+
     return Unit.objects.filter(
-        scope=scope,
         name=unit_name,
     ).first()
 

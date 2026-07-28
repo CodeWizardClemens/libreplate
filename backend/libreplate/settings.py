@@ -220,5 +220,5 @@ SPECTACULAR_SETTINGS = {
             return request;
         }
         """,
-    }
+    },
 }

@@ -1,0 +1,2374 @@
+openapi: 3.0.3
+info:
+  title: LibrePlate API
+  version: 0.0.0
+paths:
+  /api/accounts/csrf/:
+    get:
+      operationId: accounts_csrf_retrieve
+      tags:
+        - accounts
+      security:
+        - cookieAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Csrf"
+          description: ""
+  /api/accounts/login/:
+    post:
+      operationId: accounts_login_create
+      tags:
+        - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Login"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Login"
+        required: true
+      security:
+        - cookieAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+          description: ""
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+          description: ""
+  /api/accounts/logout/:
+    post:
+      operationId: accounts_logout_create
+      tags:
+        - accounts
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+          description: ""
+  /api/accounts/me/:
+    get:
+      operationId: accounts_me_retrieve
+      tags:
+        - accounts
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+          description: ""
+  /api/foods/:
+    get:
+      operationId: foods_list
+      tags:
+        - foods
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Food"
+          description: ""
+    post:
+      operationId: foods_create
+      tags:
+        - foods
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Food"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Food"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Food"
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Food"
+          description: ""
+  /api/foods/{id}/:
+    get:
+      operationId: foods_retrieve
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - foods
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Food"
+          description: ""
+    put:
+      operationId: foods_update
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - foods
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Food"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Food"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Food"
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Food"
+          description: ""
+    patch:
+      operationId: foods_partial_update
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - foods
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedFood"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedFood"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedFood"
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Food"
+          description: ""
+    delete:
+      operationId: foods_destroy
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - foods
+      security:
+        - cookieAuth: []
+      responses:
+        "204":
+          description: No response body
+  /api/groceries/:
+    get:
+      operationId: groceries_list
+      tags:
+        - groceries
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GroceryList"
+          description: ""
+    post:
+      operationId: groceries_create
+      tags:
+        - groceries
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GroceryList"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/GroceryList"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/GroceryList"
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroceryList"
+          description: ""
+  /api/groceries/{grocery_pk}/items/:
+    get:
+      operationId: groceries_items_list
+      parameters:
+        - in: path
+          name: grocery_pk
+          schema:
+            type: integer
+          required: true
+      tags:
+        - groceries
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GroceryListFood"
+          description: ""
+    post:
+      operationId: groceries_items_create
+      parameters:
+        - in: path
+          name: grocery_pk
+          schema:
+            type: integer
+          required: true
+      tags:
+        - groceries
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GroceryListFood"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/GroceryListFood"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/GroceryListFood"
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroceryListFood"
+          description: ""
+  /api/groceries/{grocery_pk}/items/{id}/:
+    patch:
+      operationId: groceries_items_partial_update
+      parameters:
+        - in: path
+          name: grocery_pk
+          schema:
+            type: integer
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - groceries
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedGroceryListFood"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedGroceryListFood"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedGroceryListFood"
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroceryListFood"
+          description: ""
+    delete:
+      operationId: groceries_items_destroy
+      parameters:
+        - in: path
+          name: grocery_pk
+          schema:
+            type: integer
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - groceries
+      security:
+        - cookieAuth: []
+      responses:
+        "204":
+          description: No response body
+  /api/groceries/{grocery_pk}/items/{id}/toggle/:
+    post:
+      operationId: groceries_items_toggle_create
+      parameters:
+        - in: path
+          name: grocery_pk
+          schema:
+            type: integer
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - groceries
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GroceryListFood"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/GroceryListFood"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/GroceryListFood"
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroceryListFood"
+          description: ""
+  /api/groceries/{id}/:
+    get:
+      operationId: groceries_retrieve
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - groceries
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroceryList"
+          description: ""
+    delete:
+      operationId: groceries_destroy
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - groceries
+      security:
+        - cookieAuth: []
+      responses:
+        "204":
+          description: No response body
+  /api/integrations/usda/save/:
+    post:
+      operationId: integrations_usda_save_create
+      tags:
+        - integrations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/USDASave"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/USDASave"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/USDASave"
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                description: Food successfully saved.
+          description: ""
+        "400":
+          content:
+            application/json:
+              schema:
+                description: Invalid FDC ID or USDA error.
+          description: ""
+  /api/integrations/usda/search/:
+    get:
+      operationId: integrations_usda_search_retrieve
+      parameters:
+        - in: query
+          name: term
+          schema:
+            type: string
+          description: Search term for USDA foods.
+          required: true
+      tags:
+        - integrations
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/USDAFoodSearchResponse"
+          description: ""
+        "400":
+          content:
+            application/json:
+              schema:
+                description: Invalid search parameters or USDA error.
+          description: ""
+  /api/meals/:
+    get:
+      operationId: meals_list
+      tags:
+        - meals
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Meal"
+          description: ""
+    post:
+      operationId: meals_create
+      tags:
+        - meals
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Meal"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Meal"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Meal"
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meal"
+          description: ""
+  /api/meals/{id}/:
+    get:
+      operationId: meals_retrieve
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - meals
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meal"
+          description: ""
+    put:
+      operationId: meals_update
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - meals
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Meal"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Meal"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Meal"
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meal"
+          description: ""
+    patch:
+      operationId: meals_partial_update
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - meals
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedMeal"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedMeal"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedMeal"
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meal"
+          description: ""
+    delete:
+      operationId: meals_destroy
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - meals
+      security:
+        - cookieAuth: []
+      responses:
+        "204":
+          description: No response body
+  /api/meals/day/{day}/:
+    get:
+      operationId: meals_day_list
+      description:
+        Returns every meal slot for a given day. Each slot corresponds
+        to a DefaultMeal. If a Meal exists for that slot, meal_id is populated. Otherwise
+        meal_id is null.
+      parameters:
+        - in: path
+          name: day
+          schema:
+            type: string
+            format: date
+          description: Date to retrieve meals for.
+          required: true
+      tags:
+        - meals
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DayMeal"
+          description: ""
+  /api/meals/defaults/:
+    get:
+      operationId: meals_defaults_list
+      tags:
+        - meals
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DefaultMeal"
+          description: ""
+    post:
+      operationId: meals_defaults_create
+      tags:
+        - meals
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DefaultMeal"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/DefaultMeal"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/DefaultMeal"
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DefaultMeal"
+          description: ""
+  /api/meals/defaults/{id}/:
+    get:
+      operationId: meals_defaults_retrieve
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - meals
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DefaultMeal"
+          description: ""
+    put:
+      operationId: meals_defaults_update
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - meals
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DefaultMeal"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/DefaultMeal"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/DefaultMeal"
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DefaultMeal"
+          description: ""
+    patch:
+      operationId: meals_defaults_partial_update
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - meals
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedDefaultMeal"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedDefaultMeal"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedDefaultMeal"
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DefaultMeal"
+          description: ""
+    delete:
+      operationId: meals_defaults_destroy
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - meals
+      security:
+        - cookieAuth: []
+      responses:
+        "204":
+          description: No response body
+  /api/meals/meal-foods/:
+    post:
+      operationId: meals_meal_foods_create
+      tags:
+        - meals
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MealFoodCreate"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/MealFoodCreate"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/MealFoodCreate"
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MealFoodCreate"
+          description: ""
+  /api/meals/meal-foods/{id}/:
+    put:
+      operationId: meals_meal_foods_update
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - meals
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MealFoodCreate"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/MealFoodCreate"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/MealFoodCreate"
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MealFoodCreate"
+          description: ""
+    patch:
+      operationId: meals_meal_foods_partial_update
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - meals
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedMealFoodCreate"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedMealFoodCreate"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedMealFoodCreate"
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MealFoodCreate"
+          description: ""
+    delete:
+      operationId: meals_meal_foods_destroy
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - meals
+      security:
+        - cookieAuth: []
+      responses:
+        "204":
+          description: No response body
+  /api/nutrients/:
+    get:
+      operationId: nutrients_list
+      tags:
+        - nutrients
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Nutrient"
+          description: ""
+  /api/nutrients/{id}/:
+    get:
+      operationId: nutrients_retrieve
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - nutrients
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Nutrient"
+          description: ""
+  /api/recipes/:
+    get:
+      operationId: recipes_list
+      tags:
+        - recipes
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Recipe"
+          description: ""
+    post:
+      operationId: recipes_create
+      tags:
+        - recipes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Recipe"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Recipe"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Recipe"
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+          description: ""
+  /api/recipes/{id}/:
+    get:
+      operationId: recipes_retrieve
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - recipes
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+          description: ""
+    put:
+      operationId: recipes_update
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - recipes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Recipe"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Recipe"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Recipe"
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+          description: ""
+    patch:
+      operationId: recipes_partial_update
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - recipes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedRecipe"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedRecipe"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedRecipe"
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+          description: ""
+    delete:
+      operationId: recipes_destroy
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - recipes
+      security:
+        - cookieAuth: []
+      responses:
+        "204":
+          description: No response body
+  /api/recipes/{id}/copy/:
+    post:
+      operationId: recipes_copy_create
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - recipes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Recipe"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Recipe"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Recipe"
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+          description: ""
+  /api/recipes/{id}/ingredients/:
+    get:
+      operationId: recipes_ingredients_list
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - recipes
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RecipeIngredient"
+          description: ""
+    post:
+      operationId: recipes_ingredients_create
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - recipes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecipeIngredient"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/RecipeIngredient"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RecipeIngredient"
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecipeIngredient"
+          description: ""
+  /api/recipes/{id}/ingredients/{ingredient_pk}/:
+    get:
+      operationId: recipes_ingredients_retrieve
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+        - in: path
+          name: ingredient_pk
+          schema:
+            type: integer
+          required: true
+      tags:
+        - recipes
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecipeIngredient"
+          description: ""
+    put:
+      operationId: recipes_ingredients_update
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+        - in: path
+          name: ingredient_pk
+          schema:
+            type: integer
+          required: true
+      tags:
+        - recipes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecipeIngredient"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/RecipeIngredient"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RecipeIngredient"
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecipeIngredient"
+          description: ""
+    patch:
+      operationId: recipes_ingredients_partial_update
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+        - in: path
+          name: ingredient_pk
+          schema:
+            type: integer
+          required: true
+      tags:
+        - recipes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedRecipeIngredient"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedRecipeIngredient"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedRecipeIngredient"
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecipeIngredient"
+          description: ""
+    delete:
+      operationId: recipes_ingredients_destroy
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+        - in: path
+          name: ingredient_pk
+          schema:
+            type: integer
+          required: true
+      tags:
+        - recipes
+      security:
+        - cookieAuth: []
+      responses:
+        "204":
+          description: No response body
+  /api/recipes/{id}/picture/:
+    get:
+      operationId: recipes_picture_retrieve
+      description: |-
+        GET /api/recipes/<recipe_id>/picture/
+
+        Returns private image file.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - recipes
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecipePicture"
+          description: ""
+    post:
+      operationId: recipes_picture_create
+      description: |-
+        POST /api/recipes/<recipe_id>/picture/
+
+        Upload or replace recipe picture.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - recipes
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RecipePicture"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/RecipePicture"
+      security:
+        - cookieAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecipePicture"
+          description: ""
+    delete:
+      operationId: recipes_picture_destroy
+      description: DELETE /api/recipes/<recipe_id>/picture/
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - recipes
+      security:
+        - cookieAuth: []
+      responses:
+        "204":
+          description: No response body
+  /api/recipes/{id}/toggle-favorite/:
+    post:
+      operationId: recipes_toggle_favorite_create
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - recipes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Recipe"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Recipe"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Recipe"
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+          description: ""
+  /api/recipes/{id}/toggle-pin/:
+    post:
+      operationId: recipes_toggle_pin_create
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - recipes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Recipe"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Recipe"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Recipe"
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+          description: ""
+  /api/recipes/tags/:
+    get:
+      operationId: recipes_tags_list
+      tags:
+        - recipes
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RecipeTag"
+          description: ""
+    post:
+      operationId: recipes_tags_create
+      tags:
+        - recipes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecipeTag"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/RecipeTag"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RecipeTag"
+        required: true
+      security:
+        - cookieAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecipeTag"
+          description: ""
+  /api/recipes/tags/{id}/delete/:
+    delete:
+      operationId: recipes_tags_delete_destroy
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - recipes
+      security:
+        - cookieAuth: []
+      responses:
+        "204":
+          description: No response body
+  /api/schema/:
+    get:
+      operationId: schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+        - in: query
+          name: format
+          schema:
+            type: string
+            enum:
+              - json
+              - yaml
+        - in: query
+          name: lang
+          schema:
+            type: string
+            enum:
+              - af
+              - ar
+              - ar-dz
+              - ast
+              - az
+              - be
+              - bg
+              - bn
+              - br
+              - bs
+              - ca
+              - ckb
+              - cs
+              - cy
+              - da
+              - de
+              - dsb
+              - el
+              - en
+              - en-au
+              - en-gb
+              - eo
+              - es
+              - es-ar
+              - es-co
+              - es-mx
+              - es-ni
+              - es-ve
+              - et
+              - eu
+              - fa
+              - fi
+              - fr
+              - fy
+              - ga
+              - gd
+              - gl
+              - he
+              - hi
+              - hr
+              - hsb
+              - hu
+              - hy
+              - ia
+              - id
+              - ig
+              - io
+              - is
+              - it
+              - ja
+              - ka
+              - kab
+              - kk
+              - km
+              - kn
+              - ko
+              - ky
+              - lb
+              - lt
+              - lv
+              - mk
+              - ml
+              - mn
+              - mr
+              - ms
+              - my
+              - nb
+              - ne
+              - nl
+              - nn
+              - os
+              - pa
+              - pl
+              - pt
+              - pt-br
+              - ro
+              - ru
+              - sk
+              - sl
+              - sq
+              - sr
+              - sr-latn
+              - sv
+              - sw
+              - ta
+              - te
+              - tg
+              - th
+              - tk
+              - tr
+              - tt
+              - udm
+              - ug
+              - uk
+              - ur
+              - uz
+              - vi
+              - zh-hans
+              - zh-hant
+      tags:
+        - schema
+      security:
+        - cookieAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ""
+  /api/units/:
+    get:
+      operationId: units_list
+      tags:
+        - units
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Unit"
+          description: ""
+components:
+  schemas:
+    Csrf:
+      type: object
+      properties:
+        csrfToken:
+          type: string
+      required:
+        - csrfToken
+    DayMeal:
+      type: object
+      description: |-
+        Serializer representing a meal slot for a specific day.
+
+        If meal_id is null, the slot has not yet been persisted.
+      properties:
+        meal_id:
+          type: integer
+          nullable: true
+        default_meal:
+          $ref: "#/components/schemas/DefaultMeal"
+        name:
+          type: string
+        date:
+          type: string
+          format: date
+        note:
+          type: string
+        order:
+          type: integer
+        meal_foods:
+          type: array
+          items:
+            $ref: "#/components/schemas/MealFood"
+      required:
+        - date
+        - default_meal
+        - meal_foods
+        - meal_id
+        - name
+        - note
+        - order
+    DefaultMeal:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
+        description:
+          type: string
+        order:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+      required:
+        - id
+        - name
+    Food:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        serving:
+          type: number
+          format: double
+        unit_id:
+          type: integer
+        unit_name:
+          type: string
+          readOnly: true
+        barcode:
+          type: string
+          nullable: true
+          maxLength: 50
+        brand:
+          type: string
+          nullable: true
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        is_favorite:
+          type: boolean
+        usda_fdc_id:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+        nutrients:
+          type: array
+          items:
+            $ref: "#/components/schemas/FoodNutrient"
+      required:
+        - id
+        - name
+        - serving
+        - unit_id
+        - unit_name
+    FoodNutrient:
+      type: object
+      properties:
+        nutrient_id:
+          type: integer
+        nutrient_name:
+          type: string
+          readOnly: true
+        nutrient_unit:
+          type: string
+          readOnly: true
+        amount:
+          type: number
+          format: double
+      required:
+        - amount
+        - nutrient_id
+        - nutrient_name
+        - nutrient_unit
+    GroceryList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        date_start:
+          type: string
+          format: date
+          nullable: true
+        date_end:
+          type: string
+          format: date
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        name:
+          type: string
+      required:
+        - created_at
+        - id
+        - name
+        - updated_at
+    GroceryListFood:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        food:
+          type: integer
+        food_name:
+          type: string
+          readOnly: true
+        amount:
+          type: number
+          format: double
+        on_hand:
+          type: boolean
+          readOnly: true
+      required:
+        - amount
+        - food
+        - food_name
+        - id
+        - on_hand
+    Login:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+      required:
+        - password
+        - username
+    Meal:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        default_meal:
+          type: integer
+          nullable: true
+        name:
+          type: string
+          maxLength: 255
+        date:
+          type: string
+          format: date
+        note:
+          type: string
+        order:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        meal_foods:
+          type: array
+          items:
+            $ref: "#/components/schemas/MealFood"
+      required:
+        - date
+        - id
+        - name
+    MealFood:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        food_id:
+          type: integer
+          writeOnly: true
+        food:
+          allOf:
+            - $ref: "#/components/schemas/Food"
+          readOnly: true
+        serving_size:
+          type: number
+          format: double
+        number_of_servings:
+          type: number
+          format: double
+      required:
+        - food
+        - food_id
+        - id
+        - number_of_servings
+        - serving_size
+    MealFoodCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        meal_id:
+          type: integer
+        food_id:
+          type: integer
+        serving_size:
+          type: number
+          format: double
+        number_of_servings:
+          type: number
+          format: double
+      required:
+        - food_id
+        - id
+        - meal_id
+        - number_of_servings
+        - serving_size
+    Message:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+        - detail
+    Nutrient:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+          nullable: true
+        abbreviation:
+          type: string
+          readOnly: true
+          nullable: true
+        unit:
+          type: string
+          readOnly: true
+          nullable: true
+          description: Display unit for this nutrient's amount (e.g. g, mg, kcal).
+        usda_nutrient_number:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: USDA nutrient number (e.g. 1003 for Protein).
+        order:
+          type: integer
+          readOnly: true
+        show_in_diary_total:
+          type: boolean
+          readOnly: true
+          nullable: true
+          description: Show this nutrient in diary totals.
+        show_in_diary_meal:
+          type: boolean
+          readOnly: true
+          nullable: true
+          description: Show this nutrient in individual diary meals.
+        show_in_food_edit:
+          type: boolean
+          readOnly: true
+          nullable: true
+          description: Show this nutrient when editing a food.
+        show_in_recipe:
+          type: boolean
+          readOnly: true
+          nullable: true
+          description: Show this nutrient a recipe.
+        show_in_recipes:
+          type: boolean
+          readOnly: true
+          nullable: true
+          description: Show this nutrient in recipes.
+        show_in_foods:
+          type: boolean
+          readOnly: true
+          nullable: true
+          description: Show this nutrient in food detail/list pages.
+        show_in_goal_edit:
+          type: boolean
+          readOnly: true
+          nullable: true
+      required:
+        - abbreviation
+        - description
+        - id
+        - name
+        - order
+        - show_in_diary_meal
+        - show_in_diary_total
+        - show_in_food_edit
+        - show_in_foods
+        - show_in_goal_edit
+        - show_in_recipe
+        - show_in_recipes
+        - unit
+        - usda_nutrient_number
+    PatchedDefaultMeal:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
+        description:
+          type: string
+        order:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+    PatchedFood:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        serving:
+          type: number
+          format: double
+        unit_id:
+          type: integer
+        unit_name:
+          type: string
+          readOnly: true
+        barcode:
+          type: string
+          nullable: true
+          maxLength: 50
+        brand:
+          type: string
+          nullable: true
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        is_favorite:
+          type: boolean
+        usda_fdc_id:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+        nutrients:
+          type: array
+          items:
+            $ref: "#/components/schemas/FoodNutrient"
+    PatchedGroceryListFood:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        food:
+          type: integer
+        food_name:
+          type: string
+          readOnly: true
+        amount:
+          type: number
+          format: double
+        on_hand:
+          type: boolean
+          readOnly: true
+    PatchedMeal:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        default_meal:
+          type: integer
+          nullable: true
+        name:
+          type: string
+          maxLength: 255
+        date:
+          type: string
+          format: date
+        note:
+          type: string
+        order:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        meal_foods:
+          type: array
+          items:
+            $ref: "#/components/schemas/MealFood"
+    PatchedMealFoodCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        meal_id:
+          type: integer
+        food_id:
+          type: integer
+        serving_size:
+          type: number
+          format: double
+        number_of_servings:
+          type: number
+          format: double
+    PatchedRecipe:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        is_favorite:
+          type: boolean
+        is_pinned:
+          type: boolean
+        summary:
+          type: string
+          nullable: true
+          maxLength: 70
+        description:
+          type: string
+          nullable: true
+        instructions:
+          type: string
+          nullable: true
+        cooking_time:
+          type: string
+          nullable: true
+          maxLength: 20
+        prepping_time:
+          type: string
+          nullable: true
+          maxLength: 20
+        portions:
+          type: number
+          format: double
+          description: Number of portions this recipe creates
+        last_used_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeTag"
+          readOnly: true
+        tag_ids:
+          type: array
+          items:
+            type: integer
+            writeOnly: true
+          writeOnly: true
+        has_picture:
+          type: boolean
+          readOnly: true
+        ingredients:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeIngredient"
+          readOnly: true
+        nutrients:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeNutrient"
+          readOnly: true
+    PatchedRecipeIngredient:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        food:
+          type: integer
+        food_name:
+          type: string
+          readOnly: true
+        number_of_servings:
+          type: number
+          format: double
+        serving_amount:
+          type: number
+          format: double
+        order:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+    Recipe:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        is_favorite:
+          type: boolean
+        is_pinned:
+          type: boolean
+        summary:
+          type: string
+          nullable: true
+          maxLength: 70
+        description:
+          type: string
+          nullable: true
+        instructions:
+          type: string
+          nullable: true
+        cooking_time:
+          type: string
+          nullable: true
+          maxLength: 20
+        prepping_time:
+          type: string
+          nullable: true
+          maxLength: 20
+        portions:
+          type: number
+          format: double
+          description: Number of portions this recipe creates
+        last_used_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeTag"
+          readOnly: true
+        tag_ids:
+          type: array
+          items:
+            type: integer
+            writeOnly: true
+          writeOnly: true
+        has_picture:
+          type: boolean
+          readOnly: true
+        ingredients:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeIngredient"
+          readOnly: true
+        nutrients:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeNutrient"
+          readOnly: true
+      required:
+        - created_at
+        - has_picture
+        - id
+        - ingredients
+        - name
+        - nutrients
+        - tags
+        - updated_at
+    RecipeIngredient:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        food:
+          type: integer
+        food_name:
+          type: string
+          readOnly: true
+        number_of_servings:
+          type: number
+          format: double
+        serving_amount:
+          type: number
+          format: double
+        order:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+      required:
+        - food
+        - food_name
+        - id
+    RecipeNutrient:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        amount:
+          type: number
+          format: double
+      required:
+        - amount
+        - id
+        - name
+    RecipePicture:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+      required:
+        - id
+    RecipeTag:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
+      required:
+        - id
+        - name
+    USDAFoodSearchResponse:
+      type: object
+      properties:
+        foods:
+          type: array
+          items:
+            $ref: "#/components/schemas/Food"
+      required:
+        - foods
+    USDASave:
+      type: object
+      properties:
+        fdc_id:
+          type: integer
+          minimum: 1
+      required:
+        - fdc_id
+    Unit:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
+        description:
+          type: string
+        abbreviation:
+          type: string
+          maxLength: 15
+      required:
+        - id
+        - name
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+      required:
+        - email
+        - id
+        - username
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
