@@ -184,7 +184,41 @@ SPECTACULAR_SETTINGS = {
                 "type": "apiKey",
                 "in": "cookie",
                 "name": "sessionid",
-            }
+            },
         }
     },
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "LibrePlate API",
+    "VERSION": "0.0.0",
+    "APPEND_COMPONENTS": {
+        "securitySchemes": {
+            "cookieAuth": {
+                "type": "apiKey",
+                "in": "cookie",
+                "name": "sessionid",
+            },
+        }
+    },
+    "SWWAGGER_UI_SETTINGS": {
+        "withCredentials": True,
+        "requestInterceptor": """
+        function(request) {
+            console.log("INTERCEPTOR RUNNING", request);
+
+            const csrf = document.cookie
+                .split("; ")
+                .find(row => row.startsWith("csrftoken="));
+
+            if (csrf) {
+                request.headers["X-CSRFToken"] = csrf.split("=")[1];
+            }
+
+            request.credentials = "include";
+
+            return request;
+        }
+        """,
+    }
 }

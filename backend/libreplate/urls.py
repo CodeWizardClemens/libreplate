@@ -2,11 +2,36 @@ from django.conf import settings
 from django.http import FileResponse
 from django.urls import include, path, re_path
 from django.views.static import serve
+
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
+
+
+class CustomSpectacularSwaggerView(SpectacularSwaggerView):
+    swagger_ui_settings = {
+        "withCredentials": True,
+        "requestInterceptor": """
+        function(request) {
+            console.log("INTERCEPTOR RUNNING", request);
+
+            const csrfCookie = document.cookie
+                .split("; ")
+                .find(row => row.startsWith("csrftoken="));
+
+            if (csrfCookie) {
+                const csrfToken = csrfCookie.split("=")[1];
+                request.headers["X-CSRFToken"] = csrfToken;
+            }
+
+            request.credentials = "include";
+
+            return request;
+        }
+        """,
+    }
 
 
 def react_app(request):
@@ -24,6 +49,7 @@ urlpatterns = [
     path("api/recipes/", include("recipes.urls")),
 ]
 
+
 if settings.DEBUG:
     urlpatterns += [
         path(
@@ -33,12 +59,16 @@ if settings.DEBUG:
         ),
         path(
             "api/docs/",
-            SpectacularSwaggerView.as_view(url_name="schema"),
+            CustomSpectacularSwaggerView.as_view(
+                url_name="schema",
+            ),
             name="swagger-ui",
         ),
         path(
             "api/redoc/",
-            SpectacularRedocView.as_view(url_name="schema"),
+            SpectacularRedocView.as_view(
+                url_name="schema",
+            ),
             name="redoc",
         ),
     ]
@@ -68,7 +98,6 @@ urlpatterns += [
             "path": "favicon.ico",
         },
     ),
-    # React SPA fallback
     re_path(
         r"^(?!api/).*",
         react_app,
