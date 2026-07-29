@@ -1,10 +1,10 @@
 from invoke import Context, task
 
-from .db import migrate
+from .data import migrate
 from .utils import info
 
 
-@task
+@task(aliases=["u"])
 def update(c: Context):
     """
     Update LibrePlate dependencies, source code, and database state.

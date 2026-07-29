@@ -4,11 +4,11 @@ import shlex
 
 from invoke import Context, task
 
-from .db import migrate, sync_default_data
+from .data import migrate, sync_default_data
 from .utils import django_run, info
 
 
-@task
+@task(aliases=["i"])
 def init(c: Context):
     """
     Initialize LibrePlate.
@@ -20,9 +20,10 @@ def init(c: Context):
 
 
 @task(
+    aliases=["ua"],
     help={
         "skip-password-validation": "Skip password validation.",
-    }
+    },
 )
 def user_add(
     c: Context,
@@ -53,7 +54,7 @@ def user_add(
     django_run(c, command)
 
 
-@task()
+@task(aliases=["ur"])
 def user_remove(c: Context, username: str):
     """
     Remove an existing LibrePlate user account.

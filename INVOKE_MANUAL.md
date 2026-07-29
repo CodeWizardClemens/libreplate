@@ -32,8 +32,8 @@ invoke --help
 
 ## Table of contents
 
-- [`db.migrate`](#db.migrate)
-- [`db.sync-default-data`](#db.sync-default-data)
+- [`data.migrate`](#data.migrate)
+- [`data.sync-default-data`](#data.sync-default-data)
 - [`dev.check`](#dev.check)
 - [`dev.format`](#dev.format)
 - [`dev.generate-api`](#dev.generate-api)
@@ -54,11 +54,13 @@ invoke --help
 - [`setup.user-remove`](#setup.user-remove)
 
 
-## `db.migrate`
+## `data.migrate`
+
+**Aliases:** `data.m`
 
 ```text
 
-Usage: inv[oke] [--core-opts] db.migrate [other tasks here ...]
+Usage: inv[oke] [--core-opts] data.migrate [other tasks here ...]
 
 Docstring:
   Create and apply Django migrations.
@@ -70,13 +72,13 @@ Options:
 ```
 
 
-## `db.sync-default-data`
+## `data.sync-default-data`
 
-**Aliases:** `db.sd`
+**Aliases:** `data.sd`
 
 ```text
 
-Usage: inv[oke] [--core-opts] db.sync-default-data [other tasks here ...]
+Usage: inv[oke] [--core-opts] data.sync-default-data [other tasks here ...]
 
 Docstring:
   Synchronize default application data.
@@ -278,6 +280,8 @@ Options:
 
 ## `manage.migrate`
 
+**Aliases:** `manage.m`
+
 ```text
 
 Usage: inv[oke] [--core-opts] manage.migrate [other tasks here ...]
@@ -293,6 +297,8 @@ Options:
 
 
 ## `manage.update`
+
+**Aliases:** `manage.u`
 
 ```text
 
@@ -328,6 +334,8 @@ Options:
 
 ## `setup.init`
 
+**Aliases:** `setup.i`
+
 ```text
 
 Usage: inv[oke] [--core-opts] setup.init [other tasks here ...]
@@ -343,6 +351,8 @@ Options:
 
 
 ## `setup.migrate`
+
+**Aliases:** `setup.m`
 
 ```text
 
@@ -378,6 +388,8 @@ Options:
 
 ## `setup.user-add`
 
+**Aliases:** `setup.ua`
+
 ```text
 
 Usage: inv[oke] [--core-opts] setup.user-add [--options] [other tasks here ...]
@@ -398,6 +410,8 @@ Options:
 
 
 ## `setup.user-remove`
+
+**Aliases:** `setup.ur`
 
 ```text
 

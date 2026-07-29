@@ -3,7 +3,7 @@ from invoke import Context, task
 from .utils import django_run, info
 
 
-@task
+@task(aliases=["m"])
 def migrate(c: Context):
     """
     Create and apply Django migrations.
