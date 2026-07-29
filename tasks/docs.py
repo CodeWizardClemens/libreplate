@@ -4,7 +4,15 @@ from pathlib import Path
 from invoke import Context, task
 from utils import BASE_DIR, print_success
 
-TASK_PATTERN = re.compile(r"^\s{2}(?P<name>[a-zA-Z_][\w.-]*)\s{2,}")
+TASK_PATTERN = re.compile(
+    r"""
+    ^\s{2}
+    (?P<name>[a-zA-Z_][\w.-]*)
+    (?:\s+\((?P<aliases>[^)]*)\))?
+    \s{2,}
+    """,
+    re.VERBOSE,
+)
 
 MANUAL_HEADER = """
 <!-- AUTOMATICALLY GENERATED FILE, CHECK INVOKE HOW TO UPDATE. -->
@@ -13,33 +21,34 @@ MANUAL_HEADER = """
 
 To use invoke you will have to create a virtual environment first, and use its
 python shell. Install [Python UV](https://docs.astral.sh/uv/getting-started/installation/) and run.
-```
+
+```sh
 cd backend && uv sync
 source ./venv/bin/activate
 cd ../
 ```
 
-To run a task you can run:
-```
+To run a task you can use:
+
+```sh
 invoke <task> <flags>
 ```
 
-To learn more about that invoke task you can run:
+To learn more about a task:
 
-```
+```sh
 invoke --help <task>
 ```
 
-If you are new to invoke you can also run:
+If you are new to Invoke you can also run:
 
+```sh
+invoke --help
 ```
-invoke -help
-```
-
 """
 
 
-@task(aliases=["geninv"])
+@task(aliases=["gi"])
 def generate_invoke_manual(c: Context, check: bool = False) -> None:
     """
     Generate a Markdown manual of all Invoke tasks.
@@ -50,25 +59,51 @@ def generate_invoke_manual(c: Context, check: bool = False) -> None:
 
     output = Path(BASE_DIR / "INVOKE_MANUAL.md")
     result = c.run("invoke --list", hide=True)
+
     tasks = []
 
     for line in result.stdout.splitlines():
         match = TASK_PATTERN.match(line)
-        if match:
-            tasks.append(match.group("name"))
+        if not match:
+            continue
+
+        aliases = []
+        if match.group("aliases"):
+            aliases = [alias.strip() for alias in match.group("aliases").split(",")]
+
+        tasks.append(
+            {
+                "name": match.group("name"),
+                "aliases": aliases,
+            }
+        )
 
     markdown = [MANUAL_HEADER]
 
-    for name in tasks:
+    markdown.append("## Table of contents\n")
+
+    for task_data in tasks:
+        markdown.append(f"- [`{task_data['name']}`](#{task_data['name'].lower()})")
+
+    markdown.append("")
+
+    for task_data in tasks:
+        name = task_data["name"]
+        aliases = task_data["aliases"]
+
         help_text = c.run(
             f"invoke --help {name}",
             hide=True,
             warn=True,
         ).stdout
 
+        markdown.append(f"\n## `{name}`\n")
+
+        if aliases:
+            markdown.append(f"**Aliases:** {', '.join(f'`{a}`' for a in aliases)}\n")
+
         markdown.extend(
             [
-                f"\n## `{name}`\n",
                 "```text\n",
                 help_text,
                 "```\n",
@@ -84,7 +119,9 @@ def generate_invoke_manual(c: Context, check: bool = False) -> None:
         existing = output.read_text(encoding="utf-8")
 
         if existing != generated:
-            c.fail(f"`{output}` is out of date. Run `invoke generate-invoke-manual`.")
+            c.fail(
+                f"`{output}` is out of date. Run `invoke dev.generate-invoke-manual`."
+            )
 
         print_success("Invoke manual is up to date.")
         return

@@ -5,29 +5,53 @@
 
 To use invoke you will have to create a virtual environment first, and use its
 python shell. Install [Python UV](https://docs.astral.sh/uv/getting-started/installation/) and run.
-```
+
+```sh
 cd backend && uv sync
 source ./venv/bin/activate
 cd ../
 ```
 
-To run a task you can run:
-```
+To run a task you can use:
+
+```sh
 invoke <task> <flags>
 ```
 
-To learn more about that invoke task you can run:
+To learn more about a task:
 
-```
+```sh
 invoke --help <task>
 ```
 
-If you are new to invoke you can also run:
+If you are new to Invoke you can also run:
 
-```
-invoke -help
+```sh
+invoke --help
 ```
 
+## Table of contents
+
+- [`db.migrate`](#db.migrate)
+- [`db.sync-default-data`](#db.sync-default-data)
+- [`dev.check`](#dev.check)
+- [`dev.format`](#dev.format)
+- [`dev.generate-api`](#dev.generate-api)
+- [`dev.generate-invoke-manual`](#dev.generate-invoke-manual)
+- [`dev.serve-backend`](#dev.serve-backend)
+- [`dev.serve-frontend`](#dev.serve-frontend)
+- [`dev.test`](#dev.test)
+- [`dev.user-add-dummy`](#dev.user-add-dummy)
+- [`dev.verify`](#dev.verify)
+- [`docs.generate-invoke-manual`](#docs.generate-invoke-manual)
+- [`manage.migrate`](#manage.migrate)
+- [`manage.update`](#manage.update)
+- [`setup.add-usda-api-key`](#setup.add-usda-api-key)
+- [`setup.init`](#setup.init)
+- [`setup.migrate`](#setup.migrate)
+- [`setup.sync-default-data`](#setup.sync-default-data)
+- [`setup.user-add`](#setup.user-add)
+- [`setup.user-remove`](#setup.user-remove)
 
 
 ## `db.migrate`
@@ -48,6 +72,8 @@ Options:
 
 ## `db.sync-default-data`
 
+**Aliases:** `db.sd`
+
 ```text
 
 Usage: inv[oke] [--core-opts] db.sync-default-data [other tasks here ...]
@@ -63,6 +89,8 @@ Options:
 
 
 ## `dev.check`
+
+**Aliases:** `dev.c`
 
 ```text
 
@@ -80,6 +108,8 @@ Options:
 
 ## `dev.format`
 
+**Aliases:** `dev.f`
+
 ```text
 
 Usage: inv[oke] [--core-opts] dev.format [--options] [other tasks here ...]
@@ -94,7 +124,50 @@ Options:
 ```
 
 
+## `dev.generate-api`
+
+**Aliases:** `dev.ga`
+
+```text
+
+Usage: inv[oke] [--core-opts] dev.generate-api [--options] [other tasks here ...]
+
+Docstring:
+  Generate the frontend API client from the Django OpenAPI schema.
+
+  Use --check to fail if generated files would change.
+
+Options:
+  -c, --check
+
+
+```
+
+
+## `dev.generate-invoke-manual`
+
+**Aliases:** `dev.gi`
+
+```text
+
+Usage: inv[oke] [--core-opts] dev.generate-invoke-manual [--options] [other tasks here ...]
+
+Docstring:
+  Generate a Markdown manual of all Invoke tasks.
+
+  Args:
+      check: Only check whether the generated manual differs from the existing file.
+
+Options:
+  -c, --check
+
+
+```
+
+
 ## `dev.serve-backend`
+
+**Aliases:** `dev.sb`
 
 ```text
 
@@ -112,6 +185,8 @@ Options:
 
 ## `dev.serve-frontend`
 
+**Aliases:** `dev.sf`
+
 ```text
 
 Usage: inv[oke] [--core-opts] dev.serve-frontend [other tasks here ...]
@@ -127,6 +202,8 @@ Options:
 
 
 ## `dev.test`
+
+**Aliases:** `dev.t`
 
 ```text
 
@@ -144,6 +221,8 @@ Options:
 
 ## `dev.user-add-dummy`
 
+**Aliases:** `dev.ud`
+
 ```text
 
 Usage: inv[oke] [--core-opts] dev.user-add-dummy [other tasks here ...]
@@ -160,6 +239,8 @@ Options:
 
 ## `dev.verify`
 
+**Aliases:** `dev.v`
+
 ```text
 
 Usage: inv[oke] [--core-opts] dev.verify [--options] [other tasks here ...]
@@ -174,11 +255,32 @@ Options:
 ```
 
 
-## `maintenance.migrate`
+## `docs.generate-invoke-manual`
+
+**Aliases:** `docs.gi`
 
 ```text
 
-Usage: inv[oke] [--core-opts] maintenance.migrate [other tasks here ...]
+Usage: inv[oke] [--core-opts] docs.generate-invoke-manual [--options] [other tasks here ...]
+
+Docstring:
+  Generate a Markdown manual of all Invoke tasks.
+
+  Args:
+      check: Only check whether the generated manual differs from the existing file.
+
+Options:
+  -c, --check
+
+
+```
+
+
+## `manage.migrate`
+
+```text
+
+Usage: inv[oke] [--core-opts] manage.migrate [other tasks here ...]
 
 Docstring:
   Create and apply Django migrations.
@@ -190,11 +292,11 @@ Options:
 ```
 
 
-## `maintenance.update`
+## `manage.update`
 
 ```text
 
-Usage: inv[oke] [--core-opts] maintenance.update [other tasks here ...]
+Usage: inv[oke] [--core-opts] manage.update [other tasks here ...]
 
 Docstring:
   Update LibrePlate dependencies, source code, and database state.
@@ -207,6 +309,8 @@ Options:
 
 
 ## `setup.add-usda-api-key`
+
+**Aliases:** `setup.au`
 
 ```text
 
@@ -255,6 +359,8 @@ Options:
 
 
 ## `setup.sync-default-data`
+
+**Aliases:** `setup.sd`
 
 ```text
 

@@ -69,7 +69,10 @@ def ruff_check_cmd(fix: bool = False, exit_zero: bool = False) -> str:
     return " ".join(args)
 
 
-@task(help={"verbose": "Show stdout output from commands."})
+@task(
+    aliases=["v"],
+    help={"verbose": "Show stdout output from commands."},
+)
 def verify(c: Context, verbose: bool = False) -> None:
     """
     Run all code quality checks and tests.
@@ -81,7 +84,7 @@ def verify(c: Context, verbose: bool = False) -> None:
     test(c, verbose)
 
 
-@task()
+@task(aliases=["ud"])
 def user_add_dummy(c: Context):
     """
     Create a dummy LibrePlate user account.
@@ -106,7 +109,10 @@ def user_add_dummy(c: Context):
     )
 
 
-@task(help={"verbose": "Show stdout output from commands."})
+@task(
+    aliases=["c"],
+    help={"verbose": "Show stdout output from commands."},
+)
 def check(c: Context, verbose: bool = False) -> None:
     """
     Run code quality checks.
@@ -128,7 +134,10 @@ def check(c: Context, verbose: bool = False) -> None:
     print_success(message="Code checks passed")
 
 
-@task(help={"verbose": "Show stdout output from commands."})
+@task(
+    aliases=["f"],
+    help={"verbose": "Show stdout output from commands."},
+)
 def format(c: Context, verbose: bool = False) -> None:
     """
     Automatically format the codebase.
@@ -150,7 +159,10 @@ def format(c: Context, verbose: bool = False) -> None:
     print_success(message="Code formatters passed")
 
 
-@task(help={"verbose": "Show stdout output from commands."})
+@task(
+    aliases=["t"],
+    help={"verbose": "Show stdout output from commands."},
+)
 def test(c: Context, verbose: bool = False) -> None:
     """
     Run the LibrePlate automated test suite.
@@ -163,7 +175,7 @@ def test(c: Context, verbose: bool = False) -> None:
     print_success(message="All tests passed")
 
 
-@task
+@task(aliases=["sb"])
 def serve_backend(c: Context) -> None:
     """
     Start the backend development server.
@@ -173,6 +185,7 @@ def serve_backend(c: Context) -> None:
     django_run(c, "runserver")
 
 
+@task(aliases=["sf"])
 @task
 def serve_frontend(c: Context) -> None:
     """
@@ -202,7 +215,7 @@ def api_changed(c: Context) -> bool:
         )
 
 
-@task(aliases=["apigen"])
+@task(aliases=["ga"])
 def generate_api(c: Context, check: bool = False) -> None:
     """
     Generate the frontend API client from the Django OpenAPI schema.

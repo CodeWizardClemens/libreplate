@@ -62,7 +62,7 @@ def user_remove(c: Context, username: str):
     django_run(c, f'remove_user "{username}"')
 
 
-@task(name="add-usda-api-key")
+@task(aliases=["au"])
 def add_usda_api_key(c: Context, key: str):
     """
     Configure the USDA API key.

@@ -61,6 +61,7 @@ def run_command(c: Context, command: str, quiet_stdout: bool = False) -> None:
         c.run(command)
 
 
+# TODO it does not make sense for invoke to call UV. use venv.
 def uv_run(c: Context, command: str, quiet_stdout: bool = False) -> None:
     """
     Run a UV command.

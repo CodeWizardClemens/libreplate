@@ -14,7 +14,7 @@ def migrate(c: Context):
     django_run(c, "migrate")
 
 
-@task(name="sync-default-data")
+@task(aliases=["sd"])
 def sync_default_data(c: Context):
     """
     Synchronize default application data.
