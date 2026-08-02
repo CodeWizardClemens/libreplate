@@ -14,7 +14,9 @@ from .utils import copy_frontend_dist, django_run, info, npm_run
 
 @task
 def build_front_end(c):
-    npm_run(c, "install")
+    info("Building front end")
+
+    npm_run(c, "ci")
     npm_run(c, "run build")
     copy_frontend_dist()
 

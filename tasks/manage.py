@@ -1,11 +1,12 @@
+import io
 import os
 import subprocess
+import zipfile
 
 from github import Github
 from invoke import Context, task
 
 from .data import migrate
-from .setup import build_front_end
 from .utils import info
 
 
@@ -71,10 +72,47 @@ def github_actions_status(owner: str, repo: str, sha: str):
     return "success"
 
 
+def download_frontend_dist(owner: str, repo: str, sha: str):
+    """
+    Download the frontend_dist artifact for a commit.
+    """
+    frontend_dist = os.getenv("FRONTEND_DIST")
+    if not frontend_dist:
+        raise RuntimeError("FRONTEND_DIST environment variable is not set")
+
+    token = os.environ.get("GITHUB_TOKEN")
+    github = Github(token) if token else Github()
+    repository = github.get_repo(f"{owner}/{repo}")
+
+    runs = repository.get_workflow_runs(head_sha=sha)
+
+    run = next(iter(runs), None)
+    if run is None:
+        raise RuntimeError(f"No workflow run found for commit {sha}")
+
+    artifact = None
+    for a in run.get_artifacts():
+        if a.name == "frontend_dist" and not a.expired:
+            artifact = a
+            break
+
+    if artifact is None:
+        raise RuntimeError("frontend_dist artifact not found")
+
+    info(f"Downloading artifact '{artifact.name}'")
+
+    archive = artifact.download_artifact()
+
+    os.makedirs(frontend_dist, exist_ok=True)
+
+    with zipfile.ZipFile(io.BytesIO(archive)) as zf:
+        zf.extractall(frontend_dist)
+
+
 @task(aliases=["u"])
 def update(c: Context):
     """
-    Update LibrePlate dependencies, source code, and database state.
+    Update LibrePlate dependencies, source code, frontend assets, and database state.
     """
     info("Checking latest master build")
 
@@ -98,4 +136,7 @@ def update(c: Context):
     c.run("git pull origin master")
     c.run("uv sync")
     migrate(c)
-    build_front_end(c)
+
+    download_frontend_dist(owner, repo, sha)
+
+    info("Update complete")

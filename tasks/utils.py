@@ -113,9 +113,8 @@ def copy_frontend_dist() -> None:
     destination = Path(frontend_dist).resolve()
 
     if source.resolve() == destination:
-        raise RuntimeError(
-            "FRONTEND_DIST cannot point to the frontend build directory itself"
-        )
+        print_success(f"Frontend already available at {destination}")
+        return
 
     if not source.exists():
         raise RuntimeError(f"Frontend build directory does not exist: {source}")

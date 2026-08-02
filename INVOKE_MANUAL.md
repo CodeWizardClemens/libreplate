@@ -324,7 +324,7 @@ Options:
 Usage: inv[oke] [--core-opts] manage.update [other tasks here ...]
 
 Docstring:
-  Update LibrePlate dependencies, source code, and database state.
+  Update LibrePlate dependencies, source code, frontend assets, and database state.
 
 Options:
   none
