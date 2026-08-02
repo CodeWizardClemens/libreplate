@@ -9,6 +9,17 @@ jobs:
   verify:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: libreplate
+          POSTGRES_PASSWORD: unsafe_development_pwd!1
+          POSTGRES_DB: libreplate_db
+        ports:
+          - 5432:5432
+        options: --health-cmd="pg_isready -U libreplate -d libreplate_db" --health-interval=10s --health-timeout=5s --health-retries=5
+
     steps:
       - uses: actions/checkout@v4
 
@@ -32,6 +43,17 @@ jobs:
 
       - name: Sync dependencies
         run: uv sync
+
+      - name: Create environment file
+        run: |
+          cp .env_example .env
+          echo "SECRET_KEY=django-insecure-ci-key" >> .env
+          echo "FRONTEND_DIST=${{ github.workspace }}/frontend/dist/" >> .env
+          echo "SESSION_COOKIE_SECURE=False" >> .env
+          echo "CSRF_COOKIE_SECURE=False" >> .env
+
+      - name: Init LibrePlate
+        run: uv run invoke setup.init
 
       - name: Run verification
         run: uv run invoke dev.verify --verbose
