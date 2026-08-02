@@ -1,6 +1,5 @@
-from rest_framework import serializers
-
 from foods.serializers import FoodSerializer
+from rest_framework import serializers
 
 
 class USDAFoodSearchSerializer(serializers.Serializer):

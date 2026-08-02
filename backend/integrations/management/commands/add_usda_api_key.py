@@ -1,7 +1,6 @@
 # add_usda_api_key.py
 
 from django.core.management.base import BaseCommand
-
 from integrations.models import USDAAPISettings
 
 

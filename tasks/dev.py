@@ -38,7 +38,7 @@ def isort_cmd(check_only: bool = False) -> str:
         "--skip",
         str(VENV_DIR),
         "--settings-path",
-        "backend/pyproject.toml",
+        str(BASE_DIR / "pyproject.toml"),
     ]
 
     if check_only:

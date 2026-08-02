@@ -2,10 +2,9 @@ import logging
 from typing import Final
 
 from django.db import transaction
-from rest_framework import serializers
-
 from integrations.usda_client import USDAFood, USDAFoodNutrient
 from nutrients.models import Nutrient
+from rest_framework import serializers
 from units.models import Unit
 
 from .models import Food, FoodNutrient

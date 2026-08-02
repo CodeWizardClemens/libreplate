@@ -14,7 +14,7 @@ from invoke.exceptions import Failure
 from rich.console import Console
 
 BASE_DIR = Path(__file__).parent.parent.resolve()
-VENV_DIR = BASE_DIR / "backend" / ".venv"
+VENV_DIR = BASE_DIR / ".venv"
 
 load_dotenv(BASE_DIR / ".env")
 

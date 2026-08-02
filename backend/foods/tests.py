@@ -1,10 +1,8 @@
 import pytest
-from rest_framework import status
-
 from foods.models import Food
 from nutrients.models import Nutrient
+from rest_framework import status
 from units.models import Unit
-
 
 
 @pytest.fixture

@@ -7,6 +7,9 @@ from typing import Any, Literal
 import requests
 from django.contrib.auth.models import User
 from django.db import transaction
+from foods.models import Food, FoodNutrient
+from integrations.models import USDAAPISettings
+from nutrients.models import Nutrient
 from pydantic import (
     AliasChoices,
     BaseModel,
@@ -15,10 +18,6 @@ from pydantic import (
     field_validator,
     model_validator,
 )
-
-from foods.models import Food, FoodNutrient
-from integrations.models import USDAAPISettings
-from nutrients.models import Nutrient
 from units.models import Unit
 
 USDA_API_BASE_URL = "https://api.nal.usda.gov/fdc/v1"

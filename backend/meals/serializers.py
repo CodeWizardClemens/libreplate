@@ -1,8 +1,7 @@
 from django.db import transaction
-from rest_framework import serializers
-
 from foods.models import Food
 from foods.serializers import FoodSerializer
+from rest_framework import serializers
 
 from .models import DefaultMeal, Meal, MealFood
 

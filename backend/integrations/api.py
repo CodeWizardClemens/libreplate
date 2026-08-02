@@ -1,13 +1,12 @@
 from drf_spectacular.utils import OpenApiParameter, extend_schema
+from foods.serializers import FoodSerializer
+from integrations import usda_client
+from integrations.usda_client import USDAError
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from foods.serializers import FoodSerializer
-from integrations import usda_client
-from integrations.usda_client import USDAError
 
 from .serializers import (
     USDAFoodSearchResponseSerializer,
