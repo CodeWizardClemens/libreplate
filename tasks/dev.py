@@ -37,6 +37,8 @@ def isort_cmd(check_only: bool = False) -> str:
         str(BASE_DIR),
         "--skip",
         str(VENV_DIR),
+        "--skip-glob",
+        "*/migrations/*",
         "--settings-path",
         str(BASE_DIR / "pyproject.toml"),
     ]
