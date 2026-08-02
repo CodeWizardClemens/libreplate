@@ -2,6 +2,7 @@ import re
 from pathlib import Path
 
 from invoke import Context, task
+from invoke.exceptions import Exit
 from utils import BASE_DIR, print_success
 
 TASK_PATTERN = re.compile(
@@ -114,18 +115,21 @@ def generate_invoke_manual(c: Context, check: bool = False) -> None:
 
     if check:
         if not output.exists():
-            c.fail(f"`{output}` does not exist. Manual needs to be generated.")
+            raise Exit(
+                f"`{output}` does not exist. Run `invoke dev.generate-invoke-manual`.",
+                code=1,
+            )
 
         existing = output.read_text(encoding="utf-8")
 
         if existing != generated:
-            c.fail(
-                f"`{output}` is out of date. Run `invoke dev.generate-invoke-manual`."
+            raise Exit(
+                f"`{output}` is out of date. Run `invoke dev.generate-invoke-manual`.",
+                code=1,
             )
 
         print_success("Invoke manual is up to date.")
         return
 
     output.write_text(generated, encoding="utf-8")
-
     print_success(f"Generated `{output}`")

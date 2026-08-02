@@ -35,6 +35,7 @@ invoke --help
 - [`data.migrate`](#data.migrate)
 - [`data.sync-default-data`](#data.sync-default-data)
 - [`dev.check`](#dev.check)
+- [`dev.django-shell`](#dev.django-shell)
 - [`dev.format`](#dev.format)
 - [`dev.generate-api`](#dev.generate-api)
 - [`dev.generate-invoke-manual`](#dev.generate-invoke-manual)
@@ -78,13 +79,13 @@ Options:
 
 ```text
 
-Usage: inv[oke] [--core-opts] data.sync-default-data [other tasks here ...]
+Usage: inv[oke] [--core-opts] data.sync-default-data [--options] [other tasks here ...]
 
 Docstring:
   Synchronize default application data.
 
 Options:
-  none
+  -o, --overwrite
 
 
 ```
@@ -103,6 +104,24 @@ Docstring:
 
 Options:
   -v, --verbose   Show stdout output from commands.
+
+
+```
+
+
+## `dev.django-shell`
+
+**Aliases:** `dev.ds`
+
+```text
+
+Usage: inv[oke] [--core-opts] dev.django-shell [other tasks here ...]
+
+Docstring:
+  Open the django shell.
+
+Options:
+  none
 
 
 ```
@@ -374,13 +393,13 @@ Options:
 
 ```text
 
-Usage: inv[oke] [--core-opts] setup.sync-default-data [other tasks here ...]
+Usage: inv[oke] [--core-opts] setup.sync-default-data [--options] [other tasks here ...]
 
 Docstring:
   Synchronize default application data.
 
 Options:
-  none
+  -o, --overwrite
 
 
 ```
