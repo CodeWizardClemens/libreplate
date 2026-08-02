@@ -13,14 +13,15 @@ from invoke import Context
 from invoke.exceptions import Failure
 from rich.console import Console
 
+# This file is located in base_dir/tasks/utils.py. So 'parent' needs to be
+# called twice.
 BASE_DIR = Path(__file__).parent.parent.resolve()
 VENV_DIR = BASE_DIR / ".venv"
 
+# TODO add helper to verify the environment file.
+IS_DEBUG = os.getenv("DEBUG", "false").lower() == "true"
 load_dotenv(BASE_DIR / ".env")
 
-
-# Rich console handles terminal output, colors, and formatting.
-# It automatically detects terminal capabilities and falls back gracefully.
 console = Console()
 
 
@@ -56,7 +57,6 @@ def run_command(c: Context, command: str, quiet_stdout: bool = False) -> None:
         if result.exited != 0:
             sys.stderr.write(result.stderr or "")
             raise Failure(result)
-
     else:
         c.run(command)
 
@@ -66,9 +66,7 @@ def venv_run(c: Context, command: str, quiet_stdout: bool = False) -> None:
     Run a command from the project virtual environment.
     """
     executable, *args = command.split(" ")
-
     executable_path = VENV_DIR / "bin" / executable
-
     if executable_path.exists():
         command = f'"{executable_path}" {" ".join(args)}'
 
@@ -97,18 +95,3 @@ def npm_run(c: Context, command: str, quiet_stdout: bool = False) -> None:
     """
     with c.cd(BASE_DIR / "frontend"):
         run_command(c, f"npm {command}", quiet_stdout)
-
-
-def get_bool_env(name: str, default: bool = False) -> bool:
-    """
-    Get a boolean environment variable.
-    """
-    value = os.getenv(name, str(default)).lower()
-
-    if value not in {"true", "false"}:
-        raise ValueError(f"{name} must be 'true' or 'false', got {value!r}")
-
-    return value == "true"
-
-
-IS_DEBUG = get_bool_env("DEBUG")
