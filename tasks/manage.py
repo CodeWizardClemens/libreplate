@@ -5,6 +5,7 @@ from github import Github
 from invoke import Context, task
 
 from .data import migrate
+from .setup import build_front_end
 from .utils import info
 
 
@@ -97,3 +98,4 @@ def update(c: Context):
     c.run("git pull origin master")
     c.run("uv sync")
     migrate(c)
+    build_front_end(c)

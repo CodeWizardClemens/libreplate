@@ -13,7 +13,7 @@ from .utils import copy_frontend_dist, django_run, info, npm_run
 
 
 @task
-def generate_front_end(c):
+def build_front_end(c):
     npm_run(c, "install")
     npm_run(c, "run build")
     copy_frontend_dist()
