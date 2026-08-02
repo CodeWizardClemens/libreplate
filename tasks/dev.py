@@ -46,7 +46,7 @@ def isort_cmd(check_only: bool = False) -> str:
     if check_only:
         args.insert(2, "--check-only")
 
-    return " ".join(args)
+    return " ".join(shlex.quote(arg) for arg in args)
 
 
 def black_cmd() -> str:
