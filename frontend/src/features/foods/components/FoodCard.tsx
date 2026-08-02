@@ -29,10 +29,7 @@ export default function FoodCard({ food, onDelete, onToggleFavorite }: Props) {
             <h5 className="card-title mb-0">{food.name}</h5>
           </div>
 
-          <div
-            className="ms-2"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="ms-2" onClick={(e) => e.stopPropagation()}>
             <FoodCardActions
               food={food}
               onDelete={onDelete}
@@ -41,9 +38,7 @@ export default function FoodCard({ food, onDelete, onToggleFavorite }: Props) {
           </div>
         </div>
 
-        <p className="card-text mb-0 text-muted">
-          {food.brand || "No brand"}
-        </p>
+        <p className="card-text mb-0 text-muted">{food.brand || "No brand"}</p>
 
         <div className="text-muted small mt-0">
           {food.serving != null && (

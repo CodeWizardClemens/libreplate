@@ -93,7 +93,7 @@ export default function FoodCardActions({
             role="menuitem"
             onClick={() => {
               const confirmed = window.confirm(
-                `Are you sure you want to delete "${food.name}"?`
+                `Are you sure you want to delete "${food.name}"?`,
               );
 
               if (confirmed) {
