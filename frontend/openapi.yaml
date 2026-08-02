@@ -2349,6 +2349,12 @@ components:
         abbreviation:
           type: string
           maxLength: 15
+        visible_in_nutrients:
+          type: boolean
+        visible_in_body_metrics:
+          type: boolean
+        visible_in_foods:
+          type: boolean
       required:
       - id
       - name

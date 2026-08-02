@@ -281,6 +281,9 @@ export type Unit = {
     name: string;
     description?: string;
     abbreviation?: string;
+    visible_in_nutrients?: boolean;
+    visible_in_body_metrics?: boolean;
+    visible_in_foods?: boolean;
 };
 
 export type User = {
@@ -464,6 +467,9 @@ export type UnitWritable = {
     name: string;
     description?: string;
     abbreviation?: string;
+    visible_in_nutrients?: boolean;
+    visible_in_body_metrics?: boolean;
+    visible_in_foods?: boolean;
 };
 
 export type AccountsCsrfRetrieveData = {

@@ -6,9 +6,7 @@ from .models import Unit
 
 def sync_default_units(overwrite=False):
     operation = (
-        Unit.objects.update_or_create
-        if overwrite
-        else Unit.objects.get_or_create
+        Unit.objects.update_or_create if overwrite else Unit.objects.get_or_create
     )
 
     for unit in DEFAULT_UNITS:
