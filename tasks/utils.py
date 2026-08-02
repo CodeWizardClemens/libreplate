@@ -61,12 +61,18 @@ def run_command(c: Context, command: str, quiet_stdout: bool = False) -> None:
         c.run(command)
 
 
-# TODO it does not make sense for invoke to call UV. use venv.
-def uv_run(c: Context, command: str, quiet_stdout: bool = False) -> None:
+def venv_run(c: Context, command: str, quiet_stdout: bool = False) -> None:
     """
-    Run a UV command.
+    Run a command from the project virtual environment.
     """
-    run_command(c, f"uv run {command}", quiet_stdout)
+    executable, *args = command.split(" ")
+
+    executable_path = VENV_DIR / "bin" / executable
+
+    if executable_path.exists():
+        command = f'"{executable_path}" {" ".join(args)}'
+
+    run_command(c, command, quiet_stdout)
 
 
 def django_run(c: Context, command: str, quiet_stdout: bool = False) -> None:
@@ -74,7 +80,7 @@ def django_run(c: Context, command: str, quiet_stdout: bool = False) -> None:
     Run a Django command.
     """
     with c.cd(BASE_DIR / "backend"):
-        uv_run(c, f"python manage.py {command}", quiet_stdout)
+        venv_run(c, f"python manage.py {command}", quiet_stdout)
 
 
 def npx_run(c: Context, command: str, quiet_stdout: bool = False) -> None:

@@ -27,7 +27,7 @@ from .utils import (
     npx_run,
     print_error,
     print_success,
-    uv_run,
+    venv_run,
 )
 
 
@@ -123,9 +123,9 @@ def check(c: Context, verbose: bool = False) -> None:
     if verbose:
         info("Checking code quality. This may take a while.")
 
-    uv_run(c, isort_cmd(check_only=True), quiet_stdout=not verbose)
-    uv_run(c, black_cmd(), quiet_stdout=not verbose)
-    uv_run(c, ruff_check_cmd(fix=True), quiet_stdout=not verbose)
+    venv_run(c, isort_cmd(check_only=True), quiet_stdout=not verbose)
+    venv_run(c, black_cmd(), quiet_stdout=not verbose)
+    venv_run(c, ruff_check_cmd(fix=True), quiet_stdout=not verbose)
     npx_run(c, "oxlint .", quiet_stdout=not verbose)
     npx_run(
         c,
@@ -153,10 +153,12 @@ def format(c: Context, verbose: bool = False) -> None:
         f"prettier --write . --ignore-path {BASE_DIR / 'frontend/.prettierignore'}",
         quiet_stdout=not verbose,
     )
-    uv_run(c, isort_cmd(), quiet_stdout=not verbose)
-    uv_run(c, black_cmd().replace("--check", ""), quiet_stdout=not verbose)
-    uv_run(c, f"ruff format {BASE_DIR} --exclude {VENV_DIR}", quiet_stdout=not verbose)
-    uv_run(c, ruff_check_cmd(fix=True, exit_zero=True), quiet_stdout=not verbose)
+    venv_run(c, isort_cmd(), quiet_stdout=not verbose)
+    venv_run(c, black_cmd().replace("--check", ""), quiet_stdout=not verbose)
+    venv_run(
+        c, f"ruff format {BASE_DIR} --exclude {VENV_DIR}", quiet_stdout=not verbose
+    )
+    venv_run(c, ruff_check_cmd(fix=True, exit_zero=True), quiet_stdout=not verbose)
 
     print_success(message="Code formatters passed")
 
@@ -174,7 +176,7 @@ def test(c: Context, verbose: bool = False) -> None:
         info("Running tests")
 
     with c.cd(BASE_DIR / "backend"):
-        uv_run(c, "pytest", quiet_stdout=not verbose)
+        venv_run(c, "pytest", quiet_stdout=not verbose)
 
     print_success(message="All tests passed")
 
@@ -207,7 +209,7 @@ def api_changed(c: Context) -> bool:
         tmp_schema = Path(tmp_dir) / "openapi.yaml"
 
         with c.cd(BASE_DIR / "backend"):
-            uv_run(
+            venv_run(
                 c,
                 f"python manage.py spectacular --file {tmp_schema}",
             )
@@ -237,7 +239,7 @@ def generate_api(c: Context, check: bool = False) -> None:
         return
 
     with c.cd(BASE_DIR / "backend"):
-        uv_run(
+        venv_run(
             c,
             f"python manage.py spectacular --file {schema_path}",
         )
