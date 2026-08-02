@@ -77,6 +77,7 @@ def django_run(c: Context, command: str, quiet_stdout: bool = False) -> None:
     """
     Run a Django command.
     """
+
     with c.cd(BASE_DIR / "backend"):
         venv_run(c, f"python manage.py {command}", quiet_stdout)
 

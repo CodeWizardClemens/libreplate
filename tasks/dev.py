@@ -86,6 +86,14 @@ def verify(c: Context, verbose: bool = False) -> None:
     test(c, verbose)
 
 
+@task(aliases=["ds"])
+def django_shell(c: Context):
+    """
+    Open the django shell.
+    """
+    django_run(c, "shell")
+
+
 @task(aliases=["ud"])
 def user_add_dummy(c: Context):
     """

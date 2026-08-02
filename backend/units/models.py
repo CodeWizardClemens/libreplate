@@ -25,6 +25,9 @@ class Unit(models.Model):
     description = models.TextField(blank=True)
     abbreviation = models.CharField(max_length=15, blank=True)
 
+    # TODO "visable", is not a good name for it. It should be more descriptive.
+    # These flags mean that it shows in a dropdown menu for a user when they can
+    # pick a unit.
     visible_in_nutrients = models.BooleanField(default=False)
     visible_in_body_metrics = models.BooleanField(default=False)
     visible_in_foods = models.BooleanField(default=False)

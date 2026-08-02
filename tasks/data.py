@@ -15,7 +15,7 @@ def migrate(c: Context):
 
 
 @task(aliases=["sd"])
-def sync_default_data(c: Context):
+def sync_default_data(c: Context, overwrite=False):
     """
     Synchronize default application data.
     """
@@ -26,4 +26,8 @@ def sync_default_data(c: Context):
         "sync_default_units",
         "sync_default_body_metrics",
     ]:
-        django_run(c, command)
+        full_command = command
+        if overwrite:
+            full_command += " --overwrite"
+
+        django_run(c, full_command)
