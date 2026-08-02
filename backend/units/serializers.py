@@ -11,4 +11,7 @@ class UnitSerializer(serializers.ModelSerializer):
             "name",
             "description",
             "abbreviation",
+            "visible_in_nutrients",
+            "visible_in_body_metrics",
+            "visible_in_foods",
         ]
