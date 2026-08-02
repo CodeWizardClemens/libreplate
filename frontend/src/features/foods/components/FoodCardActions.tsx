@@ -1,5 +1,5 @@
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import type { Food } from "@/api/generated";
 
 interface Props {
@@ -13,78 +13,110 @@ export default function FoodCardActions({
   onDelete,
   onToggleFavorite,
 }: Props) {
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  const stopCardClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-  };
-
-  const handleDelete = () => {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${food.name}"? This cannot be undone.`,
-    );
-
-    if (confirmed) {
-      onDelete?.(food.id);
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
     }
-  };
 
-  const actions = (
-    <>
-      <button
-        className={
-          food.is_favorite ? "btn btn-primary" : "btn btn-outline-secondary"
-        }
-        onClick={(e) => {
-          stopCardClick(e);
-          onToggleFavorite?.(food.id);
-        }}
-        title="Favorite"
-      >
-        <i className={food.is_favorite ? "bi bi-heart-fill" : "bi bi-heart"} />
-      </button>
+    document.addEventListener("mousedown", handleClickOutside);
 
-      <button
-        className="btn btn-outline-secondary"
-        onClick={(e) => {
-          stopCardClick(e);
-          navigate(`/foods/${food.id}/edit`);
-        }}
-        title="Edit"
-      >
-        <i className="bi bi-pencil" />
-      </button>
-
-      <button
-        className="btn btn-outline-secondary"
-        onClick={(e) => {
-          stopCardClick(e);
-          handleDelete();
-        }}
-        title="Delete"
-      >
-        <i className="bi bi-trash" />
-      </button>
-    </>
-  );
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
-    <>
-      {/* Desktop */}
-      <div
-        className="col-12 col-md-auto d-none d-md-flex gap-2 order-3"
-        onClick={(e) => e.stopPropagation()}
+    <div
+      ref={dropdownRef}
+      className="dropdown position-relative ms-auto"
+      onClick={(event) => event.stopPropagation()}
+    >
+      <button
+        type="button"
+        className="btn btn-sm border-0 bg-transparent p-1 text-dark"
+        aria-label="Open food actions"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((previous) => !previous)}
       >
-        {actions}
-      </div>
+        <i className="bi bi-three-dots"></i>
+      </button>
 
-      {/* Mobile */}
-      <div
-        className="d-flex d-md-none justify-content-end gap-2 mt-3 order-3 flex-wrap"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {actions}
-      </div>
-    </>
+      {open && (
+        <div
+          className="dropdown-menu show text-end"
+          role="menu"
+          style={{
+            minWidth: "max-content",
+            right: "100%",
+            left: "auto",
+            top: 0,
+            marginRight: "0.25rem",
+          }}
+        >
+          <button
+            type="button"
+            className="dropdown-item text-end food-action-item"
+            role="menuitem"
+            onClick={() => {
+              navigate(`/foods/${food.id}/edit`);
+              setOpen(false);
+            }}
+          >
+            Edit
+          </button>
+
+          <button
+            type="button"
+            className="dropdown-item text-end food-action-item"
+            role="menuitem"
+            onClick={() => {
+              onToggleFavorite?.(food.id);
+              setOpen(false);
+            }}
+          >
+            {food.is_favorite ? "Favorited" : "Add favorite"}
+          </button>
+
+          <button
+            type="button"
+            className="dropdown-item text-danger text-end food-action-item"
+            role="menuitem"
+            onClick={() => {
+              const confirmed = window.confirm(
+                `Are you sure you want to delete "${food.name}"?`
+              );
+
+              if (confirmed) {
+                onDelete?.(food.id);
+              }
+
+              setOpen(false);
+            }}
+          >
+            Delete
+          </button>
+        </div>
+      )}
+
+      <style>
+        {`
+          .food-action-item:active,
+          .food-action-item:focus {
+            background-color: var(--bs-dropdown-link-hover-bg);
+            color: var(--bs-dropdown-link-hover-color);
+          }
+        `}
+      </style>
+    </div>
   );
 }

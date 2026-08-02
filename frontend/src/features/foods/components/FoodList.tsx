@@ -16,11 +16,8 @@ export default function FoodList({ foods, onDelete, onToggleFavorite }: Props) {
       {foods.map((food) => (
         <FoodCard
           key={food.id}
-
           food={food}
-
           onDelete={onDelete}
-
           onToggleFavorite={onToggleFavorite}
         />
       ))}

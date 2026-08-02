@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import FoodList from "@/features/foods/components/FoodList";
 import FoodSearchBar, {
@@ -18,6 +19,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function FoodsPage() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const foodsQuery = useQuery({
     queryKey: ["foods"],
@@ -33,10 +35,16 @@ export default function FoodsPage() {
       foodsCreate({
         body: data,
       }),
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({
         queryKey: ["foods"],
       });
+
+      const food = response.data;
+
+      if (food?.id) {
+        navigate(`/foods/${food.id}/edit`);
+      }
     },
   });
 
@@ -86,7 +94,7 @@ export default function FoodsPage() {
   function handleAddFood() {
     createFood.mutate({
       name: "New food",
-      unit_id: 1, // TODO hard coded gram and 100 serving. fix later
+      unit_id: 1,
       serving: 100,
       barcode: null,
       brand: null,
