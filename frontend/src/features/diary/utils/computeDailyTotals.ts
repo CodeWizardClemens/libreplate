@@ -1,4 +1,5 @@
-import type { DayMeal } from "@/types/MealTypes";
+import type { DayMeal } from "@/api/generated";
+
 import { computeMealTotals } from "./MealFormulas";
 
 export interface DailyTotals {
@@ -17,7 +18,7 @@ export function computeDailyTotals(meals: DayMeal[]): DailyTotals {
   };
 
   for (const meal of meals) {
-    const mealTotals = computeMealTotals(meal.meal_foods);
+    const mealTotals = computeMealTotals(meal.meal_foods ?? []);
 
     totals.energy += mealTotals.energy;
     totals.protein += mealTotals.protein;

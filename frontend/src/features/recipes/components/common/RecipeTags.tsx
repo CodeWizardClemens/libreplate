@@ -1,14 +1,31 @@
-import type { Recipe } from "@/types/RecipeTypes";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { useRecipeTags, useUpdateRecipe } from "@/api/RecipeAPI";
+import type { Recipe } from "@/api/generated/types.gen";
+import { recipesPartialUpdate, recipesTagsList } from "@/api/generated";
 
 interface Props {
   recipe: Recipe;
 }
 
 export default function RecipeCardTags({ recipe }: Props) {
-  const { data: availableTags = [] } = useRecipeTags();
-  const updateRecipe = useUpdateRecipe();
+  const { data: tagsResponse } = useQuery({
+    queryKey: ["recipe-tags"],
+    queryFn: () => recipesTagsList(),
+  });
+
+  const availableTags = tagsResponse?.data ?? [];
+
+  const updateRecipe = useMutation({
+    mutationFn: (tagIds: number[]) =>
+      recipesPartialUpdate({
+        path: {
+          id: recipe.id,
+        },
+        body: {
+          tag_ids: tagIds,
+        },
+      }),
+  });
 
   const unusedTags = availableTags.filter(
     (tag) => !recipe.tags.some((recipeTag) => recipeTag.id === tag.id),
@@ -19,12 +36,7 @@ export default function RecipeCardTags({ recipe }: Props) {
   }
 
   function updateRecipeData(tagIds: number[]) {
-    updateRecipe.mutate({
-      id: recipe.id,
-      data: {
-        tag_ids: tagIds,
-      },
-    });
+    updateRecipe.mutate(tagIds);
   }
 
   function addTag(tagId: number) {

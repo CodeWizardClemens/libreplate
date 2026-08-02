@@ -1,4 +1,4 @@
-import type { Tag } from "@/types/TagTypes";
+import type { RecipeTag } from "@/api/generated";
 import TagSelector from "./TagSelector";
 
 export interface SortOption<TSort extends string> {
@@ -11,7 +11,7 @@ export interface SearchScope {
   label: string;
 }
 
-interface Props<TSort extends string, TagType extends Tag> {
+interface Props<TSort extends string, TagType extends RecipeTag> {
   search: string;
   onSearchChange: (value: string) => void;
   scope: SearchScope;
@@ -31,7 +31,10 @@ interface Props<TSort extends string, TagType extends Tag> {
   manageTagsLabel?: string;
 }
 
-export default function SearchBar<TSort extends string, TagType extends Tag>({
+export default function SearchBar<
+  TSort extends string,
+  TagType extends RecipeTag,
+>({
   search,
   onSearchChange,
   scope,

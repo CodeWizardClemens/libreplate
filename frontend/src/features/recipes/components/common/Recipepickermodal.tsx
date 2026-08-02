@@ -1,6 +1,8 @@
 import { useState } from "react";
-import type { Recipe } from "@/types/RecipeTypes";
-import { useRecipes } from "@/api/RecipeAPI";
+import { useQuery } from "@tanstack/react-query";
+
+import type { Recipe } from "@/api/generated/types.gen";
+import { recipesList } from "@/api/generated";
 
 interface RecipePickerModalProps {
   isOpen: boolean;
@@ -15,16 +17,24 @@ export default function RecipePickerModal({
 }: RecipePickerModalProps) {
   const [search, setSearch] = useState("");
 
-  const { data: recipes, isLoading, isError } = useRecipes();
+  const {
+    data: recipesResponse,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["recipes"],
+    queryFn: () => recipesList(),
+  });
+
+  const recipes = recipesResponse?.data ?? [];
 
   if (!isOpen) {
     return null;
   }
 
-  const filteredRecipes =
-    recipes?.filter((recipe) =>
-      recipe.name.toLowerCase().includes(search.toLowerCase()),
-    ) ?? [];
+  const filteredRecipes = recipes.filter((recipe) =>
+    recipe.name.toLowerCase().includes(search.toLowerCase()),
+  );
 
   function reset() {
     setSearch("");
@@ -68,10 +78,6 @@ export default function RecipePickerModal({
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-
-        {/* {isLoading && (
-          <p className="text-muted">Loading recipes...</p>
-        )} */}
 
         {isError && <p className="text-danger">Failed to load recipes.</p>}
 

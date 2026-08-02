@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import type { RecipeTag } from "@/types/RecipeTypes";
+import type { RecipeTag } from "@/api/generated/types.gen";
 import SearchBar, { type SortOption } from "@/components/ui/SearchBar";
 import TagModal from "../common/TagModal";
 

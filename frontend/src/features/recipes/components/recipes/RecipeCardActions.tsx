@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-import type { Recipe } from "@/types/RecipeTypes";
+import type { Recipe } from "@/api/generated/types.gen";
 
 interface Props {
   recipe: Recipe;

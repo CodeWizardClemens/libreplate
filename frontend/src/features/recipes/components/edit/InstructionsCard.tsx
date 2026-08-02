@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
-import type { Recipe } from "@/types/RecipeTypes";
-import { useUpdateRecipe } from "@/api/RecipeAPI";
+import { recipesPartialUpdate } from "@/api/generated";
+import type { Recipe } from "@/api/generated/types.gen";
 
 type Props = {
   recipe: Recipe;
@@ -10,11 +10,10 @@ type Props = {
 
 export default function InstructionsCard({ recipe }: Props) {
   const [editing, setEditing] = useState(false);
-  const [instructions, setInstructions] = useState(recipe.instructions);
+  const [instructions, setInstructions] = useState(recipe.instructions ?? "");
+  const [isSaving, setIsSaving] = useState(false);
 
   const cardRef = useRef<HTMLDivElement>(null);
-
-  const updateRecipe = useUpdateRecipe();
 
   useEffect(() => {
     if (editing) {
@@ -25,20 +24,25 @@ export default function InstructionsCard({ recipe }: Props) {
     }
   }, [editing]);
 
-  function saveInstructions() {
-    updateRecipe.mutate(
-      {
-        id: recipe.id,
-        data: {
+  async function saveInstructions() {
+    try {
+      setIsSaving(true);
+
+      await recipesPartialUpdate({
+        path: {
+          id: recipe.id,
+        },
+        body: {
           instructions,
         },
-      },
-      {
-        onSuccess() {
-          setEditing(false);
-        },
-      },
-    );
+      });
+
+      setEditing(false);
+    } catch (error) {
+      console.error("Failed to update recipe instructions", error);
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   return (
@@ -59,9 +63,9 @@ export default function InstructionsCard({ recipe }: Props) {
             <button
               className="btn btn-primary btn-sm"
               onClick={saveInstructions}
-              disabled={updateRecipe.isPending}
+              disabled={isSaving}
             >
-              {updateRecipe.isPending ? "Saving..." : "Save"}
+              {isSaving ? "Saving..." : "Save"}
             </button>
           )}
 

@@ -1,9 +1,9 @@
-import { useUpdateRecipe } from "@/api/RecipeAPI";
-import type { Recipe } from "@/types/RecipeTypes";
+import type { ReactNode } from "react";
+
+import { recipesPartialUpdate } from "@/api/generated";
+import type { Recipe } from "@/api/generated/types.gen";
 
 import { useInlineEdit } from "@/features/recipes/hooks/useInlineEdit";
-
-import type { ReactNode } from "react";
 
 interface Props {
   recipe: Recipe;
@@ -55,12 +55,12 @@ function EditableText<T>({
 }
 
 export default function TitleInfo({ recipe }: Props) {
-  const updateRecipe = useUpdateRecipe();
-
   const edit = useInlineEdit(recipe, (field, value) => {
-    updateRecipe.mutate({
-      id: recipe.id,
-      data: {
+    recipesPartialUpdate({
+      path: {
+        id: recipe.id,
+      },
+      body: {
         [field]: value,
       },
     });

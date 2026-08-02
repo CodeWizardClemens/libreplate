@@ -1,4 +1,4 @@
-import type { Recipe } from "@/types/RecipeTypes";
+import type { Recipe } from "@/api/generated/types.gen";
 
 interface Props {
   nutrients: Recipe["nutrients"];
@@ -16,28 +16,10 @@ export default function RecipeCardNutrients({ nutrients }: Props) {
   }
 
   return (
-    <div
-      className="
-        row
-        g-2
-        mb-3
-      "
-    >
+    <div className="row g-2 mb-3">
       {allowedNutrients.map((nutrient) => (
-        <div
-          key={nutrient.id}
-          className="
-            col-6
-            col-md-auto
-          "
-        >
-          <span
-            className="
-              badge
-              text-bg-light
-              border
-            "
-          >
+        <div key={nutrient.id} className="col-6 col-md-auto">
+          <span className="badge text-bg-light border">
             {nutrient.name.toLowerCase() === "carbohydrates"
               ? "Carbs"
               : nutrient.name}

@@ -1,8 +1,7 @@
 import { useState } from "react";
 
-import type { Recipe } from "@/types/RecipeTypes";
-
-import { useUpdateRecipe } from "@/api/RecipeAPI";
+import type { Recipe } from "@/api/generated/types.gen";
+import { recipesPartialUpdate } from "@/api/generated";
 
 import RecipeCardActions from "./RecipeCardActions";
 import RecipeCardHeader from "./RecipeCardHeader";
@@ -26,19 +25,19 @@ export default function RecipeCard({
   onTogglePinned,
   onCopy,
 }: Props) {
-  const updateRecipe = useUpdateRecipe();
-
   const [editingName, setEditingName] = useState(false);
   const [editingSummary, setEditingSummary] = useState(false);
 
-  function updateRecipeData(data: {
+  async function updateRecipeData(data: {
     name?: string;
     summary?: string;
     tag_ids?: number[];
   }) {
-    updateRecipe.mutate({
-      id: recipe.id,
-      data,
+    await recipesPartialUpdate({
+      path: {
+        id: recipe.id,
+      },
+      body: data,
     });
   }
 

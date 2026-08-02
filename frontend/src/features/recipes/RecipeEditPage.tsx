@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
-import { useRecipe, useRecipeTags } from "@/api/RecipeAPI";
+import { recipesRetrieve, recipesTagsList } from "@/api/generated";
 
 import BackButton from "./components/edit/BackButton";
 import RecipeInfoBar from "./components/edit/RecipeInfoBar";
@@ -18,8 +19,24 @@ export default function RecipeEditPage() {
 
   const recipeId = Number(id);
 
-  const { data: recipe, isLoading } = useRecipe(recipeId);
-  const { data: tags } = useRecipeTags();
+  const { data: recipeResponse, isLoading } = useQuery({
+    queryKey: ["recipe", recipeId],
+    queryFn: () =>
+      recipesRetrieve({
+        path: {
+          id: recipeId,
+        },
+      }),
+    enabled: Number.isFinite(recipeId),
+  });
+
+  const { data: tagsResponse } = useQuery({
+    queryKey: ["recipe-tags"],
+    queryFn: () => recipesTagsList(),
+  });
+
+  const recipe = recipeResponse?.data;
+  const tags = tagsResponse?.data;
 
   const [showTagModal, setShowTagModal] = useState(false);
 
@@ -56,6 +73,7 @@ export default function RecipeEditPage() {
           >
             Tags
           </button>
+
           <RecipeCardTags recipe={recipe} />
         </div>
       </div>

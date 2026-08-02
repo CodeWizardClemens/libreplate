@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { useUpdateMealFood } from "@/api/MealAPI";
-import type { MealFood } from "@/types/MealTypes";
+import { useMutation } from "@tanstack/react-query";
+
+import { mealsMealFoodsPartialUpdate } from "@/api/generated";
+
+import type { MealFood } from "@/api/generated";
 
 type Props = {
   item: MealFood;
@@ -8,23 +11,55 @@ type Props = {
 };
 
 export default function EditMealFoodModal({ item, onClose }: Props) {
-  const updateMealFood = useUpdateMealFood();
+  const [servingSize, setServingSize] = useState(
+    String(item.serving_size ?? 0),
+  );
 
-  const [servingSize, setServingSize] = useState(String(item.serving_size));
-  const [servings, setServings] = useState(String(item.number_of_servings));
+  const [servings, setServings] = useState(
+    String(item.number_of_servings ?? 0),
+  );
+
+  const updateMealFood = useMutation({
+    mutationFn: async ({
+      id,
+      serving_size,
+      number_of_servings,
+    }: {
+      id: number;
+      serving_size: number;
+      number_of_servings: number;
+    }) => {
+      const response = await mealsMealFoodsPartialUpdate({
+        path: {
+          id,
+        },
+        body: {
+          serving_size,
+          number_of_servings,
+        },
+      });
+
+      return response.data;
+    },
+  });
 
   async function handleSave() {
     const parsedSize = parseFloat(servingSize);
     const parsedServings = parseFloat(servings);
 
-    if (parsedSize <= 0 || parsedServings <= 0) return;
+    if (
+      Number.isNaN(parsedSize) ||
+      Number.isNaN(parsedServings) ||
+      parsedSize <= 0 ||
+      parsedServings <= 0
+    ) {
+      return;
+    }
 
     await updateMealFood.mutateAsync({
       id: item.id,
-      data: {
-        serving_size: parsedSize,
-        number_of_servings: parsedServings,
-      },
+      serving_size: parsedSize,
+      number_of_servings: parsedServings,
     });
 
     onClose();
@@ -60,6 +95,7 @@ export default function EditMealFoodModal({ item, onClose }: Props) {
 
         <div>
           <label className="form-label">Serving size (g)</label>
+
           <input
             type="number"
             min={0}
@@ -72,6 +108,7 @@ export default function EditMealFoodModal({ item, onClose }: Props) {
 
         <div>
           <label className="form-label">Number of servings</label>
+
           <input
             type="number"
             min={0}
@@ -83,12 +120,21 @@ export default function EditMealFoodModal({ item, onClose }: Props) {
         </div>
 
         <div
-          style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "10px",
+          }}
         >
           <button className="btn btn-secondary" onClick={onClose}>
             Cancel
           </button>
-          <button className="btn btn-primary" onClick={handleSave}>
+
+          <button
+            className="btn btn-primary"
+            onClick={handleSave}
+            disabled={updateMealFood.isPending}
+          >
             Save
           </button>
         </div>

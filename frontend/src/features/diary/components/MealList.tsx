@@ -1,6 +1,9 @@
 import { useState } from "react";
-import type { DayMeal } from "@/types/MealTypes";
+
+import type { DayMeal } from "@/api/generated";
+
 import MealFoodItem from "./MealFoodItem";
+
 import { computeMealTotals } from "@/features/diary/utils/MealFormulas";
 
 type Props = {
@@ -27,7 +30,9 @@ function MealCard({
 }) {
   const [open, setOpen] = useState(true);
 
-  const totals = computeMealTotals(meal.meal_foods);
+  const mealFoods = meal.meal_foods ?? [];
+
+  const totals = computeMealTotals(mealFoods);
 
   return (
     <div className="col-12">
@@ -52,14 +57,13 @@ function MealCard({
 
                 <div className="small text-muted d-flex gap-3">
                   <span>Kcal {totals.energy.toFixed(0)}</span>
+
                   <span>P {totals.protein.toFixed(0)}</span>
+
                   <span>F {totals.fat.toFixed(0)}</span>
+
                   <span>C {totals.carbs.toFixed(0)}</span>
                 </div>
-
-                {/* {meal.meal_id === null && (
-                  <span className="badge bg-light text-dark">Empty</span>
-                )} */}
               </div>
             </div>
 
@@ -74,11 +78,11 @@ function MealCard({
 
           {/* Collapsible content */}
           <div className={`collapse ${open ? "show" : ""}`}>
-            {meal.meal_foods.length === 0 ? (
+            {mealFoods.length === 0 ? (
               <div className="text-muted"></div>
             ) : (
               <ul className="list-group list-group-flush">
-                {meal.meal_foods.map((item) => (
+                {mealFoods.map((item) => (
                   <MealFoodItem key={item.id} item={item} />
                 ))}
               </ul>

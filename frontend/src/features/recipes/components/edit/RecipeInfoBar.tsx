@@ -1,32 +1,33 @@
 import { useEffect, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 
-import { useUpdateRecipe } from "@/api/RecipeAPI";
+import { recipesPartialUpdate } from "@/api/generated";
+import type { Recipe } from "@/api/generated/types.gen";
 
 type Props = {
-  recipe?: any;
+  recipe?: Recipe;
 };
 
 export default function RecipeInfoBar({ recipe }: Props) {
   const [show, setShow] = useState(false);
   const [hovered, setHovered] = useState(false);
 
-  const [portions, setPortions] = useState(0);
-  const [cookingTime, setCookingTime] = useState(0);
-  const [preppingTime, setPreppingTime] = useState(0);
+  const [portions, setPortions] = useState("0");
+  const [cookingTime, setCookingTime] = useState("0");
+  const [preppingTime, setPreppingTime] = useState("0");
 
-  const [draftPortions, setDraftPortions] = useState(0);
-  const [draftCookingTime, setDraftCookingTime] = useState(0);
-  const [draftPreppingTime, setDraftPreppingTime] = useState(0);
+  const [draftPortions, setDraftPortions] = useState("0");
+  const [draftCookingTime, setDraftCookingTime] = useState("0");
+  const [draftPreppingTime, setDraftPreppingTime] = useState("0");
 
-  const updateRecipe = useUpdateRecipe();
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (!recipe) return;
 
-    setPortions(recipe.portions ?? 0);
-    setCookingTime(recipe.cooking_time ?? 0);
-    setPreppingTime(recipe.prepping_time ?? 0);
+    setPortions(String(recipe.portions ?? 0));
+    setCookingTime(String(recipe.cooking_time ?? 0));
+    setPreppingTime(String(recipe.prepping_time ?? 0));
   }, [recipe]);
 
   const handleOpen = () => {
@@ -44,22 +45,32 @@ export default function RecipeInfoBar({ recipe }: Props) {
     if (!recipe?.id) return;
 
     try {
-      await updateRecipe.mutateAsync({
-        id: recipe.id,
-        data: {
-          portions: draftPortions,
+      setIsSaving(true);
+
+      const response = await recipesPartialUpdate({
+        path: {
+          id: recipe.id,
+        },
+        body: {
+          portions: Number(draftPortions),
           cooking_time: draftCookingTime,
           prepping_time: draftPreppingTime,
         },
       });
 
-      setPortions(draftPortions);
-      setCookingTime(draftCookingTime);
-      setPreppingTime(draftPreppingTime);
+      const updatedRecipe = response.data;
+
+      if (updatedRecipe) {
+        setPortions(String(updatedRecipe.portions ?? 0));
+        setCookingTime(String(updatedRecipe.cooking_time ?? 0));
+        setPreppingTime(String(updatedRecipe.prepping_time ?? 0));
+      }
 
       setShow(false);
     } catch (error) {
       console.error("Failed to update recipe", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -74,17 +85,17 @@ export default function RecipeInfoBar({ recipe }: Props) {
       >
         <span>
           <i className="bi bi-people me-1" />
-          {portions ?? 0} {portions === 1 ? "portion" : "portions"}
+          {portions} {portions === "1" ? "portion" : "portions"}
         </span>
 
         <span>
           <i className="bi bi-stopwatch me-1" />
-          {cookingTime ?? 0}m cook
+          {cookingTime}m cook
         </span>
 
         <span>
           <i className="bi bi-stopwatch me-1" />
-          {preppingTime ?? 0}m prep
+          {preppingTime}m prep
         </span>
 
         <i
@@ -109,7 +120,7 @@ export default function RecipeInfoBar({ recipe }: Props) {
                 type="number"
                 min={1}
                 value={draftPortions}
-                onChange={(e) => setDraftPortions(Number(e.target.value))}
+                onChange={(e) => setDraftPortions(e.target.value)}
               />
             </Form.Group>
 
@@ -119,7 +130,7 @@ export default function RecipeInfoBar({ recipe }: Props) {
                 type="number"
                 min={0}
                 value={draftCookingTime}
-                onChange={(e) => setDraftCookingTime(Number(e.target.value))}
+                onChange={(e) => setDraftCookingTime(e.target.value)}
               />
             </Form.Group>
 
@@ -129,27 +140,19 @@ export default function RecipeInfoBar({ recipe }: Props) {
                 type="number"
                 min={0}
                 value={draftPreppingTime}
-                onChange={(e) => setDraftPreppingTime(Number(e.target.value))}
+                onChange={(e) => setDraftPreppingTime(e.target.value)}
               />
             </Form.Group>
           </Form>
         </Modal.Body>
 
         <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={handleClose}
-            disabled={updateRecipe.isPending}
-          >
+          <Button variant="secondary" onClick={handleClose} disabled={isSaving}>
             Cancel
           </Button>
 
-          <Button
-            variant="primary"
-            onClick={handleSave}
-            disabled={updateRecipe.isPending}
-          >
-            {updateRecipe.isPending ? "Saving..." : "Save"}
+          <Button variant="primary" onClick={handleSave} disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save"}
           </Button>
         </Modal.Footer>
       </Modal>

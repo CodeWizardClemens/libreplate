@@ -1,4 +1,4 @@
-import type { MealFood } from "@/types/MealTypes";
+import type { MealFood } from "@/api/generated";
 
 export function computeMealTotals(mealFoods: MealFood[]) {
   const totals = {
@@ -9,12 +9,15 @@ export function computeMealTotals(mealFoods: MealFood[]) {
   };
 
   for (const mf of mealFoods) {
-    const multiplier = (mf.serving_size * mf.number_of_servings) / 100;
+    const servingSize = mf.serving_size ?? 0;
+    const numberOfServings = mf.number_of_servings ?? 0;
 
-    for (const n of mf.food.nutrients) {
-      const amount = n.amount * multiplier;
+    const multiplier = (servingSize * numberOfServings) / 100;
 
-      switch (n.nutrient_name.toLowerCase()) {
+    for (const nutrient of mf.food?.nutrients ?? []) {
+      const amount = (nutrient.amount ?? 0) * multiplier;
+
+      switch (nutrient.nutrient_name?.toLowerCase()) {
         case "energy":
         case "calories":
         case "kcal":

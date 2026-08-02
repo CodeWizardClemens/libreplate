@@ -1,4 +1,5 @@
-import type { DayMeal } from "@/types/MealTypes";
+import type { DayMeal } from "@/api/generated";
+
 import { computeDailyTotals } from "../utils/computeDailyTotals";
 
 type Props = {
@@ -15,8 +16,11 @@ export default function DailyTotalsBar({ meals }: Props) {
 
         <div className="d-flex gap-4 text-muted">
           <span>Kcal {totals.energy.toFixed(0)}</span>
+
           <span>P {totals.protein.toFixed(0)}</span>
+
           <span>F {totals.fat.toFixed(0)}</span>
+
           <span>C {totals.carbs.toFixed(0)}</span>
         </div>
       </div>

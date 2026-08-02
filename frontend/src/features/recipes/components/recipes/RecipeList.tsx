@@ -1,6 +1,6 @@
 import RecipeCard from "./RecipeCard";
 
-import type { Recipe } from "@/types/RecipeTypes";
+import type { Recipe } from "@/api/generated/types.gen";
 
 interface Props {
   recipes: Recipe[];
@@ -22,23 +22,14 @@ export default function RecipeList({
   onCopy,
 }: Props) {
   return (
-    <div
-      className="
-                space-y-4
-            "
-    >
+    <div className="space-y-4">
       {recipes.map((recipe) => (
         <RecipeCard
           key={recipe.id}
-
           recipe={recipe}
-
           onDelete={onDelete}
-
           onToggleFavorite={onToggleFavorite}
-
           onTogglePinned={onTogglePinned}
-
           onCopy={onCopy}
         />
       ))}

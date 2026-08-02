@@ -1,6 +1,7 @@
 import { useRef } from "react";
+import { useMutation } from "@tanstack/react-query";
 
-import { useUploadRecipePicture } from "@/api/RecipeAPI";
+import { recipesPictureCreate } from "@/api/generated";
 
 interface Props {
   recipeId: number;
@@ -11,7 +12,19 @@ interface Props {
 export default function RecipeCardPicture({ recipeId, width, height }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const uploadPicture = useUploadRecipePicture();
+  const uploadPicture = useMutation({
+    mutationFn: (file: File) => {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      return recipesPictureCreate({
+        path: {
+          id: recipeId,
+        },
+        body: formData as unknown as never,
+      });
+    },
+  });
 
   function stopCardClick(event: React.MouseEvent) {
     event.stopPropagation();
@@ -31,10 +44,7 @@ export default function RecipeCardPicture({ recipeId, width, height }: Props) {
       return;
     }
 
-    uploadPicture.mutate({
-      recipeId,
-      file,
-    });
+    uploadPicture.mutate(file);
 
     event.target.value = "";
   }

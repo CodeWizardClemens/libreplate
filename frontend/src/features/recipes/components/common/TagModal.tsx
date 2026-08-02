@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 
-import type { RecipeTag } from "@/types/RecipeTypes";
+import type { RecipeTag } from "@/api/generated";
 
-import { useCreateRecipeTag, useDeleteRecipeTag } from "@/api/RecipeAPI";
+import { recipesTagsCreate, recipesTagsDeleteDestroy } from "@/api/generated";
 
 interface Props {
   open: boolean;
@@ -13,8 +14,23 @@ interface Props {
 export default function TagModal({ open, onClose, tags }: Props) {
   const [newTag, setNewTag] = useState("");
 
-  const createTag = useCreateRecipeTag();
-  const deleteTag = useDeleteRecipeTag();
+  const createTag = useMutation({
+    mutationFn: (name: string) =>
+      recipesTagsCreate({
+        body: {
+          name,
+        },
+      }),
+  });
+
+  const deleteTag = useMutation({
+    mutationFn: (id: number) =>
+      recipesTagsDeleteDestroy({
+        path: {
+          id,
+        },
+      }),
+  });
 
   if (!open) {
     return null;

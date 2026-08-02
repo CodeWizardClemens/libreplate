@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 
-import type { Recipe, RecipeIngredient } from "@/types/RecipeTypes";
-import { type Food, foodsRetrieve } from "@/api/generated";
-
+import type { Recipe, RecipeIngredient } from "@/api/generated/types.gen";
 import {
-  useCreateRecipeIngredient,
-  useDeleteRecipeIngredient,
-  useUpdateRecipeIngredient,
-} from "@/api/RecipeAPI";
+  recipesIngredientsCreate,
+  recipesIngredientsDestroy,
+  recipesIngredientsPartialUpdate,
+  foodsRetrieve,
+  type Food,
+} from "@/api/generated";
 
 import { useQuery } from "@tanstack/react-query";
 import FoodPickerModal from "@/features/foods/components/FoodPickerModal";
@@ -58,8 +58,8 @@ function calculateNutrients(
   ingredient: RecipeIngredient,
 ): NutrientTotals {
   const multiplier =
-    ingredient.number_of_servings *
-    (ingredient.serving_amount / (food.serving ?? 1));
+    Number(ingredient.number_of_servings) *
+    (Number(ingredient.serving_amount) / (food.serving ?? 1));
 
   return Object.fromEntries(
     Object.entries(nutrients).map(([key, names]) => [
@@ -118,21 +118,30 @@ function IngredientRow({
   onUpdate: (id: number, data: Partial<RecipeIngredient>) => void;
 }) {
   const { data: food } = useFood(ingredient.food);
-  const updateMutation = useUpdateRecipeIngredient();
+
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const values = useMemo(
     () => (food ? calculateNutrients(food, ingredient) : emptyTotals()),
     [food, ingredient.number_of_servings, ingredient.serving_amount],
   );
 
-  const update = (data: Partial<RecipeIngredient>) => {
+  const update = async (data: Partial<RecipeIngredient>) => {
     onUpdate(ingredient.id, data);
 
-    updateMutation.mutate({
-      recipeId,
-      ingredientId: ingredient.id,
-      data,
-    });
+    try {
+      setIsUpdating(true);
+
+      await recipesIngredientsPartialUpdate({
+        path: {
+          id: recipeId,
+          ingredient_pk: ingredient.id,
+        },
+        body: data,
+      });
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   if (!food) {
@@ -151,15 +160,23 @@ function IngredientRow({
 
       <td>
         <NumberInput
-          value={ingredient.number_of_servings}
-          onChange={(value) => update({ number_of_servings: value })}
+          value={ingredient.number_of_servings ?? 0}
+          onChange={(value) =>
+            update({
+              number_of_servings: value,
+            })
+          }
         />
       </td>
 
       <td>
         <NumberInput
-          value={ingredient.serving_amount}
-          onChange={(value) => update({ serving_amount: value })}
+          value={ingredient.serving_amount ?? 0}
+          onChange={(value) =>
+            update({
+              serving_amount: value,
+            })
+          }
         />
       </td>
 
@@ -170,6 +187,7 @@ function IngredientRow({
       <td className="text-end">
         <button
           className="btn btn-sm btn-outline-danger"
+          disabled={isUpdating}
           onClick={() => onDelete(ingredient.id)}
         >
           Delete
@@ -192,7 +210,13 @@ function IngredientTotalsItem({
     if (!food) return;
 
     onChange(ingredient.id, calculateNutrients(food, ingredient));
-  }, [food, ingredient.number_of_servings, ingredient.serving_amount]);
+  }, [
+    food,
+    ingredient.id,
+    ingredient.number_of_servings,
+    ingredient.serving_amount,
+    onChange,
+  ]);
 
   return null;
 }
@@ -265,19 +289,26 @@ function IngredientTotals({
 }
 
 export default function IngredientsCard({ recipe }: IngredientsCardProps) {
-  const [ingredients, setIngredients] = useState(recipe.ingredients);
+  const [ingredients, setIngredients] = useState<RecipeIngredient[]>(
+    recipe.ingredients ?? [],
+  );
+
   const [pickerOpen, setPickerOpen] = useState(false);
 
-  const createMutation = useCreateRecipeIngredient();
-  const deleteMutation = useDeleteRecipeIngredient();
-
   useEffect(() => {
-    setIngredients(recipe.ingredients);
+    setIngredients(recipe.ingredients ?? []);
   }, [recipe.ingredients]);
 
   const updateIngredient = (id: number, data: Partial<RecipeIngredient>) => {
     setIngredients((items) =>
-      items.map((item) => (item.id === id ? { ...item, ...data } : item)),
+      items.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              ...data,
+            }
+          : item,
+      ),
     );
   };
 
@@ -290,9 +321,11 @@ export default function IngredientsCard({ recipe }: IngredientsCardProps) {
       const order = nextOrder;
       nextOrder += 1;
 
-      const ingredient = await createMutation.mutateAsync({
-        recipeId: recipe.id,
-        data: {
+      const response = await recipesIngredientsCreate({
+        path: {
+          id: recipe.id,
+        },
+        body: {
           food: food.id,
           number_of_servings: 1,
           serving_amount: food.serving ?? 1,
@@ -300,16 +333,20 @@ export default function IngredientsCard({ recipe }: IngredientsCardProps) {
         },
       });
 
-      setIngredients((items) => [...items, ingredient]);
+      if (response.data) {
+        setIngredients((items) => [...items, response.data]);
+      }
     }
   };
 
-  const removeIngredient = (id: number) => {
+  const removeIngredient = async (id: number) => {
     setIngredients((items) => items.filter((item) => item.id !== id));
 
-    deleteMutation.mutate({
-      recipeId: recipe.id,
-      ingredientId: id,
+    await recipesIngredientsDestroy({
+      path: {
+        id: recipe.id,
+        ingredient_pk: id,
+      },
     });
   };
 

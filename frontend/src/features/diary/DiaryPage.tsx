@@ -1,7 +1,13 @@
 import { useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+
 import DailyTotalsBar from "./components//DailyTotalsBar";
 
-import { useDayMeals, useCreateMeal, useCreateMealFood } from "@/api/MealAPI";
+import {
+  mealsDayList,
+  mealsCreate,
+  mealsMealFoodsCreate,
+} from "@/api/generated";
 
 import FoodPickerModal from "../foods/components/FoodPickerModal";
 import RecipePickerModal from "../recipes/components/common/Recipepickermodal";
@@ -10,12 +16,10 @@ import AddToMealModal from "./components/AddToMealModal";
 import DiaryHeader from "./components/DiaryHeader";
 import MealList from "./components/MealList";
 
-import type { DayMeal } from "@/types/MealTypes";
-import type { Food } from "@/api/generated";
-import type { Recipe } from "@/types/RecipeTypes";
+import type { DayMeal, Food, Recipe } from "@/api/generated";
 
-function formatDate(date: Date) {
-  return date.toISOString().split("T")[0];
+function formatDate(date: Date): string {
+  return date.toISOString().split("T")[0]!;
 }
 
 export default function DiaryPage() {
@@ -29,13 +33,42 @@ export default function DiaryPage() {
 
   const [selectedMeal, setSelectedMeal] = useState<DayMeal | null>(null);
 
-  const { data: meals = [], isLoading, isError } = useDayMeals(selectedDate);
+  const {
+    data: meals = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["meals", "day", selectedDate],
+    queryFn: async () => {
+      const response = await mealsDayList({
+        path: {
+          day: selectedDate,
+        },
+      });
 
-  const createMeal = useCreateMeal();
-  const createMealFood = useCreateMealFood();
+      return response.data ?? [];
+    },
+  });
+
+  const createMeal = useMutation({
+    mutationFn: async (options: Parameters<typeof mealsCreate>[0]) => {
+      const response = await mealsCreate(options);
+
+      return response.data;
+    },
+  });
+
+  const createMealFood = useMutation({
+    mutationFn: async (options: Parameters<typeof mealsMealFoodsCreate>[0]) => {
+      const response = await mealsMealFoodsCreate(options);
+
+      return response.data;
+    },
+  });
 
   function changeDay(amount: number) {
     const date = new Date(selectedDate);
+
     date.setDate(date.getDate() + amount);
 
     setSelectedDate(formatDate(date));
@@ -56,19 +89,25 @@ export default function DiaryPage() {
     setIsRecipePickerOpen(true);
   }
 
-  async function ensureMealId(meal: DayMeal) {
+  async function ensureMealId(meal: DayMeal): Promise<number> {
     if (meal.meal_id !== null) {
       return meal.meal_id;
     }
 
     const newMeal = await createMeal.mutateAsync({
-      default_meal: meal.default_meal.id,
-      name: meal.name,
-      date: meal.date,
-      note: meal.note,
-      order: meal.order,
-      meal_foods: [],
+      body: {
+        default_meal: meal.default_meal.id,
+        name: meal.name,
+        date: meal.date,
+        note: meal.note,
+        order: meal.order,
+        meal_foods: [],
+      },
     });
+
+    if (!newMeal) {
+      throw new Error("Failed to create meal");
+    }
 
     return newMeal.id;
   }
@@ -82,10 +121,12 @@ export default function DiaryPage() {
 
     for (const food of foods) {
       await createMealFood.mutateAsync({
-        meal_id: mealId,
-        food_id: food.id,
-        serving_size: food.serving ?? 1,
-        number_of_servings: 1,
+        body: {
+          meal_id: mealId,
+          food_id: food.id,
+          serving_size: food.serving ?? 1,
+          number_of_servings: 1,
+        },
       });
     }
 
@@ -102,10 +143,12 @@ export default function DiaryPage() {
 
     for (const ingredient of recipe.ingredients) {
       await createMealFood.mutateAsync({
-        meal_id: mealId,
-        food_id: ingredient.food,
-        serving_size: ingredient.serving_amount,
-        number_of_servings: ingredient.number_of_servings * servings,
+        body: {
+          meal_id: mealId,
+          food_id: ingredient.food,
+          serving_size: ingredient.serving_amount ?? 1,
+          number_of_servings: (ingredient.number_of_servings ?? 1) * servings,
+        },
       });
     }
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import RecipeList from "./components/recipes/RecipeList";
 import RecipeSearchBar, {
@@ -7,26 +8,83 @@ import RecipeSearchBar, {
 } from "./components/recipes/RecipeSearchBar";
 
 import {
-  useCopyRecipe,
-  useCreateRecipe,
-  useDeleteRecipe,
-  useRecipeTags,
-  useRecipes,
-  useToggleFavorite,
-  useTogglePin,
-} from "@/api/RecipeAPI";
+  recipesCopyCreate,
+  recipesCreate,
+  recipesDestroy,
+  recipesList,
+  recipesTagsList,
+  recipesToggleFavoriteCreate,
+  recipesTogglePinCreate,
+} from "@/api/generated";
 
 export default function RecipePage() {
   const navigate = useNavigate();
 
-  const recipesQuery = useRecipes();
-  const tagsQuery = useRecipeTags();
+  const recipesQuery = useQuery({
+    queryKey: ["recipes"],
+    queryFn: () => recipesList(),
+  });
 
-  const deleteRecipe = useDeleteRecipe();
-  const toggleFavorite = useToggleFavorite();
-  const togglePin = useTogglePin();
-  const copyRecipe = useCopyRecipe();
-  const createRecipe = useCreateRecipe();
+  const tagsQuery = useQuery({
+    queryKey: ["recipe-tags"],
+    queryFn: () => recipesTagsList(),
+  });
+
+  const deleteRecipe = useMutation({
+    mutationFn: (id: number) =>
+      recipesDestroy({
+        path: {
+          id,
+        },
+      }),
+  });
+
+  const toggleFavorite = useMutation({
+    mutationFn: (id: number) =>
+      recipesToggleFavoriteCreate({
+        path: {
+          id,
+        },
+        body: {} as never,
+      }),
+  });
+
+  const togglePin = useMutation({
+    mutationFn: (id: number) =>
+      recipesTogglePinCreate({
+        path: {
+          id,
+        },
+        body: {} as never,
+      }),
+  });
+
+  const copyRecipe = useMutation({
+    mutationFn: ({ id, name }: { id: number; name: string }) =>
+      recipesCopyCreate({
+        path: {
+          id,
+        },
+        body: {
+          name,
+        } as never,
+      }),
+  });
+
+  const createRecipe = useMutation({
+    mutationFn: () =>
+      recipesCreate({
+        body: {
+          name: "New recipe",
+          summary: "",
+          description: "",
+          instructions: "",
+          cooking_time: "0",
+          prepping_time: "0",
+          portions: 1,
+        },
+      }),
+  });
 
   const [search, setSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState<number[]>([]);
@@ -41,25 +99,19 @@ export default function RecipePage() {
     return <div className="container py-3">Failed to load recipes.</div>;
   }
 
-  const recipes = recipesQuery.data;
+  const recipes = recipesQuery.data.data ?? [];
+  const tags = tagsQuery.data?.data ?? [];
 
   function handleAddRecipe() {
-    createRecipe.mutate(
-      {
-        name: "New recipe",
-        summary: "",
-        description: "",
-        instructions: "",
-        cooking_time: 0,
-        prepping_time: 0,
-        portions: 1,
+    createRecipe.mutate(undefined, {
+      onSuccess: (response) => {
+        if (!response.data) {
+          return;
+        }
+
+        navigate(`/recipes/${response.data.id}/edit`);
       },
-      {
-        onSuccess: (recipe) => {
-          navigate(`/recipes/${recipe.id}/edit`);
-        },
-      },
-    );
+    });
   }
 
   const filteredRecipes = recipes
@@ -68,7 +120,7 @@ export default function RecipePage() {
 
       const matchesSearch =
         recipe.name.toLowerCase().includes(searchTerm) ||
-        recipe.summary.toLowerCase().includes(searchTerm);
+        (recipe.summary ?? "").toLowerCase().includes(searchTerm);
 
       const matchesFavorite = !showFavorites || recipe.is_favorite;
 
@@ -81,8 +133,13 @@ export default function RecipePage() {
       return matchesSearch && matchesFavorite && matchesTags;
     })
     .sort((a, b) => {
-      if (a.is_pinned && !b.is_pinned) return -1;
-      if (!a.is_pinned && b.is_pinned) return 1;
+      if (a.is_pinned && !b.is_pinned) {
+        return -1;
+      }
+
+      if (!a.is_pinned && b.is_pinned) {
+        return 1;
+      }
 
       switch (sortMethod) {
         case "name":
@@ -99,8 +156,13 @@ export default function RecipePage() {
           );
 
         case "last_used_at":
-          if (!a.last_used_at) return 1;
-          if (!b.last_used_at) return -1;
+          if (!a.last_used_at) {
+            return 1;
+          }
+
+          if (!b.last_used_at) {
+            return -1;
+          }
 
           return (
             new Date(b.last_used_at).getTime() -
@@ -131,10 +193,10 @@ export default function RecipePage() {
           onSearchChange={setSearch}
           recipeCount={filteredRecipes.length}
           showFavorites={showFavorites}
-          onToggleFavorites={() => setShowFavorites(!showFavorites)}
+          onToggleFavorites={() => setShowFavorites((value) => !value)}
           sortMethod={sortMethod}
           onSortChange={setSortMethod}
-          tags={tagsQuery.data ?? []}
+          tags={tags}
           selectedTags={selectedTags}
           onTagsChange={setSelectedTags}
         />

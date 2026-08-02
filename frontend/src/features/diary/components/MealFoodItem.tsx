@@ -1,6 +1,10 @@
 import { useState } from "react";
-import { useDeleteMealFood } from "@/api/MealAPI";
-import type { MealFood } from "@/types/MealTypes";
+import { useMutation } from "@tanstack/react-query";
+
+import { mealsMealFoodsDestroy } from "@/api/generated";
+
+import type { MealFood } from "@/api/generated";
+
 import EditMealFoodModal from "./EditMealFoodModal";
 
 type Props = {
@@ -8,9 +12,17 @@ type Props = {
 };
 
 export default function MealFoodItem({ item }: Props) {
-  const deleteMealFood = useDeleteMealFood();
-
   const [isEditOpen, setIsEditOpen] = useState(false);
+
+  const deleteMealFood = useMutation({
+    mutationFn: async (id: number) => {
+      await mealsMealFoodsDestroy({
+        path: {
+          id,
+        },
+      });
+    },
+  });
 
   return (
     <>
@@ -31,7 +43,7 @@ export default function MealFoodItem({ item }: Props) {
 
         <span className="d-flex align-items-center gap-3 text-muted">
           <span>
-            {item.serving_size}g × {item.number_of_servings}
+            {item.serving_size ?? 0}g × {item.number_of_servings ?? 0}
           </span>
 
           <button
@@ -45,7 +57,7 @@ export default function MealFoodItem({ item }: Props) {
             aria-label={`Remove ${item.food.name}`}
             title="Remove"
           >
-            <i className="bi bi-trash" aria-hidden="true"></i>
+            <i className="bi bi-trash" aria-hidden="true" />
           </button>
         </span>
       </li>

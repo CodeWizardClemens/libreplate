@@ -1,5 +1,6 @@
 import { useState } from "react";
-import type { Recipe } from "@/types/RecipeTypes";
+
+import type { Recipe } from "@/api/generated/types.gen";
 import { useEditableFieldKeyboard } from "@/hooks/useEditableFieldKeyboard";
 
 interface Props {
@@ -22,16 +23,20 @@ export default function RecipeCardHeader({
   setEditingSummary,
 }: Props) {
   const [values, setValues] = useState({
-    name: recipe.name,
-    summary: recipe.summary,
+    name: recipe.name ?? "",
+    summary: recipe.summary ?? "",
   });
 
   const [hoveredField, setHoveredField] = useState<Field | null>(null);
 
+  const getFieldValue = (field: Field): string => {
+    return recipe[field] ?? "";
+  };
+
   const edit = (field: Field) => {
     setValues((v) => ({
       ...v,
-      [field]: recipe[field],
+      [field]: getFieldValue(field),
     }));
 
     field === "name" ? setEditingName(true) : setEditingSummary(true);
@@ -48,7 +53,7 @@ export default function RecipeCardHeader({
   const cancel = (field: Field) => {
     setValues((v) => ({
       ...v,
-      [field]: recipe[field],
+      [field]: getFieldValue(field),
     }));
 
     field === "name" ? setEditingName(false) : setEditingSummary(false);
@@ -123,9 +128,9 @@ export default function RecipeCardHeader({
         />
       )
     ) : field === "name" ? (
-      <h5 className="card-title mb-0">{recipe[field]}</h5>
+      <h5 className="card-title mb-0">{getFieldValue(field)}</h5>
     ) : (
-      <p className="card-text mb-0">{recipe[field]}</p>
+      <p className="card-text mb-0">{getFieldValue(field)}</p>
     );
 
   const renderEditableRow = (field: Field, editing: boolean) => (

@@ -1,7 +1,7 @@
-import type { Tag } from "@/types/TagTypes";
+import type { RecipeTag } from "@/api/generated";
 
 interface Props {
-  tags: Tag[];
+  tags: RecipeTag[];
   selectedTags: number[];
   onChange: (tags: number[]) => void;
 }
