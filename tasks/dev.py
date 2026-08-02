@@ -170,7 +170,9 @@ def test(c: Context, verbose: bool = False) -> None:
 
     if verbose:
         info("Running tests")
-    django_run(c, "test", quiet_stdout=not verbose)
+
+    with c.cd(BASE_DIR / "backend"):
+        uv_run(c, "pytest", quiet_stdout=not verbose)
 
     print_success(message="All tests passed")
 
