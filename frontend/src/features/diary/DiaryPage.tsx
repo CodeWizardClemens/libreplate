@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import DailyTotalsBar from "./components//DailyTotalsBar";
+import DailyTotalsBar from "./components/DailyTotalsBar";
 
 import {
   mealsDayList,
@@ -23,6 +23,8 @@ function formatDate(date: Date): string {
 }
 
 export default function DiaryPage() {
+  const queryClient = useQueryClient();
+
   const todayString = formatDate(new Date());
 
   const [selectedDate, setSelectedDate] = useState(todayString);
@@ -33,12 +35,14 @@ export default function DiaryPage() {
 
   const [selectedMeal, setSelectedMeal] = useState<DayMeal | null>(null);
 
+  const diaryQueryKey = ["meals", "day", selectedDate] as const;
+
   const {
     data: meals = [],
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["meals", "day", selectedDate],
+    queryKey: diaryQueryKey,
     queryFn: async () => {
       const response = await mealsDayList({
         path: {
@@ -66,8 +70,14 @@ export default function DiaryPage() {
     },
   });
 
+  async function refreshDiary() {
+    await queryClient.invalidateQueries({
+      queryKey: diaryQueryKey,
+    });
+  }
+
   function changeDay(amount: number) {
-    const date = new Date(selectedDate);
+    const date = new Date(`${selectedDate}T00:00:00`);
 
     date.setDate(date.getDate() + amount);
 
@@ -119,16 +129,20 @@ export default function DiaryPage() {
 
     const mealId = await ensureMealId(selectedMeal);
 
-    for (const food of foods) {
-      await createMealFood.mutateAsync({
-        body: {
-          meal_id: mealId,
-          food_id: food.id,
-          serving_size: food.serving ?? 1,
-          number_of_servings: 1,
-        },
-      });
-    }
+    await Promise.all(
+      foods.map((food) =>
+        createMealFood.mutateAsync({
+          body: {
+            meal_id: mealId,
+            food_id: food.id,
+            serving_size: food.serving ?? 1,
+            number_of_servings: 1,
+          },
+        }),
+      ),
+    );
+
+    await refreshDiary();
 
     setIsFoodPickerOpen(false);
     setSelectedMeal(null);
@@ -141,16 +155,20 @@ export default function DiaryPage() {
 
     const mealId = await ensureMealId(selectedMeal);
 
-    for (const ingredient of recipe.ingredients) {
-      await createMealFood.mutateAsync({
-        body: {
-          meal_id: mealId,
-          food_id: ingredient.food,
-          serving_size: ingredient.serving_amount ?? 1,
-          number_of_servings: (ingredient.number_of_servings ?? 1) * servings,
-        },
-      });
-    }
+    await Promise.all(
+      recipe.ingredients.map((ingredient) =>
+        createMealFood.mutateAsync({
+          body: {
+            meal_id: mealId,
+            food_id: ingredient.food,
+            serving_size: ingredient.serving_amount ?? 1,
+            number_of_servings: (ingredient.number_of_servings ?? 1) * servings,
+          },
+        }),
+      ),
+    );
+
+    await refreshDiary();
 
     setIsRecipePickerOpen(false);
     setSelectedMeal(null);
@@ -211,7 +229,11 @@ export default function DiaryPage() {
 
       <DailyTotalsBar meals={meals} />
 
-      <MealList meals={meals} onAdd={openAddModal} />
+      <MealList
+        meals={meals}
+        onAdd={openAddModal}
+        onDiaryChanged={refreshDiary}
+      />
     </div>
   );
 }

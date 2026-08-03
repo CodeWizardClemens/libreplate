@@ -9,9 +9,10 @@ import Modal from "@/components/ui/Modal";
 type Props = {
   item: MealFood;
   onClose: () => void;
+  onSaved: () => Promise<void>;
 };
 
-export default function EditMealFoodModal({ item, onClose }: Props) {
+export default function EditMealFoodModal({ item, onClose, onSaved }: Props) {
   const [servingSize, setServingSize] = useState(
     String(item.serving_size ?? 0),
   );
@@ -45,8 +46,8 @@ export default function EditMealFoodModal({ item, onClose }: Props) {
   });
 
   async function handleSave() {
-    const parsedSize = parseFloat(servingSize);
-    const parsedServings = parseFloat(servings);
+    const parsedSize = Number.parseFloat(servingSize);
+    const parsedServings = Number.parseFloat(servings);
 
     if (
       Number.isNaN(parsedSize) ||
@@ -63,23 +64,25 @@ export default function EditMealFoodModal({ item, onClose }: Props) {
       number_of_servings: parsedServings,
     });
 
+    await onSaved();
     onClose();
   }
 
   return (
     <Modal
-      isOpen={true}
+      isOpen
       title={`Edit ${item.food.name}`}
       onClose={onClose}
       footer={
         <div className="d-flex justify-content-end gap-2">
-          <button className="btn btn-secondary" onClick={onClose}>
+          <button type="button" className="btn btn-secondary" onClick={onClose}>
             Cancel
           </button>
 
           <button
+            type="button"
             className="btn btn-primary"
-            onClick={handleSave}
+            onClick={() => void handleSave()}
             disabled={updateMealFood.isPending}
           >
             Save
@@ -97,7 +100,7 @@ export default function EditMealFoodModal({ item, onClose }: Props) {
             step="any"
             className="form-control"
             value={servingSize}
-            onChange={(e) => setServingSize(e.target.value)}
+            onChange={(event) => setServingSize(event.target.value)}
           />
         </div>
 
@@ -110,7 +113,7 @@ export default function EditMealFoodModal({ item, onClose }: Props) {
             step="any"
             className="form-control"
             value={servings}
-            onChange={(e) => setServings(e.target.value)}
+            onChange={(event) => setServings(event.target.value)}
           />
         </div>
       </div>

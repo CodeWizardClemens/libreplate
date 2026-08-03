@@ -2,16 +2,16 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 
 import { mealsMealFoodsDestroy } from "@/api/generated";
-
 import type { MealFood } from "@/api/generated";
 
 import EditMealFoodModal from "./EditMealFoodModal";
 
 type Props = {
   item: MealFood;
+  onDiaryChanged: () => Promise<void>;
 };
 
-export default function MealFoodItem({ item }: Props) {
+export default function MealFoodItem({ item, onDiaryChanged }: Props) {
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   const deleteMealFood = useMutation({
@@ -24,6 +24,11 @@ export default function MealFoodItem({ item }: Props) {
     },
   });
 
+  async function handleDelete() {
+    await deleteMealFood.mutateAsync(item.id);
+    await onDiaryChanged();
+  }
+
   return (
     <>
       <li
@@ -31,9 +36,9 @@ export default function MealFoodItem({ item }: Props) {
         role="button"
         tabIndex={0}
         onClick={() => setIsEditOpen(true)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
             setIsEditOpen(true);
           }
         }}
@@ -49,9 +54,9 @@ export default function MealFoodItem({ item }: Props) {
           <button
             type="button"
             className="btn btn-sm btn-outline-danger border-0"
-            onClick={(e) => {
-              e.stopPropagation();
-              deleteMealFood.mutate(item.id);
+            onClick={(event) => {
+              event.stopPropagation();
+              void handleDelete();
             }}
             disabled={deleteMealFood.isPending}
             aria-label={`Remove ${item.food.name}`}
@@ -63,7 +68,11 @@ export default function MealFoodItem({ item }: Props) {
       </li>
 
       {isEditOpen && (
-        <EditMealFoodModal item={item} onClose={() => setIsEditOpen(false)} />
+        <EditMealFoodModal
+          item={item}
+          onClose={() => setIsEditOpen(false)}
+          onSaved={onDiaryChanged}
+        />
       )}
     </>
   );
