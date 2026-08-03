@@ -1,5 +1,5 @@
-# TODO. split up file, its getting to be quite large!
 name: Verify
+
 on:
   push:
     branches: [master]
