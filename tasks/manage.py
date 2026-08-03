@@ -167,8 +167,14 @@ def update(c: Context, force=False):
 
     info(f"Latest master commit {sha[:7]} passed CI")
     info("Updating LibrePlate")
-    c.run("git pull origin master")
+
+    # Sync the local checkout exactly to the verified upstream commit.
+    c.run("git fetch origin")
+    c.run("git checkout master")
+    c.run("git reset --hard origin/master")
+
     c.run("uv sync")
     migrate(c)
     download_frontend_dist(owner, repo)
+
     info("Update complete")
