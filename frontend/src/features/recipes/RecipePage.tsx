@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import RecipeList from "./components/recipes/RecipeList";
 import RecipeSearchBar, {
@@ -19,6 +19,10 @@ import {
 
 export default function RecipePage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const invalidateRecipes = () =>
+    queryClient.invalidateQueries({ queryKey: ["recipes"] });
 
   const recipesQuery = useQuery({
     queryKey: ["recipes"],
@@ -37,6 +41,7 @@ export default function RecipePage() {
           id,
         },
       }),
+    onSuccess: invalidateRecipes,
   });
 
   const toggleFavorite = useMutation({
@@ -47,6 +52,7 @@ export default function RecipePage() {
         },
         body: {} as never,
       }),
+    onSuccess: invalidateRecipes,
   });
 
   const togglePin = useMutation({
@@ -57,6 +63,7 @@ export default function RecipePage() {
         },
         body: {} as never,
       }),
+    onSuccess: invalidateRecipes,
   });
 
   const copyRecipe = useMutation({
@@ -69,6 +76,7 @@ export default function RecipePage() {
           name,
         } as never,
       }),
+    onSuccess: invalidateRecipes,
   });
 
   const createRecipe = useMutation({
@@ -84,6 +92,7 @@ export default function RecipePage() {
           portions: 1,
         },
       }),
+    onSuccess: invalidateRecipes,
   });
 
   const [search, setSearch] = useState("");
