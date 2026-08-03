@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 
 import { mealsMealFoodsPartialUpdate } from "@/api/generated";
-
 import type { MealFood } from "@/api/generated";
+
+import Modal from "@/components/ui/Modal";
 
 type Props = {
   item: MealFood;
@@ -66,66 +67,12 @@ export default function EditMealFoodModal({ item, onClose }: Props) {
   }
 
   return (
-    <div
-      onClick={onClose}
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,0.4)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 1050,
-      }}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          background: "white",
-          padding: "20px",
-          width: "360px",
-          borderRadius: "8px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "16px",
-          maxHeight: "80vh",
-        }}
-      >
-        <h2>Edit {item.food.name}</h2>
-
-        <div>
-          <label className="form-label">Serving size (g)</label>
-
-          <input
-            type="number"
-            min={0}
-            step="any"
-            value={servingSize}
-            onChange={(e) => setServingSize(e.target.value)}
-            style={{ width: "100%" }}
-          />
-        </div>
-
-        <div>
-          <label className="form-label">Number of servings</label>
-
-          <input
-            type="number"
-            min={0}
-            step="any"
-            value={servings}
-            onChange={(e) => setServings(e.target.value)}
-            style={{ width: "100%" }}
-          />
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            gap: "10px",
-          }}
-        >
+    <Modal
+      isOpen={true}
+      title={`Edit ${item.food.name}`}
+      onClose={onClose}
+      footer={
+        <div className="d-flex justify-content-end gap-2">
           <button className="btn btn-secondary" onClick={onClose}>
             Cancel
           </button>
@@ -138,7 +85,35 @@ export default function EditMealFoodModal({ item, onClose }: Props) {
             Save
           </button>
         </div>
+      }
+    >
+      <div className="d-flex flex-column gap-3">
+        <div>
+          <label className="form-label">Serving size (g)</label>
+
+          <input
+            type="number"
+            min={0}
+            step="any"
+            className="form-control"
+            value={servingSize}
+            onChange={(e) => setServingSize(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label className="form-label">Number of servings</label>
+
+          <input
+            type="number"
+            min={0}
+            step="any"
+            className="form-control"
+            value={servings}
+            onChange={(e) => setServings(e.target.value)}
+          />
+        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import type { Food } from "@/api/generated";
 import { foodsList } from "@/api/generated";
+import Modal from "@/components/ui/Modal";
 
 interface FoodPickerModalProps {
   isOpen: boolean;
@@ -56,7 +57,6 @@ export default function FoodPickerModal({
 
       try {
         const response = await foodsList();
-
         setFoods(response.data ?? []);
       } catch {
         setIsError(true);
@@ -68,14 +68,9 @@ export default function FoodPickerModal({
     loadFoods();
   }, [isOpen]);
 
-  if (!isOpen) {
-    return null;
-  }
-
-  const filteredFoods =
-    foods.filter((food) =>
-      food.name.toLowerCase().includes(search.toLowerCase()),
-    ) ?? [];
+  const filteredFoods = foods.filter((food) =>
+    food.name.toLowerCase().includes(search.toLowerCase()),
+  );
 
   function toggleFood(id: number) {
     setSelectedIds((prev) => {
@@ -113,114 +108,75 @@ export default function FoodPickerModal({
   }
 
   return (
-    <div
-      onClick={handleClose}
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,0.4)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 1050,
-      }}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          background: "white",
-          padding: "20px",
-          width: "420px",
-          maxHeight: "80vh",
-          borderRadius: "8px",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <h2>Select food</h2>
-
-        <input
-          placeholder="Search food..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{
-            width: "100%",
-            marginBottom: "15px",
-          }}
-        />
-
-        {isLoading && <p>Loading foods...</p>}
-
-        {isError && <p>Failed to load foods.</p>}
-
-        <div style={{ overflowY: "auto", flex: 1 }}>
-          {filteredFoods.map((food) => {
-            const calories = getCalories(food);
-            const isChecked = selectedIds.has(food.id);
-
-            return (
-              <label
-                key={food.id}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  width: "100%",
-                  padding: "6px 4px",
-                  marginBottom: "4px",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                  background: isChecked ? "#f0f6ff" : "transparent",
-                }}
-              >
-                <span
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={isChecked}
-                    onChange={() => toggleFood(food.id)}
-                  />
-
-                  <span>{food.name}</span>
-                </span>
-
-                <span style={{ color: "#666", fontSize: "0.9em" }}>
-                  {calories !== null ? `${Math.round(calories)} kcal` : "—"}
-                </span>
-              </label>
-            );
-          })}
-
-          {!isLoading && filteredFoods.length === 0 && (
-            <p style={{ color: "#666" }}>No foods found.</p>
-          )}
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginTop: "15px",
-          }}
-        >
-          <button onClick={handleClose}>Cancel</button>
+    <Modal
+      isOpen={isOpen}
+      title="Select foods"
+      onClose={handleClose}
+      footer={
+        <div className="d-flex justify-content-between align-items-center">
+          <button className="btn btn-secondary" onClick={handleClose}>
+            Cancel
+          </button>
 
           <button
+            className="btn btn-primary"
             onClick={handleConfirm}
             disabled={selectedIds.size === 0}
-            style={{ fontWeight: "bold" }}
           >
             Add {selectedIds.size > 0 ? selectedIds.size : ""} food
             {selectedIds.size === 1 ? "" : "s"}
           </button>
         </div>
+      }
+    >
+      <div className="mb-3">
+        <input
+          className="form-control"
+          placeholder="Search food..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
       </div>
-    </div>
+
+      {isLoading && <p>Loading foods...</p>}
+
+      {isError && <p className="text-danger">Failed to load foods.</p>}
+
+      <div className="overflow-auto">
+        {filteredFoods.map((food) => {
+          const calories = getCalories(food);
+          const isChecked = selectedIds.has(food.id);
+
+          return (
+            <label
+              key={food.id}
+              className="d-flex justify-content-between align-items-center rounded px-2 py-1 mb-1"
+              style={{
+                cursor: "pointer",
+                background: isChecked ? "#f0f6ff" : "transparent",
+              }}
+            >
+              <span className="d-flex align-items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={isChecked}
+                  onChange={() => toggleFood(food.id)}
+                />
+
+                <span>{food.name}</span>
+              </span>
+
+              <span className="text-muted small">
+                {calories !== null ? `${Math.round(calories)} kcal` : "—"}
+              </span>
+            </label>
+          );
+        })}
+
+        {!isLoading && filteredFoods.length === 0 && (
+          <p className="text-muted">No foods found.</p>
+        )}
+      </div>
+    </Modal>
   );
 }

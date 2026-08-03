@@ -49,7 +49,7 @@ export default function LoginPage() {
     <main className="container vh-100 d-flex justify-content-center align-items-center">
       <div
         className="card shadow-sm"
-        style={{ maxWidth: "420px", width: "100%" }}
+        style={{ maxWidth: "400px", width: "100%" }}
       >
         <div className="card-body p-4">
           <h1 className="h3 text-center mb-4">Login</h1>
