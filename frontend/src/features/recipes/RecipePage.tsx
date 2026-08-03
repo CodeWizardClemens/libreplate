@@ -6,6 +6,7 @@ import RecipeList from "./components/recipes/RecipeList";
 import RecipeSearchBar, {
   type RecipeSortMethod,
 } from "./components/recipes/RecipeSearchBar";
+import RoundAddButton from "@/components/ui/RoundAddButton";
 
 import {
   recipesCopyCreate,
@@ -210,24 +211,10 @@ export default function RecipePage() {
         />
       </div>
 
-      <button
-        type="button"
-        className="btn btn-primary rounded-circle position-fixed shadow d-flex align-items-center justify-content-center"
-        style={{
-          width: "45px",
-          height: "45px",
-          right: "24px",
-          bottom: "24px",
-          zIndex: 1050,
-          fontSize: "32px",
-          lineHeight: 1,
-        }}
+      <RoundAddButton
         onClick={handleAddRecipe}
         disabled={createRecipe.isPending}
-        aria-label="Add new recipe"
-      >
-        +
-      </button>
+      />
     </div>
   );
 }

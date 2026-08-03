@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import FoodList from "@/features/foods/components/FoodList";
 import FoodSearchBar, {
   type FoodSortMethod,
 } from "@/features/foods/components/FoodSearchBar";
+
+import RoundAddButton from "@/components/ui/RoundAddButton";
 
 import {
   foodsCreate,
@@ -14,8 +17,6 @@ import {
 } from "@/api/generated/sdk.gen";
 
 import type { FoodWritable } from "@/api/generated/types.gen";
-
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function FoodsPage() {
   const queryClient = useQueryClient();
@@ -148,17 +149,6 @@ export default function FoodsPage() {
 
   return (
     <div className="container">
-      <div className="text-start mb-2">
-        <button
-          type="button"
-          className="btn btn-outline-primary"
-          onClick={handleAddFood}
-          disabled={createFood.isPending}
-        >
-          New food
-        </button>
-      </div>
-
       <div className="mb-3">
         <FoodSearchBar
           search={search}
@@ -178,6 +168,11 @@ export default function FoodsPage() {
           onToggleFavorite={handleToggleFavorite}
         />
       </div>
+
+      <RoundAddButton
+        onClick={handleAddFood}
+        disabled={createFood.isPending}
+      />
     </div>
   );
 }
