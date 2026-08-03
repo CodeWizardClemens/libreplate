@@ -169,10 +169,7 @@ export default function FoodsPage() {
         />
       </div>
 
-      <RoundAddButton
-        onClick={handleAddFood}
-        disabled={createFood.isPending}
-      />
+      <RoundAddButton onClick={handleAddFood} disabled={createFood.isPending} />
     </div>
   );
 }
