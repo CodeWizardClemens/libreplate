@@ -321,13 +321,14 @@ Options:
 
 ```text
 
-Usage: inv[oke] [--core-opts] manage.update [other tasks here ...]
+Usage: inv[oke] [--core-opts] manage.update [--options] [other tasks here ...]
 
 Docstring:
   Update LibrePlate dependencies, source code, frontend assets, and database state.
 
 Options:
-  none
+  -f, --force   Force the update even if the current checkout is already up to
+                date.
 
 
 ```
