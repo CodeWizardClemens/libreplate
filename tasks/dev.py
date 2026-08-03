@@ -71,6 +71,8 @@ def ruff_check_cmd(fix: bool = False, exit_zero: bool = False) -> str:
     return " ".join(args)
 
 
+# TODO Verify should follow github workflow. now it doesn't. should generate artifacts.
+# workflow itself should call individual commands. Also download artifacts in the test!
 @task(
     aliases=["v"],
     help={"verbose": "Show stdout output from commands."},

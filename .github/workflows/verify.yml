@@ -18,7 +18,11 @@ jobs:
           POSTGRES_DB: libreplate_db
         ports:
           - 5432:5432
-        options: --health-cmd="pg_isready -U libreplate -d libreplate_db" --health-interval=10s --health-timeout=5s --health-retries=5
+        options: >-
+          --health-cmd="pg_isready -U libreplate -d libreplate_db"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
     steps:
       - uses: actions/checkout@v4
@@ -61,9 +65,42 @@ jobs:
       - name: Build front end
         run: uv run invoke setup.build-front-end
 
-      - name: Upload frontend build artifacts
+      - name: Upload frontend build
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-dist-${{ github.sha }}
+          name: frontend-dist
           path: frontend/dist/
-          retention-days: 7
+
+
+  release-nightly:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: verify
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download frontend build
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend-dist
+
+      - name: Create zip
+        run: |
+          cd frontend-dist
+          zip -r ../frontend-dist.zip .
+
+      - name: Publish nightly release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: nightly
+          target_commitish: ${{ github.sha }}
+          name: Nightly
+          prerelease: true
+          make_latest: false
+          generate_release_notes: false
+          files: frontend-dist.zip
