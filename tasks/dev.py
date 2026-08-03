@@ -136,7 +136,7 @@ def check(c: Context, verbose: bool = False) -> None:
     venv_run(c, isort_cmd(check_only=True), quiet_stdout=not verbose)
     venv_run(c, black_cmd(), quiet_stdout=not verbose)
     venv_run(c, ruff_check_cmd(fix=True), quiet_stdout=not verbose)
-    npx_run(c, "oxlint .", quiet_stdout=not verbose)
+    npx_run(c, "oxlint --deny-warnings .", quiet_stdout=not verbose)
     npx_run(
         c,
         f"prettier --check . --ignore-path {BASE_DIR / 'frontend/.prettierignore'}",

@@ -8,13 +8,7 @@ interface Props {
   onClick?: () => void;
 }
 
-export default function ItemCard({
-  title,
-  subtitle,
-  meta,
-  actions,
-  onClick,
-}: Props) {
+export default function ItemCard({ title, meta, actions, onClick }: Props) {
   return (
     <div className="card rounded-2" role="button" onClick={onClick}>
       <div className="card-body p-2">

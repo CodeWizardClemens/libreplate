@@ -55,14 +55,13 @@ function getNutrient(food: Food, names: string[]) {
 
 function calculateNutrients(
   food: Food,
-  ingredient: RecipeIngredient,
+  servings: number | null | undefined,
+  amount: number | null | undefined,
 ): NutrientTotals {
-  const servings = Number(ingredient.number_of_servings ?? 0);
-
-  const amount = Number(ingredient.serving_amount ?? 0);
-
   const multiplier =
-    food.serving && food.serving > 0 ? (servings * amount) / food.serving : 0;
+    food.serving && food.serving > 0
+      ? (Number(servings ?? 0) * Number(amount ?? 0)) / food.serving
+      : 0;
 
   return Object.fromEntries(
     Object.entries(nutrients).map(([key, names]) => [
@@ -125,7 +124,14 @@ function IngredientRow({
   const [isUpdating, setIsUpdating] = useState(false);
 
   const values = useMemo(
-    () => (food ? calculateNutrients(food, ingredient) : emptyTotals()),
+    () =>
+      food
+        ? calculateNutrients(
+            food,
+            ingredient.number_of_servings,
+            ingredient.serving_amount,
+          )
+        : emptyTotals(),
     [food, ingredient.number_of_servings, ingredient.serving_amount],
   );
 
@@ -214,7 +220,14 @@ function IngredientTotalsItem({
       return;
     }
 
-    onChange(ingredient.id, calculateNutrients(food, ingredient));
+    onChange(
+      ingredient.id,
+      calculateNutrients(
+        food,
+        ingredient.number_of_servings,
+        ingredient.serving_amount,
+      ),
+    );
   }, [
     food,
     ingredient.id,

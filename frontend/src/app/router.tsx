@@ -11,7 +11,7 @@ import FoodEditPage from "../features/foods/FoodEditPage";
 import FoodsPage from "../features/foods/FoodsPage";
 import DiaryPage from "../features/diary/DiaryPage";
 
-function Placeholder({ title }: { title: string }) {
+function placeholder(title: string) {
   return (
     <>
       <h1>{title}</h1>
@@ -21,10 +21,6 @@ function Placeholder({ title }: { title: string }) {
 }
 
 async function authLoader() {
-  // The generated client does NOT throw on error responses by default -
-  // it resolves with { data, error, response }. A try/catch here would
-  // never fire on a 401, so unauthenticated users would never be
-  // redirected. Check `error` explicitly instead.
   const { data, error } = await accountsMeRetrieve();
 
   if (error || !data) {
@@ -59,7 +55,7 @@ const router = createBrowserRouter([
 
       {
         path: "groceries",
-        element: <Placeholder title="Groceries" />,
+        element: placeholder("Groceries"),
         handle: {
           title: "Groceries",
         },
@@ -99,7 +95,7 @@ const router = createBrowserRouter([
 
       {
         path: "meal-plans",
-        element: <Placeholder title="Meal Plans" />,
+        element: placeholder("Meal Plans"),
         handle: {
           title: "Meal Plans",
         },
@@ -107,7 +103,7 @@ const router = createBrowserRouter([
 
       {
         path: "statistics",
-        element: <Placeholder title="Statistics" />,
+        element: placeholder("Statistics"),
         handle: {
           title: "Statistics",
         },
@@ -115,7 +111,7 @@ const router = createBrowserRouter([
 
       {
         path: "goals",
-        element: <Placeholder title="Goals" />,
+        element: placeholder("Goals"),
         handle: {
           title: "Goals",
         },
@@ -123,7 +119,7 @@ const router = createBrowserRouter([
 
       {
         path: "settings",
-        element: <Placeholder title="Settings" />,
+        element: placeholder("Settings"),
         handle: {
           title: "Settings",
         },
@@ -131,7 +127,7 @@ const router = createBrowserRouter([
 
       {
         path: "account",
-        element: <Placeholder title="Account" />,
+        element: placeholder("Account"),
         handle: {
           title: "Account",
         },
