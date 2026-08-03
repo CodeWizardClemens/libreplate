@@ -21,11 +21,9 @@ export default function DiaryHeader({
 
   const handleButtonClick = () => {
     if (dateInputRef.current) {
-      // Trigger the native date picker
       if (typeof dateInputRef.current.showPicker === "function") {
         dateInputRef.current.showPicker();
       } else {
-        // Fallback for older browsers
         dateInputRef.current.click();
       }
     }
@@ -35,14 +33,13 @@ export default function DiaryHeader({
     onChangeDate(event.target.value);
   };
 
-  const formattedButtonLabel = new Date(selectedDate).toLocaleDateString(
-    undefined,
-    {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    },
-  );
+  const formattedButtonLabel = new Date(
+    `${selectedDate}T00:00:00`,
+  ).toLocaleDateString(undefined, {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 
   return (
     <div className="d-flex justify-content-center mb-3">
@@ -56,12 +53,10 @@ export default function DiaryHeader({
           <span className="d-none d-sm-inline">Previous</span>
         </button>
 
-        {/* Date picker button */}
         <div
           className="position-relative flex-shrink-0"
           style={{ minWidth: "170px" }}
         >
-          {/* Hidden native input - positioned absolutely but below the button */}
           <input
             ref={dateInputRef}
             type="date"
