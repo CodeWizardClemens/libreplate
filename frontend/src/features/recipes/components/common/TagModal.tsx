@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import type { RecipeTag } from "@/api/generated";
 
@@ -12,6 +12,8 @@ interface Props {
 }
 
 export default function TagModal({ open, onClose, tags }: Props) {
+  const queryClient = useQueryClient();
+
   const [newTag, setNewTag] = useState("");
 
   const createTag = useMutation({
@@ -21,6 +23,11 @@ export default function TagModal({ open, onClose, tags }: Props) {
           name,
         },
       }),
+    onSuccess() {
+      queryClient.invalidateQueries({
+        queryKey: ["recipe-tags"],
+      });
+    },
   });
 
   const deleteTag = useMutation({
@@ -30,6 +37,15 @@ export default function TagModal({ open, onClose, tags }: Props) {
           id,
         },
       }),
+    onSuccess() {
+      queryClient.invalidateQueries({
+        queryKey: ["recipe-tags"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["recipes"],
+      });
+    },
   });
 
   if (!open) {

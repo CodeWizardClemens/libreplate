@@ -1,6 +1,6 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import type { Recipe } from "@/api/generated/types.gen";
+import type { Recipe, RecipeTag } from "@/api/generated/types.gen";
 import { recipesPartialUpdate, recipesTagsList } from "@/api/generated";
 
 interface Props {
@@ -8,85 +8,69 @@ interface Props {
 }
 
 export default function RecipeCardTags({ recipe }: Props) {
-  const { data: tagsResponse } = useQuery({
+  const queryClient = useQueryClient();
+
+  const { data } = useQuery({
     queryKey: ["recipe-tags"],
     queryFn: () => recipesTagsList(),
   });
 
-  const availableTags = tagsResponse?.data ?? [];
+  const tags: RecipeTag[] = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.data)
+      ? data.data
+      : [];
 
-  const updateRecipe = useMutation({
-    mutationFn: (tagIds: number[]) =>
+  const tagIds = recipe.tags.map((tag) => tag.id);
+
+  const update = useMutation({
+    mutationFn: (tag_ids: number[]) =>
       recipesPartialUpdate({
-        path: {
-          id: recipe.id,
-        },
-        body: {
-          tag_ids: tagIds,
-        },
+        path: { id: recipe.id },
+        body: { tag_ids },
       }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["recipe", recipe.id],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["recipes"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["recipe-tags"],
+      });
+    },
   });
 
-  const unusedTags = availableTags.filter(
-    (tag) => !recipe.tags.some((recipeTag) => recipeTag.id === tag.id),
-  );
+  const unusedTags = tags.filter((tag: RecipeTag) => !tagIds.includes(tag.id));
 
-  function stopCardClick(event: React.MouseEvent) {
-    event.stopPropagation();
-  }
+  const stop = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
 
-  function updateRecipeData(tagIds: number[]) {
-    updateRecipe.mutate(tagIds);
-  }
-
-  function addTag(tagId: number) {
-    updateRecipeData([...recipe.tags.map((tag) => tag.id), tagId]);
-  }
-
-  function removeTag(tagId: number) {
-    updateRecipeData(
-      recipe.tags.filter((tag) => tag.id !== tagId).map((tag) => tag.id),
-    );
-  }
+  const setTags = (ids: number[]) => {
+    update.mutate(ids);
+  };
 
   return (
-    <div
-      className="
-        d-flex
-        flex-wrap
-        align-items-center
-        gap-2
-      "
-      onClick={stopCardClick}
-    >
+    <div className="d-flex flex-wrap align-items-center gap-1" onClick={stop}>
       {recipe.tags.map((tag) => (
         <span
           key={tag.id}
-          className="
-            badge
-            text-bg-primary
-            d-flex
-            align-items-center
-            gap-1
-          "
+          className="badge text-bg-primary d-flex align-items-center gap-1"
         >
           {tag.name}
 
           <button
             type="button"
-            className="
-              btn
-              btn-sm
-              p-0
-              text-white
-              border-0
-              lh-1
-            "
-            onClick={(event) => {
-              stopCardClick(event);
-              removeTag(tag.id);
-            }}
+            className="btn btn-sm p-0 text-white border-0 lh-1"
             title="Remove tag"
+            onClick={(e) => {
+              stop(e);
+              setTags(tagIds.filter((id) => id !== tag.id));
+            }}
           >
             <i className="bi bi-x" />
           </button>
@@ -96,33 +80,25 @@ export default function RecipeCardTags({ recipe }: Props) {
       {unusedTags.length > 0 && (
         <div className="dropdown">
           <button
-            className="
-              btn
-              btn-sm
-              btn-outline-secondary
-              d-flex
-              align-items-center
-              justify-content-center
-              p-0
-            "
+            className="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center p-0"
             type="button"
             data-bs-toggle="dropdown"
             aria-expanded="false"
             title="Add tag"
-            onClick={stopCardClick}
+            onClick={stop}
           >
             <i className="bi bi-plus" />
           </button>
 
           <ul className="dropdown-menu">
-            {unusedTags.map((tag) => (
+            {unusedTags.map((tag: RecipeTag) => (
               <li key={tag.id}>
                 <button
                   className="dropdown-item"
                   type="button"
-                  onClick={(event) => {
-                    stopCardClick(event);
-                    addTag(tag.id);
+                  onClick={(e) => {
+                    stop(e);
+                    setTags([...tagIds, tag.id]);
                   }}
                 >
                   {tag.name}

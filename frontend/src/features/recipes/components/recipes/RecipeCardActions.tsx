@@ -2,6 +2,10 @@ import { useNavigate } from "react-router-dom";
 
 import type { Recipe } from "@/api/generated/types.gen";
 
+import ItemCardActions, {
+  type ItemCardMenuItem,
+} from "@/components/ui/ItemCardActions";
+
 interface Props {
   recipe: Recipe;
   onCopy: () => void;
@@ -15,106 +19,40 @@ export default function RecipeCardActions({
   onCopy,
   onDelete,
   onToggleFavorite,
-  onTogglePinned,
+  // onTogglePinned,
 }: Props) {
   const navigate = useNavigate();
 
-  const stopCardClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-  };
+  const items: ItemCardMenuItem[] = [
+    // TODO Pin is usefully but distracts the UI too much.
+    // {
+    //   key: "pin",
+    //   label: recipe.is_pinned ? "Unpin" : "Pin",
+    //   onClick: () => onTogglePinned?.(recipe.id),
+    // },
+    {
+      key: "favorite",
+      label: recipe.is_favorite ? "Favorited" : "Favorite",
+      onClick: () => onToggleFavorite?.(recipe.id),
+    },
+    {
+      key: "edit",
+      label: "Edit",
+      onClick: () => navigate(`/recipes/${recipe.id}/edit`),
+    },
+    {
+      key: "copy",
+      label: "Copy",
+      onClick: onCopy,
+    },
+    {
+      key: "delete",
+      label: "Delete",
+      danger: true,
+      confirmMessage: `Are you sure you want to delete "${recipe.name}"? This cannot be undone.`,
+      onClick: () => onDelete?.(recipe.id),
+    },
+  ];
 
-  const handleDelete = () => {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${recipe.name}"? This cannot be undone.`,
-    );
-
-    if (confirmed) {
-      onDelete?.(recipe.id);
-    }
-  };
-
-  const actions = (
-    <>
-      <button
-        className={
-          recipe.is_pinned ? "btn btn-primary" : "btn btn-outline-secondary"
-        }
-        onClick={(e) => {
-          stopCardClick(e);
-          onTogglePinned?.(recipe.id);
-        }}
-        title="Pin"
-      >
-        <i className={recipe.is_pinned ? "bi bi-pin-fill" : "bi bi-pin"} />
-      </button>
-
-      <button
-        className={
-          recipe.is_favorite ? "btn btn-primary" : "btn btn-outline-secondary"
-        }
-        onClick={(e) => {
-          stopCardClick(e);
-          onToggleFavorite?.(recipe.id);
-        }}
-        title="Favorite"
-      >
-        <i
-          className={recipe.is_favorite ? "bi bi-heart-fill" : "bi bi-heart"}
-        />
-      </button>
-
-      <button
-        className="btn btn-outline-secondary"
-        onClick={(e) => {
-          stopCardClick(e);
-          navigate(`/recipes/${recipe.id}/edit`);
-        }}
-        title="Edit"
-      >
-        <i className="bi bi-pencil" />
-      </button>
-
-      <button
-        className="btn btn-outline-secondary"
-        onClick={(e) => {
-          stopCardClick(e);
-          onCopy();
-        }}
-        title="Copy"
-      >
-        <i className="bi bi-copy" />
-      </button>
-
-      <button
-        className="btn btn-outline-secondary"
-        onClick={(e) => {
-          stopCardClick(e);
-          handleDelete();
-        }}
-        title="Delete"
-      >
-        <i className="bi bi-trash" />
-      </button>
-    </>
-  );
-
-  return (
-    <>
-      {/* Desktop */}
-      <div
-        className="col-12 col-md-auto d-none d-md-flex gap-2 order-3"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {actions}
-      </div>
-
-      {/* Mobile */}
-      <div
-        className="d-flex d-md-none justify-content-end gap-2 mt-3 order-3 flex-wrap"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {actions}
-      </div>
-    </>
-  );
+  return <ItemCardActions items={items} ariaLabel="Open recipe actions" />;
 }

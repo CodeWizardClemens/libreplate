@@ -1,94 +1,50 @@
-import { useEffect, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
+import { useEffect, useState } from "react";
+import { Form } from "react-bootstrap";
 
 import { recipesPartialUpdate } from "@/api/generated";
 import type { Recipe } from "@/api/generated/types.gen";
+
+import { useAutoResizeTextarea } from "@/hooks/useAutoResizeTextarea";
 
 type Props = {
   recipe: Recipe;
 };
 
 export default function InstructionsCard({ recipe }: Props) {
-  const [editing, setEditing] = useState(false);
   const [instructions, setInstructions] = useState(recipe.instructions ?? "");
-  const [isSaving, setIsSaving] = useState(false);
 
-  const cardRef = useRef<HTMLDivElement>(null);
+  const instructionsRef = useAutoResizeTextarea(instructions);
 
   useEffect(() => {
-    if (editing) {
-      cardRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  }, [editing]);
+    setInstructions(recipe.instructions ?? "");
+  }, [recipe]);
 
-  async function saveInstructions() {
-    try {
-      setIsSaving(true);
-
-      await recipesPartialUpdate({
-        path: {
-          id: recipe.id,
-        },
-        body: {
-          instructions,
-        },
-      });
-
-      setEditing(false);
-    } catch (error) {
-      console.error("Failed to update recipe instructions", error);
-    } finally {
-      setIsSaving(false);
-    }
-  }
+  const save = () => {
+    recipesPartialUpdate({
+      path: {
+        id: recipe.id,
+      },
+      body: {
+        instructions,
+      },
+    });
+  };
 
   return (
-    <div className="card mb-4" ref={cardRef}>
-      <div className="card-header d-flex justify-content-between align-items-center">
-        <div className="d-flex align-items-center gap-2">
-          <h5 className="mb-0">Instructions</h5>
-
-          <i
-            className="bi bi-info-circle text-info"
-            role="button"
-            title="Instructions support Markdown formatting. Use **bold**, # headings, and - lists."
-          />
-        </div>
-
-        <div className="d-flex align-items-center gap-2">
-          {editing && (
-            <button
-              className="btn btn-primary btn-sm"
-              onClick={saveInstructions}
-              disabled={isSaving}
-            >
-              {isSaving ? "Saving..." : "Save"}
-            </button>
-          )}
-
-          <button
-            className="btn btn-link"
-            onClick={() => setEditing((value) => !value)}
-          >
-            <i className={`bi ${editing ? "bi-x" : "bi-pencil"}`} />
-          </button>
-        </div>
-      </div>
-
+    <div className="card mb-4">
       <div className="card-body">
-        {editing ? (
-          <textarea
-            className="form-control"
-            rows={10}
+        <Form.Group>
+          <Form.Label>Instructions (Markdown supported)</Form.Label>
+          <Form.Control
+            ref={instructionsRef}
+            as="textarea"
+            rows={1}
+            style={{ overflow: "hidden", resize: "none" }}
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
+            onBlur={save}
           />
-        ) : (
-          <ReactMarkdown>{instructions}</ReactMarkdown>
-        )}
+        </Form.Group>
       </div>
     </div>
   );

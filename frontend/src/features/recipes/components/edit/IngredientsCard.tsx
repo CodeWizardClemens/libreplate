@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { Recipe, RecipeIngredient } from "@/api/generated/types.gen";
 import {
@@ -57,9 +57,12 @@ function calculateNutrients(
   food: Food,
   ingredient: RecipeIngredient,
 ): NutrientTotals {
+  const servings = Number(ingredient.number_of_servings ?? 0);
+
+  const amount = Number(ingredient.serving_amount ?? 0);
+
   const multiplier =
-    Number(ingredient.number_of_servings) *
-    (Number(ingredient.serving_amount) / (food.serving ?? 1));
+    food.serving && food.serving > 0 ? (servings * amount) / food.serving : 0;
 
   return Object.fromEntries(
     Object.entries(nutrients).map(([key, names]) => [
@@ -156,7 +159,7 @@ function IngredientRow({
 
   return (
     <tr>
-      <td className="fw-semibold">{food.name}</td>
+      <td>{food.name}</td>
 
       <td>
         <NumberInput
@@ -180,8 +183,8 @@ function IngredientRow({
         />
       </td>
 
-      {Object.values(values).map((value) => (
-        <NutrientCell key={value} value={value} />
+      {Object.values(values).map((value, index) => (
+        <NutrientCell key={index} value={value} />
       ))}
 
       <td className="text-end">
@@ -190,7 +193,7 @@ function IngredientRow({
           disabled={isUpdating}
           onClick={() => onDelete(ingredient.id)}
         >
-          Delete
+          <i className="bi bi-trash" />
         </button>
       </td>
     </tr>
@@ -207,7 +210,9 @@ function IngredientTotalsItem({
   const { data: food } = useFood(ingredient.food);
 
   useEffect(() => {
-    if (!food) return;
+    if (!food) {
+      return;
+    }
 
     onChange(ingredient.id, calculateNutrients(food, ingredient));
   }, [
@@ -235,7 +240,7 @@ function IngredientTotals({
       const next = { ...current };
 
       Object.keys(next).forEach((id) => {
-        if (!ingredients.some((i) => i.id === Number(id))) {
+        if (!ingredients.some((item) => item.id === Number(id))) {
           delete next[Number(id)];
         }
       });
@@ -243,6 +248,27 @@ function IngredientTotals({
       return next;
     });
   }, [ingredients]);
+
+  const updateTotal = useCallback((id: number, values: NutrientTotals) => {
+    setIngredientTotals((current) => {
+      const old = current[id];
+
+      if (
+        old &&
+        old.energy === values.energy &&
+        old.protein === values.protein &&
+        old.fat === values.fat &&
+        old.carbohydrates === values.carbohydrates
+      ) {
+        return current;
+      }
+
+      return {
+        ...current,
+        [id]: values,
+      };
+    });
+  }, []);
 
   const totals = useMemo(() => {
     return ingredients.reduce<NutrientTotals>((sum, ingredient) => {
@@ -263,18 +289,14 @@ function IngredientTotals({
         <IngredientTotalsItem
           key={ingredient.id}
           ingredient={ingredient}
-          onChange={(id, values) =>
-            setIngredientTotals((current) => ({
-              ...current,
-              [id]: values,
-            }))
-          }
+          onChange={updateTotal}
         />
       ))}
 
       <tfoot className="table-light fw-semibold">
         <tr>
           <td>Totals</td>
+
           <td colSpan={2} />
 
           {Object.values(totals).map((value, index) => (
@@ -315,12 +337,9 @@ export default function IngredientsCard({ recipe }: IngredientsCardProps) {
   const addFood = async (foods: Food[]) => {
     setPickerOpen(false);
 
-    let nextOrder = ingredients.length;
+    let order = ingredients.length;
 
     for (const food of foods) {
-      const order = nextOrder;
-      nextOrder += 1;
-
       const response = await recipesIngredientsCreate({
         path: {
           id: recipe.id,
@@ -332,6 +351,8 @@ export default function IngredientsCard({ recipe }: IngredientsCardProps) {
           order,
         },
       });
+
+      order++;
 
       if (response.data) {
         setIngredients((items) => [...items, response.data]);

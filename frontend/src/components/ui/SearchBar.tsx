@@ -28,7 +28,6 @@ interface Props<TSort extends string, TagType extends RecipeTag> {
   onTagsChange: (tags: number[]) => void;
 
   onManageTags?: () => void;
-  manageTagsLabel?: string;
 }
 
 export default function SearchBar<
@@ -47,7 +46,6 @@ export default function SearchBar<
   selectedTags,
   onTagsChange,
   onManageTags,
-  manageTagsLabel = "Tags",
 }: Props<TSort, TagType>) {
   const placeholder =
     scope.count <= 1
@@ -103,7 +101,7 @@ export default function SearchBar<
                 className="btn btn-outline-secondary"
                 onClick={onManageTags}
               >
-                {manageTagsLabel}
+                {<i className="bi bi-tags"></i>}
               </button>
             </div>
           )}

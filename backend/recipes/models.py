@@ -19,7 +19,7 @@ class Recipe(models.Model):
 
             for food_nutrient in ingredient.food.food_nutrients.all():
                 nutrient_amount = Decimal(str(food_nutrient.amount))
-                totals[food_nutrient.nutrient] += nutrient_amount * multiplier
+                totals[food_nutrient.nutrient] += nutrient_amount * multiplier / 100
 
         if per_portion and self.portions:
             divisor = Decimal(str(self.portions))

@@ -2,22 +2,21 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
+import type { RecipeTag } from "@/api/generated/types.gen";
 import { recipesRetrieve, recipesTagsList } from "@/api/generated";
 
-import BackButton from "./components/edit/BackButton";
-import RecipeInfoBar from "./components/edit/RecipeInfoBar";
-import InstructionsCard from "./components/edit/InstructionsCard";
+import RecipeDetailsForm from "./components/edit/RecipeDetailsForm";
 import IngredientsCard from "./components/edit/IngredientsCard";
-import RecipeCardPicture from "./components/common/RecipePicture";
 import TagModal from "./components/common/TagModal";
 import RecipeCardTags from "./components/common/RecipeTags";
-import TitleInfo from "./components/edit/TitleInfo";
 
 export default function RecipeEditPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const recipeId = Number(id);
+
+  const [showTagModal, setShowTagModal] = useState(false);
 
   const { data: recipeResponse, isLoading } = useQuery({
     queryKey: ["recipe", recipeId],
@@ -36,9 +35,12 @@ export default function RecipeEditPage() {
   });
 
   const recipe = recipeResponse?.data;
-  const tags = tagsResponse?.data;
 
-  const [showTagModal, setShowTagModal] = useState(false);
+  const tags: RecipeTag[] = Array.isArray(tagsResponse)
+    ? tagsResponse
+    : Array.isArray(tagsResponse?.data)
+      ? tagsResponse.data
+      : [];
 
   if (isLoading || !recipe) {
     return <div className="container py-4">Loading...</div>;
@@ -46,43 +48,34 @@ export default function RecipeEditPage() {
 
   return (
     <div className="container">
-      <div
-        className="mx-auto"
-        style={{
-          maxWidth: "550px",
-        }}
-      >
-        <div className="mb-3">
-          <BackButton onClick={() => navigate("/recipes")} />
-        </div>
-
-        <TitleInfo recipe={recipe} />
-
-        <div className="d-flex justify-content-center align-items-center py-2">
-          <RecipeCardPicture recipeId={recipe.id} width={550} height={350} />
-        </div>
-
-        <div className="d-flex justify-content-center mb-2">
-          <RecipeInfoBar recipe={recipe} />
-        </div>
-
-        <div className="d-flex justify-content-center mb-2">
+      <div>
+        <div className="mb-2">
           <button
-            className="btn btn-outline-secondary btn-sm m-1"
+            className="btn btn-outline-secondary"
+            onClick={() => navigate(-1)}
+          >
+            <i className="bi bi-arrow-left me-2" />
+            Back
+          </button>
+        </div>
+
+        <RecipeDetailsForm recipe={recipe} />
+
+        <div className="d-flex align-items-center gap-2">
+          <button
+            className="btn btn-outline-secondary btn-sm"
             onClick={() => setShowTagModal(true)}
           >
-            Tags
+            <i className="bi bi-tags" />
           </button>
 
           <RecipeCardTags recipe={recipe} />
         </div>
       </div>
 
-      <InstructionsCard recipe={recipe} />
-
       <IngredientsCard recipe={recipe} />
 
-      {tags && (
+      {tags.length > 0 && (
         <TagModal
           open={showTagModal}
           onClose={() => setShowTagModal(false)}

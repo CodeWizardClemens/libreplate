@@ -12,7 +12,7 @@ interface Props {
 
 export default function FoodList({ foods, onDelete, onToggleFavorite }: Props) {
   return (
-    <div className="d-flex flex-column gap-3">
+    <div className="d-flex flex-column gap-1">
       {foods.map((food) => (
         <FoodCard
           key={food.id}

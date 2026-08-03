@@ -22,7 +22,8 @@ export default function RecipeList({
   onCopy,
 }: Props) {
   return (
-    <div className="space-y-4">
+    // TODO create card list component.
+    <div className="d-flex flex-column gap-1">
       {recipes.map((recipe) => (
         <RecipeCard
           key={recipe.id}

@@ -1,6 +1,10 @@
-import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import type { Food } from "@/api/generated";
+
+import ItemCardActions, {
+  type ItemCardMenuItem,
+} from "@/components/ui/ItemCardActions";
 
 interface Props {
   food: Food;
@@ -13,110 +17,27 @@ export default function FoodCardActions({
   onDelete,
   onToggleFavorite,
 }: Props) {
-  const [open, setOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setOpen(false);
-      }
-    }
+  const items: ItemCardMenuItem[] = [
+    {
+      key: "edit",
+      label: "Edit",
+      onClick: () => navigate(`/foods/${food.id}/edit`),
+    },
+    {
+      key: "favorite",
+      label: food.is_favorite ? "Favorited" : "Add favorite",
+      onClick: () => onToggleFavorite?.(food.id),
+    },
+    {
+      key: "delete",
+      label: "Delete",
+      danger: true,
+      confirmMessage: `Are you sure you want to delete "${food.name}"?`,
+      onClick: () => onDelete?.(food.id),
+    },
+  ];
 
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  return (
-    <div
-      ref={dropdownRef}
-      className="dropdown position-relative ms-auto"
-      onClick={(event) => event.stopPropagation()}
-    >
-      <button
-        type="button"
-        className="btn btn-sm border-0 bg-transparent p-1 text-dark"
-        aria-label="Open food actions"
-        aria-haspopup="menu"
-        aria-expanded={open}
-        onClick={() => setOpen((previous) => !previous)}
-      >
-        <i className="bi bi-three-dots"></i>
-      </button>
-
-      {open && (
-        <div
-          className="dropdown-menu show text-end"
-          role="menu"
-          style={{
-            minWidth: "max-content",
-            right: "100%",
-            left: "auto",
-            top: 0,
-            marginRight: "0.25rem",
-          }}
-        >
-          <button
-            type="button"
-            className="dropdown-item text-end food-action-item"
-            role="menuitem"
-            onClick={() => {
-              navigate(`/foods/${food.id}/edit`);
-              setOpen(false);
-            }}
-          >
-            Edit
-          </button>
-
-          <button
-            type="button"
-            className="dropdown-item text-end food-action-item"
-            role="menuitem"
-            onClick={() => {
-              onToggleFavorite?.(food.id);
-              setOpen(false);
-            }}
-          >
-            {food.is_favorite ? "Favorited" : "Add favorite"}
-          </button>
-
-          <button
-            type="button"
-            className="dropdown-item text-danger text-end food-action-item"
-            role="menuitem"
-            onClick={() => {
-              const confirmed = window.confirm(
-                `Are you sure you want to delete "${food.name}"?`,
-              );
-
-              if (confirmed) {
-                onDelete?.(food.id);
-              }
-
-              setOpen(false);
-            }}
-          >
-            Delete
-          </button>
-        </div>
-      )}
-
-      <style>
-        {`
-          .food-action-item:active,
-          .food-action-item:focus {
-            background-color: var(--bs-dropdown-link-hover-bg);
-            color: var(--bs-dropdown-link-hover-color);
-          }
-        `}
-      </style>
-    </div>
-  );
+  return <ItemCardActions items={items} ariaLabel="Open food actions" />;
 }

@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
+
 import type { Food } from "@/api/generated";
 
 import FoodCardActions from "./FoodCardActions";
-import FoodCardNutrients from "./FoodCardNutrients.tsx";
+import ItemCard from "@/components/ui/ItemCard";
 
 interface Props {
   food: Food;
@@ -17,39 +18,33 @@ export default function FoodCard({ food, onDelete, onToggleFavorite }: Props) {
     return null;
   }
 
+  const energy = food.nutrients?.find(
+    (nutrient) => nutrient.nutrient_name.toLowerCase() === "energy",
+  );
+
   return (
-    <div
-      className="card shadow-sm rounded-2"
-      role="button"
+    <ItemCard
+      title={food.name}
+      subtitle={food.brand || "No brand"}
       onClick={() => navigate(`/foods/${food.id}/edit`)}
-    >
-      <div className="card-body p-2">
-        <div className="d-flex align-items-start">
-          <div className="flex-grow-1">
-            <h5 className="card-title mb-0">{food.name}</h5>
-          </div>
-
-          <div className="ms-2" onClick={(e) => e.stopPropagation()}>
-            <FoodCardActions
-              food={food}
-              onDelete={onDelete}
-              onToggleFavorite={onToggleFavorite}
-            />
-          </div>
-        </div>
-
-        <p className="card-text mb-0 text-muted">{food.brand || "No brand"}</p>
-
-        <div className="text-muted small mt-0">
-          {food.serving != null && (
-            <>
-              {food.serving} {food.unit_name}
-              <span className="mx-1">•</span>
-              <FoodCardNutrients nutrients={food.nutrients} />
-            </>
-          )}
-        </div>
-      </div>
-    </div>
+      actions={
+        <FoodCardActions
+          food={food}
+          onDelete={onDelete}
+          onToggleFavorite={onToggleFavorite}
+        />
+      }
+      meta={
+        food.serving != null && (
+          <>
+            <i className="bi bi-lightning me-1"></i>
+            {energy?.amount ?? 0}
+            {" kcals"}
+            <i className="bi bi-people ms-2 me-1"></i>
+            {food.serving} {food.unit_name}
+          </>
+        )
+      }
+    />
   );
 }

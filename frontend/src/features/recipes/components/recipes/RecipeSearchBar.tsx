@@ -60,7 +60,6 @@ export default function RecipeSearchBar({
         selectedTags={selectedTags}
         onTagsChange={onTagsChange}
         onManageTags={() => setShowTagModal(true)}
-        manageTagsLabel="Tags"
       />
 
       <TagModal

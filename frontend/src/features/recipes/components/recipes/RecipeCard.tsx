@@ -1,17 +1,12 @@
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import type { Recipe } from "@/api/generated/types.gen";
-import { recipesPartialUpdate } from "@/api/generated";
 
+import ItemCard from "@/components/ui/ItemCard";
 import RecipeCardActions from "./RecipeCardActions";
-import RecipeCardHeader from "./RecipeCardHeader";
-import RecipeCardNutrients from "./RecipeCardNutrients";
-import RecipeCardTags from "../common/RecipeTags";
-import RecipeCardPicture from "../common/RecipePicture";
 
 interface Props {
   recipe: Recipe;
-
   onDelete?: (id: number) => void;
   onToggleFavorite?: (id: number) => void;
   onTogglePinned?: (id: number) => void;
@@ -25,21 +20,7 @@ export default function RecipeCard({
   onTogglePinned,
   onCopy,
 }: Props) {
-  const [editingName, setEditingName] = useState(false);
-  const [editingSummary, setEditingSummary] = useState(false);
-
-  async function updateRecipeData(data: {
-    name?: string;
-    summary?: string;
-    tag_ids?: number[];
-  }) {
-    await recipesPartialUpdate({
-      path: {
-        id: recipe.id,
-      },
-      body: data,
-    });
-  }
+  const navigate = useNavigate();
 
   function handleCopy() {
     const name = window.prompt("New recipe name:", `${recipe.name} Copy`);
@@ -49,56 +30,36 @@ export default function RecipeCard({
     }
   }
 
+  const energy = recipe.nutrients.find(
+    (nutrient) => nutrient.name.toLowerCase() === "energy",
+  );
+
   return (
-    <div className="card shadow-sm">
-      <div className="card-body">
-        <div className="row g-3 align-items-start">
-          <div className="col-auto order-1">
-            <RecipeCardPicture recipeId={recipe.id} height={150} width={150} />
-          </div>
-
-          <div className="col-auto order-3 ms-auto">
-            <RecipeCardActions
-              recipe={recipe}
-              onCopy={handleCopy}
-              onDelete={onDelete}
-              onToggleFavorite={onToggleFavorite}
-              onTogglePinned={onTogglePinned}
-            />
-          </div>
-
-          <div className="col order-2">
-            <RecipeCardHeader
-              recipe={recipe}
-              update={updateRecipeData}
-              editingName={editingName}
-              setEditingName={setEditingName}
-              editingSummary={editingSummary}
-              setEditingSummary={setEditingSummary}
-            />
-
-            <RecipeCardNutrients nutrients={recipe.nutrients} />
-
-            <RecipeCardTags recipe={recipe} />
-
-            <div className="text-muted small mt-3">
-              <i className="bi bi-people me-1"></i>
-              {recipe.portions ?? 0}
-              {" portions"}
-
-              <i className="bi bi-clock ms-2 me-1"></i>
-              {"Cook: "}
-              {recipe.cooking_time ?? 0}
-              {" m"}
-
-              <i className="bi bi-clock ms-2 me-1"></i>
-              {"Prep: "}
-              {recipe.prepping_time ?? 0}
-              {" m"}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <ItemCard
+      title={recipe.name}
+      subtitle={recipe.summary}
+      onClick={() => navigate(`/recipes/${recipe.id}/edit`)}
+      actions={
+        <RecipeCardActions
+          recipe={recipe}
+          onCopy={handleCopy}
+          onDelete={onDelete}
+          onToggleFavorite={onToggleFavorite}
+          onTogglePinned={onTogglePinned}
+        />
+      }
+      meta={
+        <>
+          <i className="bi bi-lightning me-1"></i>
+          {energy?.amount ?? 0}
+          {" kcals"}
+          <i className="bi bi-people ms-2 me-1"></i>
+          {recipe.portions ?? 0}
+          <i className="bi bi-clock ms-2 me-1"></i>
+          {recipe.cooking_time ?? 0}
+          {"m"}
+        </>
+      }
+    />
   );
 }
