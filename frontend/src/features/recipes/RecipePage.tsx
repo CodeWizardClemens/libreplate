@@ -185,17 +185,6 @@ export default function RecipePage() {
 
   return (
     <div className="container">
-      <div className="text-start mb-2">
-        <button
-          type="button"
-          className="btn btn-outline-primary"
-          onClick={handleAddRecipe}
-          disabled={createRecipe.isPending}
-        >
-          New recipe
-        </button>
-      </div>
-
       <div className="mb-3">
         <RecipeSearchBar
           search={search}
@@ -220,6 +209,25 @@ export default function RecipePage() {
           onCopy={(id, name) => copyRecipe.mutate({ id, name })}
         />
       </div>
+
+      <button
+        type="button"
+        className="btn btn-primary rounded-circle position-fixed shadow d-flex align-items-center justify-content-center"
+        style={{
+          width: "45px",
+          height: "45px",
+          right: "24px",
+          bottom: "24px",
+          zIndex: 1050,
+          fontSize: "32px",
+          lineHeight: 1,
+        }}
+        onClick={handleAddRecipe}
+        disabled={createRecipe.isPending}
+        aria-label="Add new recipe"
+      >
+        +
+      </button>
     </div>
   );
 }
