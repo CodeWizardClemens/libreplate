@@ -14,7 +14,7 @@ import {
 
 import RecipeDetailsForm from "./components/edit/RecipeDetailsForm";
 import IngredientsCard from "./components/edit/IngredientsCard";
-import TagModal from "./components/common/TagModal";
+import TagModal from "../../components/ui/TagModal";
 import RecipeCardTags from "./components/common/RecipeTags";
 
 export default function RecipeEditPage() {

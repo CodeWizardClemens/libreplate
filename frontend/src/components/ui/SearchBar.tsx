@@ -1,5 +1,4 @@
 import type { RecipeTag } from "@/api/generated";
-import TagSelector from "./TagSelector";
 
 export interface SortOption<TSort extends string> {
   value: TSort;
@@ -42,9 +41,7 @@ export default function SearchBar<
   sortMethod,
   onSortChange,
   sortOptions,
-  tags,
   selectedTags,
-  onTagsChange,
   onManageTags,
 }: Props<TSort, TagType>) {
   const placeholder =
@@ -80,7 +77,11 @@ export default function SearchBar<
 
             {onManageTags && (
               <button
-                className="btn btn-outline-secondary border-secondary-subtle"
+                className={`btn border ${
+                  selectedTags.length > 0
+                    ? "btn-success border-success"
+                    : "btn-outline-secondary border-secondary-subtle"
+                }`}
                 onClick={onManageTags}
                 title="Manage tags"
               >
@@ -117,20 +118,6 @@ export default function SearchBar<
           </div>
         </div>
       </div>
-
-      {tags && (
-        <div className="row g-2 align-items-center mt-1">
-          <div className="col overflow-auto">
-            <div className="d-flex flex-nowrap gap-2 overflow-auto">
-              <TagSelector
-                tags={tags}
-                selectedTags={selectedTags}
-                onChange={onTagsChange}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }

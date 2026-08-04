@@ -6,7 +6,7 @@ import type { RecipeTag } from "@/api/generated/types.gen";
 
 import SearchBar, { type SortOption } from "@/components/ui/SearchBar";
 
-import TagModal from "../common/TagModal";
+import TagModal from "../../../../components/ui/TagModal";
 
 export type RecipeSortMethod =
   "created_at" | "updated_at" | "name" | "last_used_at";
