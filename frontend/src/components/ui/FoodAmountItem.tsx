@@ -1,32 +1,41 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
 
-import { mealsMealFoodsDestroy } from "@/api/generated";
-import type { MealFood } from "@/api/generated";
+import EditFoodAmountsModal from "@/components/ui/EditFoodAmountsModal";
 
-import EditMealFoodModal from "./EditMealFoodModal";
-
-type Props = {
-  item: MealFood;
-  onDiaryChanged: () => Promise<void>;
+type Food = {
+  name: string;
+  nutrients?: {
+    amount?: number | null;
+    nutrient_name?: string | null;
+  }[];
 };
 
-export default function MealFoodItem({ item, onDiaryChanged }: Props) {
+type Props = {
+  item: {
+    id: number;
+    food: Food;
+    serving_size?: number | null;
+    number_of_servings?: number | null;
+  };
+  onSave: (values: {
+    id: number;
+    serving_size: number;
+    number_of_servings: number;
+  }) => Promise<void>;
+  onDelete: (id: number) => Promise<void>;
+};
+
+export default function FoodItem({ item, onSave, onDelete }: Props) {
   const [isEditOpen, setIsEditOpen] = useState(false);
 
-  const deleteMealFood = useMutation({
-    mutationFn: async (id: number) => {
-      await mealsMealFoodsDestroy({
-        path: {
-          id,
-        },
-      });
-    },
-  });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   async function handleDelete() {
-    await deleteMealFood.mutateAsync(item.id);
-    await onDiaryChanged();
+    setIsDeleting(true);
+
+    await onDelete(item.id);
+
+    setIsDeleting(false);
   }
 
   return (
@@ -58,7 +67,7 @@ export default function MealFoodItem({ item, onDiaryChanged }: Props) {
               event.stopPropagation();
               void handleDelete();
             }}
-            disabled={deleteMealFood.isPending}
+            disabled={isDeleting}
             aria-label={`Remove ${item.food.name}`}
             title="Remove"
           >
@@ -68,10 +77,17 @@ export default function MealFoodItem({ item, onDiaryChanged }: Props) {
       </li>
 
       {isEditOpen && (
-        <EditMealFoodModal
-          item={item}
+        <EditFoodAmountsModal
+          food={item.food}
+          servingSize={item.serving_size ?? 0}
+          numberOfServings={item.number_of_servings ?? 0}
           onClose={() => setIsEditOpen(false)}
-          onSaved={onDiaryChanged}
+          onSave={async (values) => {
+            await onSave({
+              id: item.id,
+              ...values,
+            });
+          }}
         />
       )}
     </>

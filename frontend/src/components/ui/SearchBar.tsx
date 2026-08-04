@@ -31,7 +31,10 @@ interface Props<TSort extends string, TagType extends RecipeTag> {
   onManageTags?: () => void;
 }
 
-export default function SearchBar<TSort extends string, TagType extends RecipeTag>({
+export default function SearchBar<
+  TSort extends string,
+  TagType extends RecipeTag,
+>({
   search,
   onSearchChange,
   scope,
@@ -83,7 +86,9 @@ export default function SearchBar<TSort extends string, TagType extends RecipeTa
               onClick={onToggleFavorites}
               title="Show favorites"
             >
-              <i className={showFavorites ? "bi bi-heart-fill" : "bi bi-heart"} />
+              <i
+                className={showFavorites ? "bi bi-heart-fill" : "bi bi-heart"}
+              />
             </button>
 
             {onManageTags && (
@@ -96,7 +101,9 @@ export default function SearchBar<TSort extends string, TagType extends RecipeTa
                 onClick={onManageTags}
                 title="Manage tags"
               >
-                <i className={`bi ${selectedTags.length > 0 ? "bi-tags-fill" : "bi-tags"}`} />
+                <i
+                  className={`bi ${selectedTags.length > 0 ? "bi-tags-fill" : "bi-tags"}`}
+                />
               </button>
             )}
 

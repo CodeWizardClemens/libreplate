@@ -1,9 +1,15 @@
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+
+import {
+  mealsMealFoodsDestroy,
+  mealsMealFoodsPartialUpdate,
+} from "@/api/generated";
+
+import TotalsModal from "@/components/ui/NutrientsTotalsModal";
+import FoodItem from "@/components/ui/FoodAmountItem";
 
 import type { DayMeal } from "@/api/generated";
-
-import MealFoodItem from "./MealFoodItem";
-import MealTotalsModal from "./MealTotalsModal";
 
 import { computeMealTotals } from "@/features/diary/utils/MealFormulas";
 
@@ -20,18 +26,49 @@ export default function MealCard({ meal, onAdd, onDiaryChanged }: Props) {
   const mealFoods = meal.meal_foods ?? [];
   const totals = computeMealTotals(mealFoods);
 
+  const deleteMealFood = useMutation({
+    mutationFn: async (id: number) => {
+      await mealsMealFoodsDestroy({
+        path: {
+          id,
+        },
+      });
+    },
+  });
+
+  const updateMealFood = useMutation({
+    mutationFn: async ({
+      id,
+      serving_size,
+      number_of_servings,
+    }: {
+      id: number;
+      serving_size: number;
+      number_of_servings: number;
+    }) => {
+      const response = await mealsMealFoodsPartialUpdate({
+        path: {
+          id,
+        },
+        body: {
+          serving_size,
+          number_of_servings,
+        },
+      });
+
+      return response.data;
+    },
+  });
+
   return (
     <div className="col-12">
       <div className="card">
         <div className="card-body">
-          <MealTotalsModal
+          <TotalsModal
             isOpen={isTotalsModalOpen}
             onClose={() => setIsTotalsModalOpen(false)}
             title={meal.name}
-            energy={totals.energy}
-            protein={totals.protein}
-            fat={totals.fat}
-            carbs={totals.carbs}
+            totals={totals}
           />
 
           <div className="d-flex justify-content-between align-items-start mb-1">
@@ -78,10 +115,17 @@ export default function MealCard({ meal, onAdd, onDiaryChanged }: Props) {
             {mealFoods.length > 0 && (
               <ul className="list-group list-group-flush">
                 {mealFoods.map((item) => (
-                  <MealFoodItem
+                  <FoodItem
                     key={item.id}
                     item={item}
-                    onDiaryChanged={onDiaryChanged}
+                    onSave={async (values) => {
+                      await updateMealFood.mutateAsync(values);
+                      await onDiaryChanged();
+                    }}
+                    onDelete={async (id) => {
+                      await deleteMealFood.mutateAsync(id);
+                      await onDiaryChanged();
+                    }}
                   />
                 ))}
               </ul>

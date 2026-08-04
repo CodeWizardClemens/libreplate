@@ -10,7 +10,11 @@ import {
 } from "@/api/generated";
 
 import { useQuery } from "@tanstack/react-query";
+
 import FoodPickerModal from "@/features/foods/components/FoodPickerModal";
+
+import FoodAmountItem from "@/components/ui/FoodAmountItem";
+import TotalsModal from "@/components/ui/NutrientsTotalsModal";
 
 interface IngredientsCardProps {
   recipe: Recipe;
@@ -22,17 +26,6 @@ const nutrients = {
   fat: ["fat", "total lipid"],
   carbohydrates: ["carbohydrate", "carbs"],
 };
-
-const headers = [
-  "Food",
-  "Servings",
-  "Amount",
-  "Energy",
-  "Protein",
-  "Fat",
-  "Carbs",
-  "",
-];
 
 type NutrientTotals = Record<keyof typeof nutrients, number>;
 
@@ -55,12 +48,13 @@ function getNutrient(food: Food, names: string[]) {
 
 function calculateNutrients(
   food: Food,
-  servings: number | null | undefined,
-  amount: number | null | undefined,
+  numberOfServings: number | null | undefined,
+  servingSize: number | null | undefined,
 ): NutrientTotals {
   const multiplier =
     food.serving && food.serving > 0
-      ? (Number(servings ?? 0) * Number(amount ?? 0)) / food.serving
+      ? (Number(numberOfServings ?? 0) * Number(servingSize ?? 0)) /
+        food.serving
       : 0;
 
   return Object.fromEntries(
@@ -84,126 +78,6 @@ function useFood(id: number) {
       return response.data;
     },
   });
-}
-
-function NumberInput({
-  value,
-  onChange,
-}: {
-  value: number;
-  onChange: (value: number) => void;
-}) {
-  return (
-    <input
-      className="form-control form-control-sm text-center"
-      style={{ width: 90 }}
-      type="number"
-      value={value}
-      onChange={(e) => onChange(Number(e.target.value))}
-    />
-  );
-}
-
-function NutrientCell({ value }: { value: number }) {
-  return <td className="text-start text-muted">{Math.round(value)}</td>;
-}
-
-function IngredientRow({
-  recipeId,
-  ingredient,
-  onDelete,
-  onUpdate,
-}: {
-  recipeId: number;
-  ingredient: RecipeIngredient;
-  onDelete: (id: number) => void;
-  onUpdate: (id: number, data: Partial<RecipeIngredient>) => void;
-}) {
-  const { data: food } = useFood(ingredient.food);
-
-  const [isUpdating, setIsUpdating] = useState(false);
-
-  const values = useMemo(
-    () =>
-      food
-        ? calculateNutrients(
-            food,
-            ingredient.number_of_servings,
-            ingredient.serving_amount,
-          )
-        : emptyTotals(),
-    [food, ingredient.number_of_servings, ingredient.serving_amount],
-  );
-
-  const update = async (data: Partial<RecipeIngredient>) => {
-    onUpdate(ingredient.id, data);
-
-    try {
-      setIsUpdating(true);
-
-      await recipesIngredientsPartialUpdate({
-        path: {
-          id: recipeId,
-          ingredient_pk: ingredient.id,
-        },
-        body: data,
-      });
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  if (!food) {
-    return (
-      <tr>
-        <td colSpan={8} className="text-center py-3 text-muted">
-          Loading...
-        </td>
-      </tr>
-    );
-  }
-
-  return (
-    <tr>
-      <td>{food.name}</td>
-
-      <td>
-        <NumberInput
-          value={ingredient.number_of_servings ?? 0}
-          onChange={(value) =>
-            update({
-              number_of_servings: value,
-            })
-          }
-        />
-      </td>
-
-      <td>
-        <NumberInput
-          value={ingredient.serving_amount ?? 0}
-          onChange={(value) =>
-            update({
-              serving_amount: value,
-            })
-          }
-        />
-      </td>
-
-      {Object.values(values).map((value, index) => (
-        <NutrientCell key={index} value={value} />
-      ))}
-
-      <td className="text-end">
-        <button
-          className="btn btn-sm btn-outline-danger"
-          disabled={isUpdating}
-          onClick={() => onDelete(ingredient.id)}
-        >
-          <i className="bi bi-trash" />
-        </button>
-      </td>
-    </tr>
-  );
 }
 
 function IngredientTotalsItem({
@@ -241,8 +115,10 @@ function IngredientTotalsItem({
 
 function IngredientTotals({
   ingredients,
+  onTotalsClick,
 }: {
   ingredients: RecipeIngredient[];
+  onTotalsClick: (totals: NutrientTotals) => void;
 }) {
   const [ingredientTotals, setIngredientTotals] = useState<
     Record<number, NutrientTotals>
@@ -263,24 +139,10 @@ function IngredientTotals({
   }, [ingredients]);
 
   const updateTotal = useCallback((id: number, values: NutrientTotals) => {
-    setIngredientTotals((current) => {
-      const old = current[id];
-
-      if (
-        old &&
-        old.energy === values.energy &&
-        old.protein === values.protein &&
-        old.fat === values.fat &&
-        old.carbohydrates === values.carbohydrates
-      ) {
-        return current;
-      }
-
-      return {
-        ...current,
-        [id]: values,
-      };
-    });
+    setIngredientTotals((current) => ({
+      ...current,
+      [id]: values,
+    }));
   }, []);
 
   const totals = useMemo(() => {
@@ -307,19 +169,63 @@ function IngredientTotals({
       ))}
 
       <tfoot className="table-light fw-semibold">
-        <tr>
+        <tr style={{ cursor: "pointer" }} onClick={() => onTotalsClick(totals)}>
           <td>Totals</td>
 
           <td colSpan={2} />
 
-          {Object.values(totals).map((value, index) => (
-            <td key={index}>{Math.round(value)}</td>
-          ))}
+          <td>{Math.round(totals.energy)} kcal</td>
+
+          <td>{Math.round(totals.protein)} P</td>
+
+          <td>{Math.round(totals.fat)} F</td>
+
+          <td>{Math.round(totals.carbohydrates)} C</td>
 
           <td />
         </tr>
       </tfoot>
     </>
+  );
+}
+
+function IngredientItem({
+  ingredient,
+  onSave,
+  onDelete,
+}: {
+  ingredient: RecipeIngredient;
+  onSave: (
+    id: number,
+    values: {
+      servingSize: number;
+      numberOfServings: number;
+    },
+  ) => Promise<void>;
+  onDelete: (id: number) => Promise<void>;
+}) {
+  const { data: food } = useFood(ingredient.food);
+
+  if (!food) {
+    return <li className="list-group-item">Loading...</li>;
+  }
+
+  return (
+    <FoodAmountItem
+      item={{
+        id: ingredient.id,
+        food,
+        serving_size: ingredient.serving_amount,
+        number_of_servings: ingredient.number_of_servings,
+      }}
+      onSave={async (values) => {
+        await onSave(ingredient.id, {
+          servingSize: values.serving_size,
+          numberOfServings: values.number_of_servings,
+        });
+      }}
+      onDelete={onDelete}
+    />
   );
 }
 
@@ -329,23 +235,12 @@ export default function IngredientsCard({ recipe }: IngredientsCardProps) {
   );
 
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [isTotalsModalOpen, setIsTotalsModalOpen] = useState(false);
+  const [totals, setTotals] = useState<NutrientTotals>(emptyTotals());
 
   useEffect(() => {
     setIngredients(recipe.ingredients ?? []);
   }, [recipe.ingredients]);
-
-  const updateIngredient = (id: number, data: Partial<RecipeIngredient>) => {
-    setIngredients((items) =>
-      items.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              ...data,
-            }
-          : item,
-      ),
-    );
-  };
 
   const addFood = async (foods: Food[]) => {
     setPickerOpen(false);
@@ -373,6 +268,37 @@ export default function IngredientsCard({ recipe }: IngredientsCardProps) {
     }
   };
 
+  const updateIngredient = async (
+    id: number,
+    values: {
+      servingSize: number;
+      numberOfServings: number;
+    },
+  ) => {
+    setIngredients((items) =>
+      items.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              serving_amount: values.servingSize,
+              number_of_servings: values.numberOfServings,
+            }
+          : item,
+      ),
+    );
+
+    await recipesIngredientsPartialUpdate({
+      path: {
+        id: recipe.id,
+        ingredient_pk: id,
+      },
+      body: {
+        serving_amount: values.servingSize,
+        number_of_servings: values.numberOfServings,
+      },
+    });
+  };
+
   const removeIngredient = async (id: number) => {
     setIngredients((items) => items.filter((item) => item.id !== id));
 
@@ -387,6 +313,18 @@ export default function IngredientsCard({ recipe }: IngredientsCardProps) {
   return (
     <div className="card shadow-sm border-0">
       <div className="card-body">
+        <TotalsModal
+          isOpen={isTotalsModalOpen}
+          onClose={() => setIsTotalsModalOpen(false)}
+          title={recipe.name}
+          totals={{
+            energy: totals.energy,
+            protein: totals.protein,
+            fat: totals.fat,
+            carbs: totals.carbohydrates,
+          }}
+        />
+
         <div className="d-flex justify-content-between mb-4">
           <h4 className="card-title mb-0">Ingredients</h4>
 
@@ -398,38 +336,25 @@ export default function IngredientsCard({ recipe }: IngredientsCardProps) {
           </button>
         </div>
 
-        <table className="table table-hover align-middle">
-          <thead className="table-light">
-            <tr>
-              {headers.map((header) => (
-                <th key={header}>{header}</th>
-              ))}
-            </tr>
-          </thead>
+        <ul className="list-group list-group-flush">
+          {ingredients.map((ingredient) => (
+            <IngredientItem
+              key={ingredient.id}
+              ingredient={ingredient}
+              onSave={updateIngredient}
+              onDelete={removeIngredient}
+            />
+          ))}
+        </ul>
 
-          <tbody>
-            {ingredients.length ? (
-              ingredients.map((ingredient) => (
-                <IngredientRow
-                  key={ingredient.id}
-                  recipeId={recipe.id}
-                  ingredient={ingredient}
-                  onDelete={removeIngredient}
-                  onUpdate={updateIngredient}
-                />
-              ))
-            ) : (
-              <tr>
-                <td colSpan={8} className="text-center py-5 text-muted">
-                  No ingredients added yet
-                </td>
-              </tr>
-            )}
-          </tbody>
-
-          {ingredients.length > 0 && (
-            <IngredientTotals ingredients={ingredients} />
-          )}
+        <table className="table table-hover align-middle mt-3">
+          <IngredientTotals
+            ingredients={ingredients}
+            onTotalsClick={(values) => {
+              setTotals(values);
+              setIsTotalsModalOpen(true);
+            }}
+          />
         </table>
       </div>
 

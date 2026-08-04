@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import type { DayMeal } from "@/api/generated";
 
-import DailyTotalsModal from "./DailyTotalsModal";
+import TotalsModal from "@/components/ui/NutrientsTotalsModal";
 
 import { computeDailyTotals } from "../utils/computeDailyTotals";
 
@@ -23,7 +23,7 @@ export default function DailyTotalsBar({ meals }: Props) {
         style={{ cursor: "pointer" }}
       >
         <div className="card-body d-flex justify-content-between align-items-center">
-          <h5 className="mb-0">Daily Total</h5>
+          <h5 className="mb-0">Totals</h5>
 
           {/* TODO query these nutrients, don't hardcode them!!! */}
           <div className="d-flex gap-4 text-muted">
@@ -35,9 +35,10 @@ export default function DailyTotalsBar({ meals }: Props) {
         </div>
       </div>
 
-      <DailyTotalsModal
+      <TotalsModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
+        title="Daily Total"
         totals={totals}
       />
     </>

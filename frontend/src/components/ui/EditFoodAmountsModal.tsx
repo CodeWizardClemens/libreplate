@@ -1,15 +1,25 @@
 import { useMemo, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-
-import { mealsMealFoodsPartialUpdate } from "@/api/generated";
-import type { MealFood } from "@/api/generated";
 
 import Modal from "@/components/ui/Modal";
+import MacroPieChart from "@/components/ui/MacroPieChart";
+
+type Food = {
+  name: string;
+  nutrients?: {
+    amount?: number | null;
+    nutrient_name?: string | null;
+  }[];
+};
 
 type Props = {
-  item: MealFood;
+  food: Food;
+  servingSize: number;
+  numberOfServings: number;
   onClose: () => void;
-  onSaved: () => Promise<void>;
+  onSave: (values: {
+    serving_size: number;
+    number_of_servings: number;
+  }) => Promise<void>;
 };
 
 type NutrientTotals = {
@@ -19,8 +29,8 @@ type NutrientTotals = {
   carbs: number;
 };
 
-function computeItemNutrients(
-  item: MealFood,
+function computeFoodNutrients(
+  food: Food,
   servingSize: number,
   numberOfServings: number,
 ): NutrientTotals {
@@ -33,7 +43,7 @@ function computeItemNutrients(
 
   const multiplier = (servingSize * numberOfServings) / 100;
 
-  for (const nutrient of item.food?.nutrients ?? []) {
+  for (const nutrient of food.nutrients ?? []) {
     const amount = (nutrient.amount ?? 0) * multiplier;
 
     switch (nutrient.nutrient_name?.toLowerCase()) {
@@ -67,17 +77,23 @@ function formatAmount(value: number) {
   return Number.isFinite(value) ? value.toFixed(0) : "—";
 }
 
-export default function EditMealFoodModal({ item, onClose, onSaved }: Props) {
-  const [servingSize, setServingSize] = useState(
-    String(item.serving_size ?? 0),
+export default function EditFoodAmountsModal({
+  food,
+  servingSize,
+  numberOfServings,
+  onClose,
+  onSave,
+}: Props) {
+  const [currentServingSize, setCurrentServingSize] = useState(
+    String(servingSize),
   );
 
-  const [servings, setServings] = useState(
-    String(item.number_of_servings ?? 0),
+  const [currentNumberOfServings, setCurrentNumberOfServings] = useState(
+    String(numberOfServings),
   );
 
-  const parsedSize = Number.parseFloat(servingSize);
-  const parsedServings = Number.parseFloat(servings);
+  const parsedSize = Number.parseFloat(currentServingSize);
+  const parsedServings = Number.parseFloat(currentNumberOfServings);
 
   const hasValidInputs =
     !Number.isNaN(parsedSize) &&
@@ -87,55 +103,29 @@ export default function EditMealFoodModal({ item, onClose, onSaved }: Props) {
 
   const nutrients = useMemo(() => {
     if (!hasValidInputs) {
-      return computeItemNutrients(item, 0, 0);
+      return computeFoodNutrients(food, 0, 0);
     }
 
-    return computeItemNutrients(item, parsedSize, parsedServings);
-  }, [item, parsedSize, parsedServings, hasValidInputs]);
-
-  const updateMealFood = useMutation({
-    mutationFn: async ({
-      id,
-      serving_size,
-      number_of_servings,
-    }: {
-      id: number;
-      serving_size: number;
-      number_of_servings: number;
-    }) => {
-      const response = await mealsMealFoodsPartialUpdate({
-        path: {
-          id,
-        },
-        body: {
-          serving_size,
-          number_of_servings,
-        },
-      });
-
-      return response.data;
-    },
-  });
+    return computeFoodNutrients(food, parsedSize, parsedServings);
+  }, [food, parsedSize, parsedServings, hasValidInputs]);
 
   async function handleSave() {
     if (!hasValidInputs) {
       return;
     }
 
-    await updateMealFood.mutateAsync({
-      id: item.id,
+    await onSave({
       serving_size: parsedSize,
       number_of_servings: parsedServings,
     });
 
-    await onSaved();
     onClose();
   }
 
   return (
     <Modal
       isOpen
-      title={`${item.food.name}`}
+      title={food.name}
       onClose={onClose}
       footer={
         <div className="d-flex justify-content-end gap-2">
@@ -147,7 +137,7 @@ export default function EditMealFoodModal({ item, onClose, onSaved }: Props) {
             type="button"
             className="btn btn-primary"
             onClick={() => void handleSave()}
-            disabled={updateMealFood.isPending || !hasValidInputs}
+            disabled={!hasValidInputs}
           >
             Save
           </button>
@@ -155,36 +145,47 @@ export default function EditMealFoodModal({ item, onClose, onSaved }: Props) {
       }
     >
       <div className="d-flex flex-column gap-3">
-        <div>
-          <label className="form-label">Serving size (g)</label>
+        <div className="d-flex gap-3">
+          <div className="w-50">
+            <label className="form-label">Serving size (g)</label>
 
-          <input
-            type="number"
-            min={0}
-            step="any"
-            className="form-control"
-            value={servingSize}
-            onChange={(event) => setServingSize(event.target.value)}
-          />
-        </div>
+            <input
+              type="number"
+              min={0}
+              step="any"
+              className="form-control"
+              value={currentServingSize}
+              onChange={(event) => setCurrentServingSize(event.target.value)}
+            />
+          </div>
 
-        <div>
-          <label className="form-label">Number of servings</label>
+          <div className="w-50">
+            <label className="form-label">Number of servings</label>
 
-          <input
-            type="number"
-            min={0}
-            step="any"
-            className="form-control"
-            value={servings}
-            onChange={(event) => setServings(event.target.value)}
-          />
+            <input
+              type="number"
+              min={0}
+              step="any"
+              className="form-control"
+              value={currentNumberOfServings}
+              onChange={(event) =>
+                setCurrentNumberOfServings(event.target.value)
+              }
+            />
+          </div>
         </div>
 
         <div className="border rounded p-3 bg-light">
-          <div className="fw-semibold mb-2">Nutrients</div>
+          <div className="fw-semibold mb-2">Macro distribution</div>
 
-          {/* TODO don't hardcode nutrients, query them from backend. */}
+          <MacroPieChart
+            protein={nutrients.protein}
+            fat={nutrients.fat}
+            carbs={nutrients.carbs}
+          />
+
+          <div className="fw-semibold mb-2 mt-3">Nutrients</div>
+
           <div className="d-flex flex-column gap-1 small">
             <div className="d-flex justify-content-between">
               <span>Energy (kcals)</span>
