@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .api import FoodViewSet
+from .api import FoodTagViewSet, FoodViewSet
 
 food_list = FoodViewSet.as_view(
     {
@@ -8,7 +8,6 @@ food_list = FoodViewSet.as_view(
         "post": "create",
     }
 )
-
 
 food_detail = FoodViewSet.as_view(
     {
@@ -19,8 +18,24 @@ food_detail = FoodViewSet.as_view(
     }
 )
 
+tag_list = FoodTagViewSet.as_view(
+    {
+        "get": "list",
+        "post": "create",
+    }
+)
+
+tag_detail = FoodTagViewSet.as_view(
+    {
+        "put": "update",
+        "patch": "partial_update",
+        "delete": "destroy",
+    }
+)
+
 
 urlpatterns = [
+    # Foods
     path(
         "",
         food_list,
@@ -30,5 +45,16 @@ urlpatterns = [
         "<int:pk>/",
         food_detail,
         name="food-detail",
+    ),
+    # Tags
+    path(
+        "tags/",
+        tag_list,
+        name="food-tag-list",
+    ),
+    path(
+        "tags/<int:pk>/",
+        tag_detail,
+        name="food-tag-detail",
     ),
 ]

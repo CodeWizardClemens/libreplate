@@ -23,7 +23,14 @@ export default function RecipePage() {
   const queryClient = useQueryClient();
 
   const invalidateRecipes = () =>
-    queryClient.invalidateQueries({ queryKey: ["recipes"] });
+    queryClient.invalidateQueries({
+      queryKey: ["recipes"],
+    });
+
+  const refreshTags = () =>
+    queryClient.invalidateQueries({
+      queryKey: ["recipe-tags"],
+    });
 
   const recipesQuery = useQuery({
     queryKey: ["recipes"],
@@ -198,6 +205,7 @@ export default function RecipePage() {
           tags={tags}
           selectedTags={selectedTags}
           onTagsChange={setSelectedTags}
+          refreshTags={refreshTags}
         />
       </div>
 
@@ -207,7 +215,12 @@ export default function RecipePage() {
           onDelete={(id) => deleteRecipe.mutate(id)}
           onToggleFavorite={(id) => toggleFavorite.mutate(id)}
           onTogglePinned={(id) => togglePin.mutate(id)}
-          onCopy={(id, name) => copyRecipe.mutate({ id, name })}
+          onCopy={(id, name) =>
+            copyRecipe.mutate({
+              id,
+              name,
+            })
+          }
         />
       </div>
 

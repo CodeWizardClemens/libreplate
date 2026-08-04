@@ -1,5 +1,6 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
+from tags.serializers import TagSerializer
 
 from .models import Recipe, RecipeIngredient, RecipePicture, RecipeTag
 
@@ -29,6 +30,7 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
             "serving_amount",
             "order",
         ]
+
         read_only_fields = [
             "id",
             "food_name",
@@ -41,6 +43,7 @@ class RecipePictureSerializer(serializers.ModelSerializer):
         fields = [
             "id",
         ]
+
         read_only_fields = [
             "id",
         ]
@@ -54,14 +57,10 @@ class RecipeNutrientSerializer(serializers.Serializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     nutrients = serializers.SerializerMethodField()
+
     has_picture = serializers.SerializerMethodField()
 
-    tags = RecipeTagSerializer(
-        many=True,
-        read_only=True,
-    )
-
-    ingredients = RecipeIngredientSerializer(
+    tags = TagSerializer(
         many=True,
         read_only=True,
     )
@@ -72,6 +71,11 @@ class RecipeSerializer(serializers.ModelSerializer):
         source="tags",
         write_only=True,
         required=False,
+    )
+
+    ingredients = RecipeIngredientSerializer(
+        many=True,
+        read_only=True,
     )
 
     class Meta:
@@ -102,9 +106,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
 
         if request and "tags" in attrs:
-            tags = attrs["tags"]
-
-            for tag in tags:
+            for tag in attrs["tags"]:
                 if tag.user != request.user:
                     raise serializers.ValidationError(
                         {"tag_ids": "You cannot use another user's tags."}
@@ -119,6 +121,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     @extend_schema_field(RecipeNutrientSerializer(many=True))
     def get_nutrients(self, obj):
         nutrients = obj.get_nutrients()
+
         return [
             {
                 "id": nutrient.id,

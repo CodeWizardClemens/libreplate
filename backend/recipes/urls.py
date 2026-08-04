@@ -50,6 +50,8 @@ tag_list = RecipeTagViewSet.as_view(
 
 tag_detail = RecipeTagViewSet.as_view(
     {
+        "put": "update",
+        "patch": "partial_update",
         "delete": "destroy",
     }
 )
@@ -80,21 +82,58 @@ recipe_picture = RecipePictureViewSet.as_view(
 
 
 urlpatterns = [
-    path("", recipe_list),
+    path(
+        "",
+        recipe_list,
+        name="recipe-list",
+    ),
     # Tags
-    path("tags/", tag_list),
-    path("tags/<int:pk>/delete/", tag_detail),
+    path(
+        "tags/",
+        tag_list,
+        name="recipe-tag-list",
+    ),
+    path(
+        "tags/<int:pk>/",
+        tag_detail,
+        name="recipe-tag-detail",
+    ),
     # Recipes
-    path("<int:pk>/", recipe_detail),
-    path("<int:pk>/toggle-favorite/", toggle_favorite),
-    path("<int:pk>/toggle-pin/", toggle_pin),
-    path("<int:pk>/copy/", recipe_copy),
+    path(
+        "<int:pk>/",
+        recipe_detail,
+        name="recipe-detail",
+    ),
+    path(
+        "<int:pk>/toggle-favorite/",
+        toggle_favorite,
+        name="recipe-toggle-favorite",
+    ),
+    path(
+        "<int:pk>/toggle-pin/",
+        toggle_pin,
+        name="recipe-toggle-pin",
+    ),
+    path(
+        "<int:pk>/copy/",
+        recipe_copy,
+        name="recipe-copy",
+    ),
     # Ingredients
-    path("<int:pk>/ingredients/", recipe_ingredients),
+    path(
+        "<int:pk>/ingredients/",
+        recipe_ingredients,
+        name="recipe-ingredients",
+    ),
     path(
         "<int:pk>/ingredients/<int:ingredient_pk>/",
         recipe_ingredient_detail,
+        name="recipe-ingredient-detail",
     ),
     # Picture
-    path("<int:pk>/picture/", recipe_picture),
+    path(
+        "<int:pk>/picture/",
+        recipe_picture,
+        name="recipe-picture",
+    ),
 ]

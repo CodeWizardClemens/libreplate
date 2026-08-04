@@ -5,7 +5,7 @@ import AppLayout from "./AppLayout";
 import { accountsMeRetrieve } from "@/api/generated/sdk.gen";
 
 import LoginPage from "../features/auth/LoginPage";
-import RecipesPage from "../features/recipes/RecipePage";
+import RecipesPage from "../features/recipes/RecipesPage";
 import RecipeEditPage from "../features/recipes/RecipeEditPage";
 import FoodEditPage from "../features/foods/FoodEditPage";
 import FoodsPage from "../features/foods/FoodsPage";

@@ -14,6 +14,12 @@ class Food(models.Model):
     brand = models.CharField(max_length=255, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
 
+    tags = models.ManyToManyField(
+        "FoodTag",
+        related_name="foods",
+        blank=True,
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     last_used_at = models.DateTimeField(null=True, blank=True, db_index=True)
@@ -38,6 +44,28 @@ class Food(models.Model):
 
     def get_thumbnail_url(self):
         return None
+
+
+class FoodTag(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="food_tags",
+    )
+    name = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["name"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "name"],
+                name="unique_user_food_tag",
+            )
+        ]
+
+    def __str__(self):
+        return self.name
 
 
 class FoodNutrient(models.Model):

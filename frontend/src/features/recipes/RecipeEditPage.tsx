@@ -1,9 +1,15 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import type { RecipeTag } from "@/api/generated/types.gen";
-import { recipesRetrieve, recipesTagsList } from "@/api/generated";
+
+import {
+  recipesRetrieve,
+  recipesTagsCreate,
+  recipesTagsDestroy,
+  recipesTagsList,
+} from "@/api/generated";
 
 import RecipeDetailsForm from "./components/edit/RecipeDetailsForm";
 import IngredientsCard from "./components/edit/IngredientsCard";
@@ -13,6 +19,7 @@ import RecipeCardTags from "./components/common/RecipeTags";
 export default function RecipeEditPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const recipeId = Number(id);
 
@@ -41,6 +48,12 @@ export default function RecipeEditPage() {
     : Array.isArray(tagsResponse?.data)
       ? tagsResponse.data
       : [];
+
+  function refreshTags() {
+    queryClient.invalidateQueries({
+      queryKey: ["recipe-tags"],
+    });
+  }
 
   if (isLoading || !recipe) {
     return <div className="container py-4">Loading...</div>;
@@ -75,13 +88,26 @@ export default function RecipeEditPage() {
 
       <IngredientsCard recipe={recipe} />
 
-      {tags.length > 0 && (
-        <TagModal
-          open={showTagModal}
-          onClose={() => setShowTagModal(false)}
-          tags={tags}
-        />
-      )}
+      <TagModal
+        open={showTagModal}
+        onClose={() => setShowTagModal(false)}
+        tags={tags}
+        createTag={(name) =>
+          recipesTagsCreate({
+            body: {
+              name,
+            },
+          })
+        }
+        deleteTag={(id) =>
+          recipesTagsDestroy({
+            path: {
+              id,
+            },
+          })
+        }
+        onChanged={refreshTags}
+      />
     </div>
   );
 }

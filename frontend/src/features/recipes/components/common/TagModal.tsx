@@ -1,50 +1,47 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
-import type { RecipeTag } from "@/api/generated";
-
-import { recipesTagsCreate, recipesTagsDeleteDestroy } from "@/api/generated";
-
-interface Props {
-  open: boolean;
-  onClose: () => void;
-  tags: RecipeTag[];
+interface Tag {
+  id: number;
+  name: string;
 }
 
-export default function TagModal({ open, onClose, tags }: Props) {
-  const queryClient = useQueryClient();
+interface Props<T extends Tag> {
+  open: boolean;
+  onClose: () => void;
 
+  tags: T[];
+
+  createTag: (name: string) => Promise<unknown>;
+  deleteTag: (id: number) => Promise<unknown>;
+
+  onChanged?: () => void;
+}
+
+export default function TagModal<T extends Tag>({
+  open,
+  onClose,
+  tags,
+  createTag,
+  deleteTag,
+  onChanged,
+}: Props<T>) {
   const [newTag, setNewTag] = useState("");
 
-  const createTag = useMutation({
-    mutationFn: (name: string) =>
-      recipesTagsCreate({
-        body: {
-          name,
-        },
-      }),
-    onSuccess() {
-      queryClient.invalidateQueries({
-        queryKey: ["recipe-tags"],
-      });
+  const createMutation = useMutation({
+    mutationFn: (name: string) => createTag(name),
+
+    onSuccess: () => {
+      setNewTag("");
+      onChanged?.();
     },
   });
 
-  const deleteTag = useMutation({
-    mutationFn: (id: number) =>
-      recipesTagsDeleteDestroy({
-        path: {
-          id,
-        },
-      }),
-    onSuccess() {
-      queryClient.invalidateQueries({
-        queryKey: ["recipe-tags"],
-      });
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteTag(id),
 
-      queryClient.invalidateQueries({
-        queryKey: ["recipes"],
-      });
+    onSuccess: () => {
+      onChanged?.();
     },
   });
 
@@ -59,11 +56,7 @@ export default function TagModal({ open, onClose, tags }: Props) {
       return;
     }
 
-    createTag.mutate(name, {
-      onSuccess() {
-        setNewTag("");
-      },
-    });
+    createMutation.mutate(name);
   }
 
   return (
@@ -94,11 +87,15 @@ export default function TagModal({ open, onClose, tags }: Props) {
                 <input
                   className="form-control"
                   value={newTag}
-                  onChange={(e) => setNewTag(e.target.value)}
+                  onChange={(event) => setNewTag(event.target.value)}
                   placeholder="New tag"
                 />
 
-                <button className="btn btn-primary" onClick={handleCreate}>
+                <button
+                  className="btn btn-primary"
+                  onClick={handleCreate}
+                  disabled={createMutation.isPending}
+                >
                   Add
                 </button>
               </div>
@@ -123,7 +120,8 @@ export default function TagModal({ open, onClose, tags }: Props) {
                         btn-outline-danger
                         btn-sm
                       "
-                      onClick={() => deleteTag.mutate(tag.id)}
+                      disabled={deleteMutation.isPending}
+                      onClick={() => deleteMutation.mutate(tag.id)}
                     >
                       Delete
                     </button>

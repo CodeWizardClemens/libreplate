@@ -5,11 +5,21 @@ from django.db import transaction
 from integrations.usda_client import USDAFood, USDAFoodNutrient
 from nutrients.models import Nutrient
 from rest_framework import serializers
+from tags.serializers import TagSerializer
 from units.models import Unit
 
-from .models import Food, FoodNutrient
+from .models import Food, FoodNutrient, FoodTag
 
 logger = logging.getLogger(__name__)
+
+
+class FoodTagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FoodTag
+        fields = [
+            "id",
+            "name",
+        ]
 
 
 class FoodNutrientSerializer(serializers.ModelSerializer):
@@ -51,6 +61,19 @@ class FoodSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
+    tags = TagSerializer(
+        many=True,
+        read_only=True,
+    )
+
+    tag_ids = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=FoodTag.objects.all(),
+        source="tags",
+        write_only=True,
+        required=False,
+    )
+
     nutrients = FoodNutrientSerializer(
         many=True,
         required=False,
@@ -59,6 +82,7 @@ class FoodSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Food
+
         fields = [
             "id",
             "name",
@@ -70,6 +94,8 @@ class FoodSerializer(serializers.ModelSerializer):
             "description",
             "is_favorite",
             "usda_fdc_id",
+            "tags",
+            "tag_ids",
             "nutrients",
         ]
 
@@ -78,15 +104,25 @@ class FoodSerializer(serializers.ModelSerializer):
             "unit_name",
         ]
 
-    def to_representation(self, instance):
+    def validate(self, attrs):
+        request = self.context.get("request")
 
+        if request and "tags" in attrs:
+            for tag in attrs["tags"]:
+                if tag.user != request.user:
+                    raise serializers.ValidationError(
+                        {"tag_ids": "You cannot use another user's tags."}
+                    )
+
+        return attrs
+
+    def to_representation(self, instance):
         if isinstance(instance, USDAFood):
             return self._serialize_usda_food(instance)
 
         return super().to_representation(instance)
 
     def _serialize_usda_food(self, food: USDAFood):
-
         try:
             GRAM: Final = Unit.objects.get(name="Gram")
         except Unit.DoesNotExist:
@@ -103,19 +139,16 @@ class FoodSerializer(serializers.ModelSerializer):
             "description": food.description,
             "is_favorite": False,
             "usda_fdc_id": food.fdc_id,
+            "tags": [],
             "nutrients": self._serialize_usda_nutrients(
                 food.food_nutrients,
             ),
         }
 
-    def _serialize_usda_nutrients(self, usda_nutrients: list[USDAFoodNutrient]):
-        """
-        Serialize USDA nutrients into the application's nutrient format.
-
-        Not all USDA nutrients are supported. Only nutrients that exist in the
-        database are included in the serialized output; unsupported nutrients are
-        ignored.
-        """
+    def _serialize_usda_nutrients(
+        self,
+        usda_nutrients: list[USDAFoodNutrient],
+    ):
         usda_nutrient_map = {
             nutrient.number: nutrient
             for nutrient in usda_nutrients
@@ -140,7 +173,9 @@ class FoodSerializer(serializers.ModelSerializer):
         ]
 
     def _set_nutrients(self, food, nutrients):
-        FoodNutrient.objects.filter(food=food).delete()
+        FoodNutrient.objects.filter(
+            food=food,
+        ).delete()
 
         FoodNutrient.objects.bulk_create(
             [
@@ -160,7 +195,16 @@ class FoodSerializer(serializers.ModelSerializer):
             [],
         )
 
-        food = Food.objects.create(**validated_data)
+        tags = validated_data.pop(
+            "tags",
+            [],
+        )
+
+        food = Food.objects.create(
+            **validated_data,
+        )
+
+        food.tags.set(tags)
 
         self._set_nutrients(
             food,
@@ -176,6 +220,11 @@ class FoodSerializer(serializers.ModelSerializer):
             None,
         )
 
+        tags = validated_data.pop(
+            "tags",
+            None,
+        )
+
         for attr, value in validated_data.items():
             setattr(
                 instance,
@@ -184,6 +233,9 @@ class FoodSerializer(serializers.ModelSerializer):
             )
 
         instance.save()
+
+        if tags is not None:
+            instance.tags.set(tags)
 
         if nutrients is not None:
             self._set_nutrients(

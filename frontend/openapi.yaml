@@ -216,6 +216,124 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/foods/tags/:
+    get:
+      operationId: foods_tags_list
+      tags:
+      - foods
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FoodTag'
+          description: ''
+    post:
+      operationId: foods_tags_create
+      tags:
+      - foods
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FoodTag'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FoodTag'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FoodTag'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodTag'
+          description: ''
+  /api/foods/tags/{id}/:
+    put:
+      operationId: foods_tags_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - foods
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FoodTag'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FoodTag'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FoodTag'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodTag'
+          description: ''
+    patch:
+      operationId: foods_tags_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - foods
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFoodTag'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedFoodTag'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedFoodTag'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodTag'
+          description: ''
+    delete:
+      operationId: foods_tags_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - foods
+      security:
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/groceries/:
     get:
       operationId: groceries_list
@@ -1278,10 +1396,6 @@ paths:
   /api/recipes/{id}/picture/:
     get:
       operationId: recipes_picture_retrieve
-      description: |-
-        GET /api/recipes/<recipe_id>/picture/
-
-        Returns private image file.
       parameters:
       - in: path
         name: id
@@ -1301,10 +1415,6 @@ paths:
           description: ''
     post:
       operationId: recipes_picture_create
-      description: |-
-        POST /api/recipes/<recipe_id>/picture/
-
-        Upload or replace recipe picture.
       parameters:
       - in: path
         name: id
@@ -1332,7 +1442,6 @@ paths:
           description: ''
     delete:
       operationId: recipes_picture_destroy
-      description: DELETE /api/recipes/<recipe_id>/picture/
       parameters:
       - in: path
         name: id
@@ -1451,9 +1560,70 @@ paths:
               schema:
                 $ref: '#/components/schemas/RecipeTag'
           description: ''
-  /api/recipes/tags/{id}/delete/:
+  /api/recipes/tags/{id}/:
+    put:
+      operationId: recipes_tags_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - recipes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecipeTag'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RecipeTag'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RecipeTag'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipeTag'
+          description: ''
+    patch:
+      operationId: recipes_tags_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - recipes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRecipeTag'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRecipeTag'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRecipeTag'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipeTag'
+          description: ''
     delete:
-      operationId: recipes_tags_delete_destroy
+      operationId: recipes_tags_destroy
       parameters:
       - in: path
         name: id
@@ -1723,6 +1893,17 @@ components:
           maximum: 2147483647
           minimum: 0
           nullable: true
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+          readOnly: true
+        tag_ids:
+          type: array
+          items:
+            type: integer
+            writeOnly: true
+          writeOnly: true
         nutrients:
           type: array
           items:
@@ -1731,6 +1912,7 @@ components:
       - id
       - name
       - serving
+      - tags
       - unit_id
       - unit_name
     FoodNutrient:
@@ -1752,6 +1934,18 @@ components:
       - nutrient_id
       - nutrient_name
       - nutrient_unit
+    FoodTag:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
+      required:
+      - id
+      - name
     GroceryList:
       type: object
       properties:
@@ -2027,10 +2221,30 @@ components:
           maximum: 2147483647
           minimum: 0
           nullable: true
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+          readOnly: true
+        tag_ids:
+          type: array
+          items:
+            type: integer
+            writeOnly: true
+          writeOnly: true
         nutrients:
           type: array
           items:
             $ref: '#/components/schemas/FoodNutrient'
+    PatchedFoodTag:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
     PatchedGroceryListFood:
       type: object
       properties:
@@ -2138,7 +2352,7 @@ components:
         tags:
           type: array
           items:
-            $ref: '#/components/schemas/RecipeTag'
+            $ref: '#/components/schemas/Tag'
           readOnly: true
         tag_ids:
           type: array
@@ -2180,6 +2394,15 @@ components:
           type: integer
           maximum: 2147483647
           minimum: 0
+    PatchedRecipeTag:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
     Recipe:
       type: object
       properties:
@@ -2229,7 +2452,7 @@ components:
         tags:
           type: array
           items:
-            $ref: '#/components/schemas/RecipeTag'
+            $ref: '#/components/schemas/Tag'
           readOnly: true
         tag_ids:
           type: array
@@ -2315,6 +2538,16 @@ components:
         name:
           type: string
           maxLength: 50
+      required:
+      - id
+      - name
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
       required:
       - id
       - name

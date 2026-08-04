@@ -1,17 +1,33 @@
 import { useState } from "react";
 
+import { recipesTagsCreate, recipesTagsDestroy } from "@/api/generated";
+
 import type { RecipeTag } from "@/api/generated/types.gen";
+
 import SearchBar, { type SortOption } from "@/components/ui/SearchBar";
+
 import TagModal from "../common/TagModal";
 
 export type RecipeSortMethod =
   "created_at" | "updated_at" | "name" | "last_used_at";
 
 const SORT_OPTIONS: SortOption<RecipeSortMethod>[] = [
-  { value: "created_at", label: "Created at" },
-  { value: "updated_at", label: "Updated at" },
-  { value: "name", label: "Name" },
-  { value: "last_used_at", label: "Last used at" },
+  {
+    value: "created_at",
+    label: "Created at",
+  },
+  {
+    value: "updated_at",
+    label: "Updated at",
+  },
+  {
+    value: "name",
+    label: "Name",
+  },
+  {
+    value: "last_used_at",
+    label: "Last used at",
+  },
 ];
 
 interface Props {
@@ -29,6 +45,8 @@ interface Props {
   tags: RecipeTag[];
   selectedTags: number[];
   onTagsChange: (tags: number[]) => void;
+
+  refreshTags: () => void;
 }
 
 export default function RecipeSearchBar({
@@ -42,6 +60,7 @@ export default function RecipeSearchBar({
   tags,
   selectedTags,
   onTagsChange,
+  refreshTags,
 }: Props) {
   const [showTagModal, setShowTagModal] = useState(false);
 
@@ -50,7 +69,10 @@ export default function RecipeSearchBar({
       <SearchBar
         search={search}
         onSearchChange={onSearchChange}
-        scope={{ count: recipeCount, label: "recipes" }}
+        scope={{
+          count: recipeCount,
+          label: "recipes",
+        }}
         showFavorites={showFavorites}
         onToggleFavorites={onToggleFavorites}
         sortMethod={sortMethod}
@@ -66,6 +88,21 @@ export default function RecipeSearchBar({
         open={showTagModal}
         onClose={() => setShowTagModal(false)}
         tags={tags}
+        createTag={(name) =>
+          recipesTagsCreate({
+            body: {
+              name,
+            },
+          })
+        }
+        deleteTag={(id) =>
+          recipesTagsDestroy({
+            path: {
+              id,
+            },
+          })
+        }
+        onChanged={refreshTags}
       />
     </>
   );

@@ -26,19 +26,22 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
 
     def get_queryset(self):
-
-        return Recipe.objects.filter(user=self.request.user).prefetch_related(
-            "picture",
-            "tags",
+        return (
+            Recipe.objects.filter(user=self.request.user)
+            .prefetch_related(
+                "tags",
+                "ingredients__food",
+            )
+            .select_related(
+                "picture",
+            )
         )
 
     def perform_create(self, serializer):
-
         serializer.save(user=self.request.user)
 
     @action(detail=True, methods=["post"])
     def toggle_favorite(self, request, pk=None):
-
         recipe = self.get_object()
 
         recipe.is_favorite = not recipe.is_favorite
@@ -59,7 +62,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def toggle_pin(self, request, pk=None):
-
         recipe = self.get_object()
 
         recipe.is_pinned = not recipe.is_pinned
@@ -80,7 +82,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def copy(self, request, pk=None):
-
         recipe = self.get_object()
 
         new_name = request.data.get("name")
@@ -134,12 +135,14 @@ class RecipeTagViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeTagSerializer
 
     def get_queryset(self):
-
-        return RecipeTag.objects.filter(user=self.request.user)
+        return RecipeTag.objects.filter(
+            user=self.request.user,
+        )
 
     def perform_create(self, serializer):
-
-        serializer.save(user=self.request.user)
+        serializer.save(
+            user=self.request.user,
+        )
 
 
 class RecipeIngredientViewSet(viewsets.ModelViewSet):
@@ -150,28 +153,26 @@ class RecipeIngredientViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeIngredientSerializer
 
     def get_recipe(self):
-
         return Recipe.objects.get(
             id=self.kwargs["pk"],
             user=self.request.user,
         )
 
     def get_queryset(self):
-
         recipe = self.get_recipe()
 
         return RecipeIngredient.objects.filter(recipe=recipe).select_related("food")
 
     def get_object(self):
-
         return RecipeIngredient.objects.get(
             id=self.kwargs["ingredient_pk"],
             recipe=self.get_recipe(),
         )
 
     def perform_create(self, serializer):
-
-        serializer.save(recipe=self.get_recipe())
+        serializer.save(
+            recipe=self.get_recipe(),
+        )
 
 
 class RecipePictureViewSet(viewsets.ViewSet):
@@ -187,26 +188,25 @@ class RecipePictureViewSet(viewsets.ViewSet):
     serializer_class = RecipePictureSerializer
 
     def get_recipe(self):
-
         return Recipe.objects.get(
             id=self.kwargs["pk"],
             user=self.request.user,
         )
 
     def retrieve(self, request, pk=None):
-        """
-        GET /api/recipes/<recipe_id>/picture/
-
-        Returns private image file.
-        """
-
         try:
-            picture = RecipePicture.objects.get(recipe=self.get_recipe())
+            picture = RecipePicture.objects.get(
+                recipe=self.get_recipe(),
+            )
 
         except RecipePicture.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
-        content_type, _ = mimetypes.guess_type(picture.image.name)
+        content_type, _ = mimetypes.guess_type(
+            picture.image.name,
+        )
 
         return FileResponse(
             picture.image.open("rb"),
@@ -214,15 +214,11 @@ class RecipePictureViewSet(viewsets.ViewSet):
         )
 
     def create(self, request, pk=None):
-        """
-        POST /api/recipes/<recipe_id>/picture/
-
-        Upload or replace recipe picture.
-        """
-
         recipe = self.get_recipe()
 
-        picture, created = RecipePicture.objects.get_or_create(recipe=recipe)
+        picture, created = RecipePicture.objects.get_or_create(
+            recipe=recipe,
+        )
 
         serializer = RecipePictureSerializer(
             picture,
@@ -230,28 +226,34 @@ class RecipePictureViewSet(viewsets.ViewSet):
             partial=True,
         )
 
-        serializer.is_valid(raise_exception=True)
+        serializer.is_valid(
+            raise_exception=True,
+        )
 
-        serializer.save(recipe=recipe)
+        serializer.save(
+            recipe=recipe,
+        )
 
         return Response(
             {
                 "id": picture.id,
             },
-            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+            status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK),
         )
 
     def destroy(self, request, pk=None):
-        """
-        DELETE /api/recipes/<recipe_id>/picture/
-        """
-
         try:
-            picture = RecipePicture.objects.get(recipe=self.get_recipe())
+            picture = RecipePicture.objects.get(
+                recipe=self.get_recipe(),
+            )
 
         except RecipePicture.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         picture.delete()
 
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(
+            status=status.HTTP_204_NO_CONTENT,
+        )

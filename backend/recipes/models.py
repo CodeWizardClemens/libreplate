@@ -4,6 +4,7 @@ from decimal import ROUND_HALF_UP, Decimal
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+from tags.models import BaseTag
 
 
 class Recipe(models.Model):
@@ -75,26 +76,14 @@ class RecipePicture(models.Model):
         return f"{self.recipe.name} picture"
 
 
-class RecipeTag(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="recipe_tags",
-    )
-    name = models.CharField(max_length=50)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ["name"]
+class RecipeTag(BaseTag):
+    class Meta(BaseTag.Meta):
         constraints = [
             models.UniqueConstraint(
                 fields=["user", "name"],
                 name="unique_user_recipe_tag",
             )
         ]
-
-    def __str__(self):
-        return self.name
 
 
 class RecipeIngredient(models.Model):

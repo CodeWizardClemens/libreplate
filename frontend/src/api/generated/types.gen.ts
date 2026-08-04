@@ -41,6 +41,7 @@ export type Food = {
     description?: string | null;
     is_favorite?: boolean;
     usda_fdc_id?: number | null;
+    readonly tags: Array<Tag>;
     nutrients?: Array<FoodNutrient>;
 };
 
@@ -49,6 +50,11 @@ export type FoodNutrient = {
     readonly nutrient_name: string;
     readonly nutrient_unit: string;
     amount: number;
+};
+
+export type FoodTag = {
+    readonly id: number;
+    name: string;
 };
 
 export type GroceryList = {
@@ -160,7 +166,13 @@ export type PatchedFood = {
     description?: string | null;
     is_favorite?: boolean;
     usda_fdc_id?: number | null;
+    readonly tags?: Array<Tag>;
     nutrients?: Array<FoodNutrient>;
+};
+
+export type PatchedFoodTag = {
+    readonly id?: number;
+    name?: string;
 };
 
 export type PatchedGroceryListFood = {
@@ -206,7 +218,7 @@ export type PatchedRecipe = {
     last_used_at?: string;
     readonly created_at?: string;
     readonly updated_at?: string;
-    readonly tags?: Array<RecipeTag>;
+    readonly tags?: Array<Tag>;
     readonly has_picture?: boolean;
     readonly ingredients?: Array<RecipeIngredient>;
     readonly nutrients?: Array<RecipeNutrient>;
@@ -219,6 +231,11 @@ export type PatchedRecipeIngredient = {
     number_of_servings?: number;
     serving_amount?: number;
     order?: number;
+};
+
+export type PatchedRecipeTag = {
+    readonly id?: number;
+    name?: string;
 };
 
 export type Recipe = {
@@ -238,7 +255,7 @@ export type Recipe = {
     last_used_at?: string;
     readonly created_at: string;
     readonly updated_at: string;
-    readonly tags: Array<RecipeTag>;
+    readonly tags: Array<Tag>;
     readonly has_picture: boolean;
     readonly ingredients: Array<RecipeIngredient>;
     readonly nutrients: Array<RecipeNutrient>;
@@ -265,6 +282,11 @@ export type RecipePicture = {
 
 export type RecipeTag = {
     readonly id: number;
+    name: string;
+};
+
+export type Tag = {
+    id: number;
     name: string;
 };
 
@@ -322,12 +344,17 @@ export type FoodWritable = {
     description?: string | null;
     is_favorite?: boolean;
     usda_fdc_id?: number | null;
+    tag_ids?: Array<number>;
     nutrients?: Array<FoodNutrientWritable>;
 };
 
 export type FoodNutrientWritable = {
     nutrient_id: number;
     amount: number;
+};
+
+export type FoodTagWritable = {
+    name: string;
 };
 
 export type GroceryListWritable = {
@@ -383,7 +410,12 @@ export type PatchedFoodWritable = {
     description?: string | null;
     is_favorite?: boolean;
     usda_fdc_id?: number | null;
+    tag_ids?: Array<number>;
     nutrients?: Array<FoodNutrientWritable>;
+};
+
+export type PatchedFoodTagWritable = {
+    name?: string;
 };
 
 export type PatchedGroceryListFoodWritable = {
@@ -429,6 +461,10 @@ export type PatchedRecipeIngredientWritable = {
     number_of_servings?: number;
     serving_amount?: number;
     order?: number;
+};
+
+export type PatchedRecipeTagWritable = {
+    name?: string;
 };
 
 export type RecipeWritable = {
@@ -618,6 +654,80 @@ export type FoodsUpdateResponses = {
 };
 
 export type FoodsUpdateResponse = FoodsUpdateResponses[keyof FoodsUpdateResponses];
+
+export type FoodsTagsListData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/foods/tags/';
+};
+
+export type FoodsTagsListResponses = {
+    200: Array<FoodTag>;
+};
+
+export type FoodsTagsListResponse = FoodsTagsListResponses[keyof FoodsTagsListResponses];
+
+export type FoodsTagsCreateData = {
+    body: FoodTagWritable;
+    path?: never;
+    query?: never;
+    url: '/api/foods/tags/';
+};
+
+export type FoodsTagsCreateResponses = {
+    201: FoodTag;
+};
+
+export type FoodsTagsCreateResponse = FoodsTagsCreateResponses[keyof FoodsTagsCreateResponses];
+
+export type FoodsTagsDestroyData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/foods/tags/{id}/';
+};
+
+export type FoodsTagsDestroyResponses = {
+    /**
+     * No response body
+     */
+    204: void;
+};
+
+export type FoodsTagsDestroyResponse = FoodsTagsDestroyResponses[keyof FoodsTagsDestroyResponses];
+
+export type FoodsTagsPartialUpdateData = {
+    body?: PatchedFoodTagWritable;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/foods/tags/{id}/';
+};
+
+export type FoodsTagsPartialUpdateResponses = {
+    200: FoodTag;
+};
+
+export type FoodsTagsPartialUpdateResponse = FoodsTagsPartialUpdateResponses[keyof FoodsTagsPartialUpdateResponses];
+
+export type FoodsTagsUpdateData = {
+    body: FoodTagWritable;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/foods/tags/{id}/';
+};
+
+export type FoodsTagsUpdateResponses = {
+    200: FoodTag;
+};
+
+export type FoodsTagsUpdateResponse = FoodsTagsUpdateResponses[keyof FoodsTagsUpdateResponses];
 
 export type GroceriesListData = {
     body?: never;
@@ -1395,23 +1505,53 @@ export type RecipesTagsCreateResponses = {
 
 export type RecipesTagsCreateResponse = RecipesTagsCreateResponses[keyof RecipesTagsCreateResponses];
 
-export type RecipesTagsDeleteDestroyData = {
+export type RecipesTagsDestroyData = {
     body?: never;
     path: {
         id: number;
     };
     query?: never;
-    url: '/api/recipes/tags/{id}/delete/';
+    url: '/api/recipes/tags/{id}/';
 };
 
-export type RecipesTagsDeleteDestroyResponses = {
+export type RecipesTagsDestroyResponses = {
     /**
      * No response body
      */
     204: void;
 };
 
-export type RecipesTagsDeleteDestroyResponse = RecipesTagsDeleteDestroyResponses[keyof RecipesTagsDeleteDestroyResponses];
+export type RecipesTagsDestroyResponse = RecipesTagsDestroyResponses[keyof RecipesTagsDestroyResponses];
+
+export type RecipesTagsPartialUpdateData = {
+    body?: PatchedRecipeTagWritable;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/recipes/tags/{id}/';
+};
+
+export type RecipesTagsPartialUpdateResponses = {
+    200: RecipeTag;
+};
+
+export type RecipesTagsPartialUpdateResponse = RecipesTagsPartialUpdateResponses[keyof RecipesTagsPartialUpdateResponses];
+
+export type RecipesTagsUpdateData = {
+    body: RecipeTagWritable;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/api/recipes/tags/{id}/';
+};
+
+export type RecipesTagsUpdateResponses = {
+    200: RecipeTag;
+};
+
+export type RecipesTagsUpdateResponse = RecipesTagsUpdateResponses[keyof RecipesTagsUpdateResponses];
 
 export type SchemaRetrieveData = {
     body?: never;
