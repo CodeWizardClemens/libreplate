@@ -53,20 +53,19 @@ export default function TagModal<T extends Tag>({
   });
 
   useEffect(() => {
-    if (!modalRef.current) {
+    const element = modalRef.current;
+
+    if (!element) {
       return;
     }
 
-    const modal = Modal.getOrCreateInstance(modalRef.current);
+    const modal = Modal.getOrCreateInstance(element);
 
     const handleHidden = () => {
       onClose();
     };
 
-    modalRef.current.addEventListener(
-      "hidden.bs.modal",
-      handleHidden
-    );
+    element.addEventListener("hidden.bs.modal", handleHidden);
 
     if (open) {
       modal.show();
@@ -75,10 +74,7 @@ export default function TagModal<T extends Tag>({
     }
 
     return () => {
-      modalRef.current?.removeEventListener(
-        "hidden.bs.modal",
-        handleHidden
-      );
+      element.removeEventListener("hidden.bs.modal", handleHidden);
 
       modal.dispose();
     };
@@ -133,9 +129,7 @@ export default function TagModal<T extends Tag>({
               <input
                 className="form-control"
                 value={newTag}
-                onChange={(event) =>
-                  setNewTag(event.target.value)
-                }
+                onChange={(event) => setNewTag(event.target.value)}
                 placeholder="New tag"
               />
 
@@ -177,9 +171,7 @@ export default function TagModal<T extends Tag>({
                       textDecoration: selectedTags.includes(tag.id)
                         ? "underline"
                         : "none",
-                      textDecorationThickness: selectedTags.includes(
-                        tag.id
-                      )
+                      textDecorationThickness: selectedTags.includes(tag.id)
                         ? "2px"
                         : undefined,
                       textUnderlineOffset: "4px",
@@ -198,9 +190,7 @@ export default function TagModal<T extends Tag>({
                       ms-2
                     "
                     disabled={deleteMutation.isPending}
-                    onClick={() =>
-                      deleteMutation.mutate(tag.id)
-                    }
+                    onClick={() => deleteMutation.mutate(tag.id)}
                   >
                     Delete
                   </button>
