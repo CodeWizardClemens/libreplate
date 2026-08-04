@@ -14,23 +14,23 @@ type Props = {
 };
 
 const COLORS = {
-  Fat: "#f8a922",
-  Carbs: "#292ce3",
-  Protein: "#0e9b42",
+  F: "#f8a922",
+  C: "#292ce3",
+  P: "#0e9b42",
 };
 
 export default function MacroPieChart({ protein, fat, carbs }: Props) {
   const data = [
     {
-      name: "Fat",
+      name: "F",
       value: fat * 9,
     },
     {
-      name: "Carbs",
+      name: "C",
       value: carbs * 4,
     },
     {
-      name: "Protein",
+      name: "P",
       value: protein * 4,
     },
   ].filter((item) => item.value > 0);
@@ -46,7 +46,7 @@ export default function MacroPieChart({ protein, fat, carbs }: Props) {
   }
 
   return (
-    <div style={{ width: "100%", height: 250 }}>
+    <div style={{ width: "100%", height: 210 }}>
       <ResponsiveContainer>
         <PieChart>
           <Pie

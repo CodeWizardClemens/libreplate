@@ -15,7 +15,6 @@ import {
 import RecipeDetailsForm from "./components/edit/RecipeDetailsForm";
 import IngredientsCard from "./components/edit/IngredientsCard";
 import TagModal from "../../components/ui/TagModal";
-import RecipeCardTags from "./components/common/RecipeTags";
 
 export default function RecipeEditPage() {
   const { id } = useParams();
@@ -88,7 +87,7 @@ export default function RecipeEditPage() {
   return (
     <div className="container">
       <div>
-        <div className="mb-2">
+        <div className="d-flex gap-2 mb-2">
           <button
             className="btn btn-outline-secondary"
             onClick={() => navigate(-1)}
@@ -96,20 +95,15 @@ export default function RecipeEditPage() {
             <i className="bi bi-arrow-left me-2" />
             Back
           </button>
-        </div>
-
-        <RecipeDetailsForm recipe={recipe} />
-
-        <div className="d-flex align-items-center gap-2">
           <button
-            className="btn btn-outline-secondary btn-sm"
+            className="btn btn-outline-secondary"
             onClick={() => setShowTagModal(true)}
           >
             <i className="bi bi-tags" />
           </button>
-
-          <RecipeCardTags recipe={recipe} />
         </div>
+
+        <RecipeDetailsForm recipe={recipe} />
       </div>
 
       <IngredientsCard recipe={recipe} />

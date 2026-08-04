@@ -21,9 +21,7 @@ export default function TotalsModal({ isOpen, onClose, title, totals }: Props) {
   return (
     <Modal isOpen={isOpen} title={title} onClose={onClose}>
       <div className="d-flex flex-column gap-3">
-        <div className="border rounded p-3 bg-light">
-          <div className="fw-semibold mb-2">Macro distribution</div>
-
+        <div className="border rounded p-1 bg-light">
           <MacroPieChart
             protein={totals.protein}
             fat={totals.fat}
