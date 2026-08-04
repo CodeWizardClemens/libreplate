@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from "react";
+
 import type { RecipeTag } from "@/api/generated";
 
 export interface SortOption<TSort extends string> {
@@ -29,10 +31,7 @@ interface Props<TSort extends string, TagType extends RecipeTag> {
   onManageTags?: () => void;
 }
 
-export default function SearchBar<
-  TSort extends string,
-  TagType extends RecipeTag,
->({
+export default function SearchBar<TSort extends string, TagType extends RecipeTag>({
   search,
   onSearchChange,
   scope,
@@ -44,6 +43,20 @@ export default function SearchBar<
   selectedTags,
   onManageTags,
 }: Props<TSort, TagType>) {
+  const [sortOpen, setSortOpen] = useState(false);
+  const sortRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
+        setSortOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const placeholder =
     scope.count <= 1
       ? "Not much to search through..."
@@ -70,9 +83,7 @@ export default function SearchBar<
               onClick={onToggleFavorites}
               title="Show favorites"
             >
-              <i
-                className={showFavorites ? "bi bi-heart-fill" : "bi bi-heart"}
-              />
+              <i className={showFavorites ? "bi bi-heart-fill" : "bi bi-heart"} />
             </button>
 
             {onManageTags && (
@@ -85,31 +96,34 @@ export default function SearchBar<
                 onClick={onManageTags}
                 title="Manage tags"
               >
-                <i
-                  className={`bi ${selectedTags.length > 0 ? "bi-tags-fill" : "bi-tags"}`}
-                />
+                <i className={`bi ${selectedTags.length > 0 ? "bi-tags-fill" : "bi-tags"}`} />
               </button>
             )}
 
-            <div className="dropdown">
+            <div className="dropdown" ref={sortRef}>
               <button
+                type="button"
                 className="btn btn-outline-secondary border-secondary-subtle rounded-0 rounded-end"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
+                aria-expanded={sortOpen}
                 title="Sort"
+                onClick={() => setSortOpen((open) => !open)}
               >
                 <i className="bi bi-filter" />
               </button>
 
-              <ul className="dropdown-menu dropdown-menu-end">
+              <ul
+                className={`dropdown-menu${sortOpen ? " show" : ""}`}
+                style={{ right: 0, left: "auto" }}
+              >
                 {sortOptions.map((option) => (
                   <li key={option.value}>
                     <button
-                      className={`dropdown-item ${
-                        sortMethod === option.value ? "active" : ""
-                      }`}
+                      className={`dropdown-item ${sortMethod === option.value ? "active" : ""}`}
                       type="button"
-                      onClick={() => onSortChange(option.value)}
+                      onClick={() => {
+                        onSortChange(option.value);
+                        setSortOpen(false);
+                      }}
                     >
                       {option.label}
                     </button>
