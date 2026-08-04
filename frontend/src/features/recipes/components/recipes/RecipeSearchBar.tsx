@@ -88,6 +88,8 @@ export default function RecipeSearchBar({
         open={showTagModal}
         onClose={() => setShowTagModal(false)}
         tags={tags}
+        selectedTags={selectedTags}
+        onTagsChange={onTagsChange}
         createTag={(name) =>
           recipesTagsCreate({
             body: {

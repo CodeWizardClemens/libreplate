@@ -12,6 +12,9 @@ interface Props<T extends Tag> {
 
   tags: T[];
 
+  selectedTags: number[];
+  onTagsChange: (tags: number[]) => void;
+
   createTag: (name: string) => Promise<unknown>;
   deleteTag: (id: number) => Promise<unknown>;
 
@@ -22,6 +25,8 @@ export default function TagModal<T extends Tag>({
   open,
   onClose,
   tags,
+  selectedTags,
+  onTagsChange,
   createTag,
   deleteTag,
   onChanged,
@@ -57,6 +62,15 @@ export default function TagModal<T extends Tag>({
     }
 
     createMutation.mutate(name);
+  }
+
+  function toggleTag(id: number) {
+    if (selectedTags.includes(id)) {
+      onTagsChange(selectedTags.filter((tagId) => tagId !== id));
+      return;
+    }
+
+    onTagsChange([...selectedTags, id]);
   }
 
   return (
@@ -111,7 +125,33 @@ export default function TagModal<T extends Tag>({
                       align-items-center
                     "
                   >
-                    <span>{tag.name}</span>
+                    <button
+                      type="button"
+                      className={`
+                        btn
+                        p-0
+                        border-0
+                        bg-transparent
+                        text-start
+                        ${
+                          selectedTags.includes(tag.id)
+                            ? "text-primary"
+                            : "text-body"
+                        }
+                      `}
+                      style={{
+                        textDecoration: selectedTags.includes(tag.id)
+                          ? "underline"
+                          : "none",
+                        textDecorationThickness: selectedTags.includes(tag.id)
+                          ? "2px"
+                          : undefined,
+                        textUnderlineOffset: "4px",
+                      }}
+                      onClick={() => toggleTag(tag.id)}
+                    >
+                      {tag.name}
+                    </button>
 
                     <button
                       type="button"
@@ -119,6 +159,7 @@ export default function TagModal<T extends Tag>({
                         btn
                         btn-outline-danger
                         btn-sm
+                        ms-2
                       "
                       disabled={deleteMutation.isPending}
                       onClick={() => deleteMutation.mutate(tag.id)}

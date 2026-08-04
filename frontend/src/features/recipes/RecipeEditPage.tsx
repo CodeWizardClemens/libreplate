@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import type { RecipeTag } from "@/api/generated/types.gen";
 
 import {
+  recipesPartialUpdate,
   recipesRetrieve,
   recipesTagsCreate,
   recipesTagsDestroy,
@@ -49,10 +50,35 @@ export default function RecipeEditPage() {
       ? tagsResponse.data
       : [];
 
+  const updateTags = useMutation({
+    mutationFn: (tag_ids: number[]) =>
+      recipesPartialUpdate({
+        path: {
+          id: recipeId,
+        },
+        body: {
+          tag_ids,
+        },
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["recipe", recipeId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["recipes"],
+      });
+    },
+  });
+
   function refreshTags() {
     queryClient.invalidateQueries({
       queryKey: ["recipe-tags"],
     });
+  }
+
+  function handleTagsChange(tagIds: number[]) {
+    updateTags.mutate(tagIds);
   }
 
   if (isLoading || !recipe) {
@@ -92,6 +118,8 @@ export default function RecipeEditPage() {
         open={showTagModal}
         onClose={() => setShowTagModal(false)}
         tags={tags}
+        selectedTags={recipe.tags.map((tag) => tag.id)}
+        onTagsChange={handleTagsChange}
         createTag={(name) =>
           recipesTagsCreate({
             body: {

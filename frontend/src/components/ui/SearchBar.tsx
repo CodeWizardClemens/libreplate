@@ -65,8 +65,10 @@ export default function SearchBar<
             />
 
             <button
-              className={`btn ${
-                showFavorites ? "btn-primary" : "btn-outline-secondary"
+              className={`btn border ${
+                showFavorites
+                  ? "btn-success border-success"
+                  : "btn-outline-secondary border-secondary-subtle"
               }`}
               onClick={onToggleFavorites}
               title="Show favorites"
@@ -75,37 +77,49 @@ export default function SearchBar<
                 className={showFavorites ? "bi bi-heart-fill" : "bi bi-heart"}
               />
             </button>
-          </div>
-        </div>
 
-        <div className="col-12 col-md-auto">
-          <select
-            value={sortMethod}
-            onChange={(e) => onSortChange(e.target.value as TSort)}
-            className="form-select"
-          >
-            {sortOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            {onManageTags && (
+              <button
+                className="btn btn-outline-secondary border-secondary-subtle"
+                onClick={onManageTags}
+                title="Manage tags"
+              >
+                <i className="bi bi-tags" />
+              </button>
+            )}
+
+            <div className="dropdown">
+              <button
+                className="btn btn-outline-secondary border-secondary-subtle rounded-0 rounded-end"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                title="Sort"
+              >
+                <i className="bi bi-filter" />
+              </button>
+
+              <ul className="dropdown-menu dropdown-menu-end">
+                {sortOptions.map((option) => (
+                  <li key={option.value}>
+                    <button
+                      className={`dropdown-item ${
+                        sortMethod === option.value ? "active" : ""
+                      }`}
+                      type="button"
+                      onClick={() => onSortChange(option.value)}
+                    >
+                      {option.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
 
       {tags && (
         <div className="row g-2 align-items-center mt-1">
-          {onManageTags && (
-            <div className="col-auto">
-              <button
-                className="btn btn-outline-secondary"
-                onClick={onManageTags}
-              >
-                {<i className="bi bi-tags"></i>}
-              </button>
-            </div>
-          )}
-
           <div className="col overflow-auto">
             <div className="d-flex flex-nowrap gap-2 overflow-auto">
               <TagSelector
