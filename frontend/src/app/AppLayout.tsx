@@ -21,16 +21,16 @@ export default function AppLayout() {
       .find((handle) => handle?.title)?.title ?? "LibrePlate";
 
   return (
-    <>
+    <div className="d-flex flex-column vh-100 overflow-hidden">
       <TopNavbar title={title} onMenuClick={() => setSidebarOpen(true)} />
 
       <Sidebar show={sidebarOpen} onHide={() => setSidebarOpen(false)} />
 
-      <main className="pt-3">
+      <main className="flex-grow-1 overflow-auto pt-3">
         <Container fluid="lg">
           <Outlet />
         </Container>
       </main>
-    </>
+    </div>
   );
 }
