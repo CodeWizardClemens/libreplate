@@ -85,7 +85,7 @@ export default function SearchBar<
                 onClick={onManageTags}
                 title="Manage tags"
               >
-                <i className="bi bi-tags" />
+                <i className={`bi ${selectedTags.length > 0 ? "bi-tags-fill" : "bi-tags"}`} />
               </button>
             )}
 
