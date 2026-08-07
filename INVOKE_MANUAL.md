@@ -32,6 +32,7 @@ invoke --help
 
 ## Table of contents
 
+- [`data.create-cache-table`](#data.create-cache-table)
 - [`data.migrate`](#data.migrate)
 - [`data.sync-default-data`](#data.sync-default-data)
 - [`dev.check`](#dev.check)
@@ -39,12 +40,14 @@ invoke --help
 - [`dev.format`](#dev.format)
 - [`dev.generate-api`](#dev.generate-api)
 - [`dev.generate-invoke-manual`](#dev.generate-invoke-manual)
+- [`dev.pre-commit`](#dev.pre-commit)
 - [`dev.serve-backend`](#dev.serve-backend)
 - [`dev.serve-frontend`](#dev.serve-frontend)
 - [`dev.test`](#dev.test)
 - [`dev.user-add-dummy`](#dev.user-add-dummy)
 - [`dev.verify`](#dev.verify)
 - [`docs.generate-invoke-manual`](#docs.generate-invoke-manual)
+- [`manage.create-cache-table`](#manage.create-cache-table)
 - [`manage.migrate`](#manage.migrate)
 - [`manage.update`](#manage.update)
 - [`setup.add-usda-api-key`](#setup.add-usda-api-key)
@@ -54,6 +57,22 @@ invoke --help
 - [`setup.sync-default-data`](#setup.sync-default-data)
 - [`setup.user-add`](#setup.user-add)
 - [`setup.user-remove`](#setup.user-remove)
+
+
+## `data.create-cache-table`
+
+```text
+
+Usage: inv[oke] [--core-opts] data.create-cache-table [other tasks here ...]
+
+Docstring:
+  Create the Django database cache table.
+
+Options:
+  none
+
+
+```
 
 
 ## `data.migrate`
@@ -161,6 +180,7 @@ Docstring:
 
 Options:
   -c, --check
+  -v, --verbose
 
 
 ```
@@ -182,6 +202,26 @@ Docstring:
 
 Options:
   -c, --check
+
+
+```
+
+
+## `dev.pre-commit`
+
+**Aliases:** `dev.pc`
+
+```text
+
+Usage: inv[oke] [--core-opts] dev.pre-commit [--options] [other tasks here ...]
+
+Docstring:
+  Command to run pre commit to make sure it passes the pipeline.
+
+  Also run all file generators so applicable generated code can be commited.
+
+Options:
+  -v, --verbose   Show stdout output from commands.
 
 
 ```
@@ -293,6 +333,22 @@ Docstring:
 
 Options:
   -c, --check
+
+
+```
+
+
+## `manage.create-cache-table`
+
+```text
+
+Usage: inv[oke] [--core-opts] manage.create-cache-table [other tasks here ...]
+
+Docstring:
+  Create the Django database cache table.
+
+Options:
+  none
 
 
 ```

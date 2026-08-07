@@ -7,7 +7,7 @@ import requests
 from github import Github
 from invoke import Context, task
 
-from .data import migrate
+from .data import create_cache_table, migrate
 from .utils import info
 
 
@@ -171,10 +171,14 @@ def update(c: Context, force=False):
     # Sync the local checkout exactly to the verified upstream commit.
     c.run("git fetch origin")
     c.run("git checkout master")
+
+    # TODO check that there can never be artifacts some other way.
+    # Warn if they are created. This is not a good approach.
     c.run("git reset --hard origin/master")
 
     c.run("uv sync")
     migrate(c)
+    create_cache_table(c)
     download_frontend_dist(owner, repo)
 
     info("Update complete")

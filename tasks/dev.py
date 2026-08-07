@@ -31,9 +31,6 @@ from .utils import (
     venv_run,
 )
 
-# TODO add comment for cache table setup
-# python manage.py createcachetable django_cache
-
 
 def isort_cmd(check_only: bool = False) -> str:
     args = [
@@ -94,12 +91,19 @@ def verify(c: Context, verbose: bool = False) -> None:
     aliases=["pc"],
     help={"verbose": "Show stdout output from commands."},
 )
-def pre_commit(c, verbose: str) -> None:
+def pre_commit(c, verbose: str = False) -> None:
     """
     Command to run pre commit to make sure it passes the pipeline.
+
+    Also run all file generators so applicable generated code can be commited.
     """
-    verify(c, verbose=verbose)
-    setup.build_front_end.body(c, check=True, verbose=verbose)
+
+    format(c, verbose)
+    generate_invoke_manual(c, verbose)
+    generate_api(c, verbose)
+    check(c, verbose)
+    test(c, verbose)
+    setup.build_front_end.body(c, verbose=verbose, check=True)
 
 
 @task(aliases=["ds"])
@@ -249,7 +253,7 @@ def api_changed(c: Context) -> bool:
 
 
 @task(aliases=["ga"])
-def generate_api(c: Context, check: bool = False) -> None:
+def generate_api(c: Context, check: bool = False, verbose: bool = False) -> None:
     """
     Generate the frontend API client from the Django OpenAPI schema.
 
@@ -266,11 +270,9 @@ def generate_api(c: Context, check: bool = False) -> None:
         return
 
     with c.cd(BASE_DIR / "backend"):
-        venv_run(
-            c,
-            f"python manage.py spectacular --file {schema_path}",
-        )
+        venv_run(c, f"python manage.py spectacular --file {schema_path}", verbose)
 
-    npm_run(c, "run api:generate")
-
+    # TODO find cleaner solution to "not verbose" and "quiet stdout". They
+    # are confusing. There should only be one.
+    npm_run(c, "run api:generate", quiet_stdout=not verbose)
     print_success("Frontend API generated")

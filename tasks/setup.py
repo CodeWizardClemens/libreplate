@@ -19,7 +19,7 @@ from .utils import copy_frontend_dist, django_run, info, npm_run, print_success
         "check": "Only build, do not copy frontend assets.",
     },
 )
-def build_front_end(c, check: bool = False, verbose: bool = False):
+def build_front_end(c: Context, check: bool = False, verbose: bool = False):
     """
     Build the React front end.
     """

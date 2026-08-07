@@ -3,6 +3,14 @@ from invoke import Context, task
 from .utils import django_run, info
 
 
+@task
+def create_cache_table(c: Context) -> None:
+    """
+    Create the Django database cache table.
+    """
+    django_run(c, "createcachetable django_cache")
+
+
 @task(aliases=["m"])
 def migrate(c: Context):
     """
