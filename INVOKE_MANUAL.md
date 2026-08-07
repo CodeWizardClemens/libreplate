@@ -48,6 +48,7 @@ invoke --help
 - [`manage.migrate`](#manage.migrate)
 - [`manage.update`](#manage.update)
 - [`setup.add-usda-api-key`](#setup.add-usda-api-key)
+- [`setup.build-front-end`](#setup.build-front-end)
 - [`setup.init`](#setup.init)
 - [`setup.migrate`](#setup.migrate)
 - [`setup.sync-default-data`](#setup.sync-default-data)
@@ -347,6 +348,25 @@ Docstring:
 
 Options:
   -k STRING, --key=STRING
+
+
+```
+
+
+## `setup.build-front-end`
+
+**Aliases:** `setup.bf`
+
+```text
+
+Usage: inv[oke] [--core-opts] setup.build-front-end [--options] [other tasks here ...]
+
+Docstring:
+  Build the React front end.
+
+Options:
+  -c, --check     Only build, do not copy frontend assets.
+  -v, --verbose   Show stdout output from commands.
 
 
 ```

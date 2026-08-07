@@ -9,16 +9,27 @@ import shlex
 from invoke import Context, task
 
 from .data import migrate, sync_default_data
-from .utils import copy_frontend_dist, django_run, info, npm_run
+from .utils import copy_frontend_dist, django_run, info, npm_run, print_success
 
 
-@task
-def build_front_end(c):
-    info("Building front end")
+@task(
+    aliases=["bf"],
+    help={
+        "verbose": "Show stdout output from commands.",
+        "check": "Only build, do not copy frontend assets.",
+    },
+)
+def build_front_end(c, check: bool = False, verbose: bool = False):
+    """
+    Build the React front end.
+    """
 
-    npm_run(c, "ci")
-    npm_run(c, "run build")
-    copy_frontend_dist()
+    npm_run(c, "ci", quiet_stdout=not verbose)
+    npm_run(c, "run build", quiet_stdout=not verbose)
+
+    if not check:
+        copy_frontend_dist()
+    print_success("Build front end succesfully")
 
 
 @task(aliases=["i"])

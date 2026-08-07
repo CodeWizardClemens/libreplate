@@ -17,6 +17,7 @@ from pathlib import Path
 
 from invoke import Context, task
 
+from . import setup
 from .docs import generate_invoke_manual
 from .utils import (
     BASE_DIR,
@@ -74,8 +75,6 @@ def ruff_check_cmd(fix: bool = False, exit_zero: bool = False) -> str:
     return " ".join(args)
 
 
-# TODO Verify should follow github workflow. now it doesn't. should generate artifacts.
-# workflow itself should call individual commands. Also download artifacts in the test!
 @task(
     aliases=["v"],
     help={"verbose": "Show stdout output from commands."},
@@ -89,6 +88,18 @@ def verify(c: Context, verbose: bool = False) -> None:
     generate_api(c, check=True)
     check(c, verbose)
     test(c, verbose)
+
+
+@task(
+    aliases=["pc"],
+    help={"verbose": "Show stdout output from commands."},
+)
+def pre_commit(c, verbose: str) -> None:
+    """
+    Command to run pre commit to make sure it passes the pipeline.
+    """
+    verify(c, verbose=verbose)
+    setup.build_front_end.body(c, check=True, verbose=verbose)
 
 
 @task(aliases=["ds"])

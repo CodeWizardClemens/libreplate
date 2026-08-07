@@ -265,11 +265,7 @@ export default function FoodEditPage() {
 
             <div className="col-6 col-md-3">
               <label className="form-label">Unit</label>
-              <input
-                className="form-control"
-                value={unitName}
-                readOnly
-              />
+              <input className="form-control" value={unitName} readOnly />
             </div>
 
             <div className="col-12 col-md-6">
@@ -311,10 +307,7 @@ export default function FoodEditPage() {
               key={nutrient.nutrient.id}
               className="d-flex align-items-center gap-2 mb-2"
             >
-              <div
-                className="text-truncate"
-                style={{ width: "160px" }}
-              >
+              <div className="text-truncate" style={{ width: "160px" }}>
                 {nutrient.nutrient.name}
               </div>
 

@@ -1,14 +1,7 @@
 import { useState } from "react";
 
+import type { Food } from "@/api/generated";
 import EditFoodAmountsModal from "@/components/ui/EditFoodAmountsModal";
-
-type Food = {
-  name: string;
-  nutrients?: {
-    amount?: number | null;
-    nutrient_name?: string | null;
-  }[];
-};
 
 type Props = {
   item: {
@@ -27,15 +20,16 @@ type Props = {
 
 export default function FoodItem({ item, onSave, onDelete }: Props) {
   const [isEditOpen, setIsEditOpen] = useState(false);
-
   const [isDeleting, setIsDeleting] = useState(false);
 
   async function handleDelete() {
     setIsDeleting(true);
 
-    await onDelete(item.id);
-
-    setIsDeleting(false);
+    try {
+      await onDelete(item.id);
+    } finally {
+      setIsDeleting(false);
+    }
   }
 
   return (
@@ -53,7 +47,7 @@ export default function FoodItem({ item, onSave, onDelete }: Props) {
         }}
         style={{ cursor: "pointer" }}
       >
-        <span>{item.food.name}</span>
+        {item.food.name}
 
         <span className="d-flex align-items-center gap-3 text-muted">
           <span>

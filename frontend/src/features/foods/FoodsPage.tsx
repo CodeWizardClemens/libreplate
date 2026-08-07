@@ -101,7 +101,6 @@ export default function FoodsPage() {
       brand: null,
       description: "",
       is_favorite: false,
-      usda_fdc_id: null,
       nutrients: [],
     });
   }
