@@ -34,27 +34,25 @@ export type Food = {
     readonly id: number;
     name: string;
     serving: number;
-    unit_id: number;
-    readonly unit_name: string;
+    unit: UnitBrief;
     barcode?: string | null;
     brand?: string | null;
     description?: string | null;
     is_favorite?: boolean;
-    usda_fdc_id?: number | null;
+    external_source?: string | null;
+    external_id?: string | null;
     readonly tags: Array<Tag>;
     nutrients?: Array<FoodNutrient>;
 };
 
-export type FoodNutrient = {
-    nutrient_id: number;
-    readonly nutrient_name: string;
-    readonly nutrient_unit: string;
-    amount: number;
+export type FoodIntegrationAdd = {
+    service: ServiceEnum;
+    external_id: string;
 };
 
-export type FoodTag = {
-    readonly id: number;
-    name: string;
+export type FoodNutrient = {
+    nutrient: NutrientBrief;
+    amount: number;
 };
 
 export type GroceryList = {
@@ -148,6 +146,18 @@ export type Nutrient = {
     readonly show_in_goal_edit: boolean | null;
 };
 
+/**
+ * A compact nutrient representation.
+ */
+export type NutrientBrief = {
+    readonly id: number;
+    name: string;
+    /**
+     * Display unit for this nutrient's amount (e.g. g, mg, kcal).
+     */
+    unit?: string | null;
+};
+
 export type PatchedDefaultMeal = {
     readonly id?: number;
     name?: string;
@@ -159,20 +169,15 @@ export type PatchedFood = {
     readonly id?: number;
     name?: string;
     serving?: number;
-    unit_id?: number;
-    readonly unit_name?: string;
+    unit?: UnitBrief;
     barcode?: string | null;
     brand?: string | null;
     description?: string | null;
     is_favorite?: boolean;
-    usda_fdc_id?: number | null;
+    external_source?: string | null;
+    external_id?: string | null;
     readonly tags?: Array<Tag>;
     nutrients?: Array<FoodNutrient>;
-};
-
-export type PatchedFoodTag = {
-    readonly id?: number;
-    name?: string;
 };
 
 export type PatchedGroceryListFood = {
@@ -238,6 +243,11 @@ export type PatchedRecipeTag = {
     name?: string;
 };
 
+export type PatchedTag = {
+    id?: number;
+    name?: string;
+};
+
 export type Recipe = {
     readonly id: number;
     name: string;
@@ -285,17 +295,15 @@ export type RecipeTag = {
     name: string;
 };
 
+/**
+ * * `Dirk` - Dirk
+ * * `USDA` - USDA
+ */
+export type ServiceEnum = 'Dirk' | 'USDA';
+
 export type Tag = {
     id: number;
     name: string;
-};
-
-export type UsdaFoodSearchResponse = {
-    foods: Array<Food>;
-};
-
-export type UsdaSave = {
-    fdc_id: number;
 };
 
 export type Unit = {
@@ -306,6 +314,15 @@ export type Unit = {
     visible_in_nutrients?: boolean;
     visible_in_body_metrics?: boolean;
     visible_in_foods?: boolean;
+};
+
+/**
+ * A compact unit representation.
+ */
+export type UnitBrief = {
+    readonly id: number;
+    name: string;
+    abbreviation?: string;
 };
 
 export type User = {
@@ -343,7 +360,8 @@ export type FoodWritable = {
     brand?: string | null;
     description?: string | null;
     is_favorite?: boolean;
-    usda_fdc_id?: number | null;
+    external_source?: string | null;
+    external_id?: string | null;
     tag_ids?: Array<number>;
     nutrients?: Array<FoodNutrientWritable>;
 };
@@ -351,10 +369,6 @@ export type FoodWritable = {
 export type FoodNutrientWritable = {
     nutrient_id: number;
     amount: number;
-};
-
-export type FoodTagWritable = {
-    name: string;
 };
 
 export type GroceryListWritable = {
@@ -395,6 +409,17 @@ export type MealFoodCreateWritable = {
     number_of_servings: number;
 };
 
+/**
+ * A compact nutrient representation.
+ */
+export type NutrientBriefWritable = {
+    name: string;
+    /**
+     * Display unit for this nutrient's amount (e.g. g, mg, kcal).
+     */
+    unit?: string | null;
+};
+
 export type PatchedDefaultMealWritable = {
     name?: string;
     description?: string;
@@ -409,13 +434,10 @@ export type PatchedFoodWritable = {
     brand?: string | null;
     description?: string | null;
     is_favorite?: boolean;
-    usda_fdc_id?: number | null;
+    external_source?: string | null;
+    external_id?: string | null;
     tag_ids?: Array<number>;
     nutrients?: Array<FoodNutrientWritable>;
-};
-
-export type PatchedFoodTagWritable = {
-    name?: string;
 };
 
 export type PatchedGroceryListFoodWritable = {
@@ -495,10 +517,6 @@ export type RecipeTagWritable = {
     name: string;
 };
 
-export type UsdaFoodSearchResponseWritable = {
-    foods: Array<FoodWritable>;
-};
-
 export type UnitWritable = {
     name: string;
     description?: string;
@@ -506,6 +524,14 @@ export type UnitWritable = {
     visible_in_nutrients?: boolean;
     visible_in_body_metrics?: boolean;
     visible_in_foods?: boolean;
+};
+
+/**
+ * A compact unit representation.
+ */
+export type UnitBriefWritable = {
+    name: string;
+    abbreviation?: string;
 };
 
 export type AccountsCsrfRetrieveData = {
@@ -595,6 +621,9 @@ export type FoodsCreateResponse = FoodsCreateResponses[keyof FoodsCreateResponse
 export type FoodsDestroyData = {
     body?: never;
     path: {
+        /**
+         * A unique integer value identifying this food.
+         */
         id: number;
     };
     query?: never;
@@ -613,6 +642,9 @@ export type FoodsDestroyResponse = FoodsDestroyResponses[keyof FoodsDestroyRespo
 export type FoodsRetrieveData = {
     body?: never;
     path: {
+        /**
+         * A unique integer value identifying this food.
+         */
         id: number;
     };
     query?: never;
@@ -628,6 +660,9 @@ export type FoodsRetrieveResponse = FoodsRetrieveResponses[keyof FoodsRetrieveRe
 export type FoodsPartialUpdateData = {
     body?: PatchedFoodWritable;
     path: {
+        /**
+         * A unique integer value identifying this food.
+         */
         id: number;
     };
     query?: never;
@@ -643,6 +678,9 @@ export type FoodsPartialUpdateResponse = FoodsPartialUpdateResponses[keyof Foods
 export type FoodsUpdateData = {
     body: FoodWritable;
     path: {
+        /**
+         * A unique integer value identifying this food.
+         */
         id: number;
     };
     query?: never;
@@ -663,20 +701,20 @@ export type FoodsTagsListData = {
 };
 
 export type FoodsTagsListResponses = {
-    200: Array<FoodTag>;
+    200: Array<Tag>;
 };
 
 export type FoodsTagsListResponse = FoodsTagsListResponses[keyof FoodsTagsListResponses];
 
 export type FoodsTagsCreateData = {
-    body: FoodTagWritable;
+    body: Tag;
     path?: never;
     query?: never;
     url: '/api/foods/tags/';
 };
 
 export type FoodsTagsCreateResponses = {
-    201: FoodTag;
+    201: Tag;
 };
 
 export type FoodsTagsCreateResponse = FoodsTagsCreateResponses[keyof FoodsTagsCreateResponses];
@@ -684,6 +722,9 @@ export type FoodsTagsCreateResponse = FoodsTagsCreateResponses[keyof FoodsTagsCr
 export type FoodsTagsDestroyData = {
     body?: never;
     path: {
+        /**
+         * A unique integer value identifying this food tag.
+         */
         id: number;
     };
     query?: never;
@@ -699,9 +740,30 @@ export type FoodsTagsDestroyResponses = {
 
 export type FoodsTagsDestroyResponse = FoodsTagsDestroyResponses[keyof FoodsTagsDestroyResponses];
 
-export type FoodsTagsPartialUpdateData = {
-    body?: PatchedFoodTagWritable;
+export type FoodsTagsRetrieveData = {
+    body?: never;
     path: {
+        /**
+         * A unique integer value identifying this food tag.
+         */
+        id: number;
+    };
+    query?: never;
+    url: '/api/foods/tags/{id}/';
+};
+
+export type FoodsTagsRetrieveResponses = {
+    200: Tag;
+};
+
+export type FoodsTagsRetrieveResponse = FoodsTagsRetrieveResponses[keyof FoodsTagsRetrieveResponses];
+
+export type FoodsTagsPartialUpdateData = {
+    body?: PatchedTag;
+    path: {
+        /**
+         * A unique integer value identifying this food tag.
+         */
         id: number;
     };
     query?: never;
@@ -709,14 +771,17 @@ export type FoodsTagsPartialUpdateData = {
 };
 
 export type FoodsTagsPartialUpdateResponses = {
-    200: FoodTag;
+    200: Tag;
 };
 
 export type FoodsTagsPartialUpdateResponse = FoodsTagsPartialUpdateResponses[keyof FoodsTagsPartialUpdateResponses];
 
 export type FoodsTagsUpdateData = {
-    body: FoodTagWritable;
+    body: Tag;
     path: {
+        /**
+         * A unique integer value identifying this food tag.
+         */
         id: number;
     };
     query?: never;
@@ -724,7 +789,7 @@ export type FoodsTagsUpdateData = {
 };
 
 export type FoodsTagsUpdateResponses = {
-    200: FoodTag;
+    200: Tag;
 };
 
 export type FoodsTagsUpdateResponse = FoodsTagsUpdateResponses[keyof FoodsTagsUpdateResponses];
@@ -869,51 +934,44 @@ export type GroceriesRetrieveResponses = {
 
 export type GroceriesRetrieveResponse = GroceriesRetrieveResponses[keyof GroceriesRetrieveResponses];
 
-export type IntegrationsUsdaSaveCreateData = {
-    body: UsdaSave;
+export type IntegrationsAddCreateData = {
+    body: FoodIntegrationAdd;
     path?: never;
     query?: never;
-    url: '/api/integrations/usda/save/';
+    url: '/api/integrations/add/';
 };
 
-export type IntegrationsUsdaSaveCreateErrors = {
-    /**
-     * Invalid FDC ID or USDA error.
-     */
-    400: unknown;
+export type IntegrationsAddCreateResponses = {
+    200: Food;
 };
 
-export type IntegrationsUsdaSaveCreateResponses = {
-    /**
-     * Food successfully saved.
-     */
-    201: unknown;
-};
+export type IntegrationsAddCreateResponse = IntegrationsAddCreateResponses[keyof IntegrationsAddCreateResponses];
 
-export type IntegrationsUsdaSearchRetrieveData = {
+export type IntegrationsSearchListData = {
     body?: never;
     path?: never;
     query: {
         /**
-         * Search term for USDA foods.
+         * Maximum number of results to return for all integrations combined.
          */
-        term: string;
+        limit?: number;
+        /**
+         * Search term for the food integration providers.
+         */
+        query: string;
+        /**
+         * Comma separated integration services to search. Available: Dirk, USDA.
+         */
+        services: string;
     };
-    url: '/api/integrations/usda/search/';
+    url: '/api/integrations/search/';
 };
 
-export type IntegrationsUsdaSearchRetrieveErrors = {
-    /**
-     * Invalid search parameters or USDA error.
-     */
-    400: unknown;
+export type IntegrationsSearchListResponses = {
+    200: Array<Food>;
 };
 
-export type IntegrationsUsdaSearchRetrieveResponses = {
-    200: UsdaFoodSearchResponse;
-};
-
-export type IntegrationsUsdaSearchRetrieveResponse = IntegrationsUsdaSearchRetrieveResponses[keyof IntegrationsUsdaSearchRetrieveResponses];
+export type IntegrationsSearchListResponse = IntegrationsSearchListResponses[keyof IntegrationsSearchListResponses];
 
 export type MealsListData = {
     body?: never;

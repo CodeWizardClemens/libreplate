@@ -1,102 +1,81 @@
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from foods.serializers import FoodSerializer
-from integrations import usda_client
-from integrations.usda_client import USDAError
-from rest_framework import status
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
 
-from .serializers import (
-    USDAFoodSearchResponseSerializer,
-    USDAFoodSearchSerializer,
-    USDASaveSerializer,
-)
+from .serializers import FoodIntegrationAddSerializer
+from .service import FoodIntegrationAPI
+
+FOOD_SEARCH_PARAMETERS = [
+    OpenApiParameter(
+        "query",
+        str,
+        required=True,
+        description="Search term for the food integration providers.",
+    ),
+    # TODO Hardcoded, change later.
+    OpenApiParameter(
+        "services",
+        str,
+        required=True,
+        description="Comma separated integration services to search. Available: Dirk, USDA.",
+    ),
+    OpenApiParameter(
+        "limit",
+        int,
+        description="Maximum number of results to return for all integrations combined.",
+    ),
+]
 
 
-class USDASearchAPIView(APIView):
+class FoodIntegrationViewSet(ViewSet):
     authentication_classes = [SessionAuthentication]
-
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                name="term",
-                type=str,
-                location=OpenApiParameter.QUERY,
-                required=True,
-                description="Search term for USDA foods.",
-            ),
-        ],
-        responses={
-            200: USDAFoodSearchResponseSerializer,
-            400: {"description": "Invalid search parameters or USDA error."},
-        },
+        parameters=FOOD_SEARCH_PARAMETERS,
+        responses=FoodSerializer(many=True),
     )
-    def get(self, request):
+    @action(detail=False, methods=["get"])
+    def search(self, request):
+        params = request.query_params
 
-        serializer = USDAFoodSearchSerializer(
-            data=request.query_params,
+        foods = FoodIntegrationAPI().search(
+            query=params.get("query", ""),
+            services=params.get("services", "").split(","),
+            limit=int(params.get("limit", 20)),
+            user=request.user,
         )
-
-        serializer.is_valid(raise_exception=True)
-
-        try:
-            foods = usda_client.search(
-                **serializer.validated_data,
-            )
-
-        except USDAError as exc:
-            return Response(
-                {
-                    "error": str(exc),
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
 
         return Response(
-            {
-                "foods": FoodSerializer(
-                    foods,
-                    many=True,
-                ).data,
-            }
+            FoodSerializer(
+                foods,
+                many=True,
+                context={"request": request},
+            ).data
         )
-
-
-class USDASaveAPIView(APIView):
-    authentication_classes = [SessionAuthentication]
-
-    permission_classes = [IsAuthenticated]
 
     @extend_schema(
-        request=USDASaveSerializer,
-        responses={
-            201: {"description": "Food successfully saved."},
-            400: {"description": "Invalid FDC ID or USDA error."},
-        },
+        request=FoodIntegrationAddSerializer,
+        responses=FoodSerializer,
     )
-    def post(self, request):
-
-        serializer = USDASaveSerializer(data=request.data)
-
+    @action(detail=False, methods=["post"])
+    def add(self, request):
+        serializer = FoodIntegrationAddSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        try:
-            food = usda_client.save_by_id(
-                serializer.validated_data["fdc_id"],
-                user=request.user,
-            )
-
-        except USDAError as exc:
-            return Response(
-                {"error": str(exc)},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        food = FoodIntegrationAPI().add(
+            service=serializer.validated_data["service"],
+            external_id=serializer.validated_data["external_id"],
+            user=request.user,
+        )
 
         return Response(
-            FoodSerializer(food).data,
-            status=status.HTTP_201_CREATED,
+            FoodSerializer(
+                food,
+                context={"request": request},
+            ).data
         )

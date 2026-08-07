@@ -1,4 +1,4 @@
-import type { ReactNode, CSSProperties } from "react";
+import type { ReactNode } from "react";
 
 interface ModalProps {
   isOpen: boolean;
@@ -6,7 +6,6 @@ interface ModalProps {
   onClose: () => void;
   children: ReactNode;
   footer?: ReactNode;
-  width?: number | string;
 }
 
 export default function Modal({
@@ -15,39 +14,51 @@ export default function Modal({
   onClose,
   children,
   footer,
-  width = 400,
 }: ModalProps) {
   if (!isOpen) {
     return null;
   }
 
   return (
-    <div
-      onClick={onClose}
-      className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-      style={{
-        background: "rgba(0,0,0,0.4)",
-        zIndex: 1050,
-      }}
-    >
+    <>
+      <style>
+        {`
+          .modal-responsive {
+            width: 400px;
+          }
+
+          @media (min-width: 700px) {
+            .modal-responsive {
+              width: 600px;
+            }
+          }
+        `}
+      </style>
+
       <div
-        onClick={(e) => e.stopPropagation()}
-        className="bg-white rounded-3 shadow-lg d-flex flex-column p-4"
-        style={
-          {
-            width,
-            maxHeight: "80vh",
-          } satisfies CSSProperties
-        }
+        onClick={onClose}
+        className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+        style={{
+          background: "rgba(0, 0, 0, 0.4)",
+          zIndex: 1050,
+        }}
       >
-        {title && <h2 className="mb-3">{title}</h2>}
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="modal-responsive bg-white rounded-3 shadow-lg d-flex flex-column p-4"
+          style={{
+            maxHeight: "80vh",
+          }}
+        >
+          {title}
 
-        <div className="flex-grow-1 overflow-auto" style={{ minHeight: 0 }}>
-          {children}
+          <div className="flex-grow-1 overflow-auto" style={{ minHeight: 0 }}>
+            {children}
+          </div>
+
+          {footer && <div className="mt-3">{footer}</div>}
         </div>
-
-        {footer && <div className="mt-3">{footer}</div>}
       </div>
-    </div>
+    </>
   );
 }

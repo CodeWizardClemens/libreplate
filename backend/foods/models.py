@@ -3,11 +3,16 @@ from django.db import models
 
 
 class Food(models.Model):
+    # TODO add public ID for serializing.
+
     name = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="foods")
+
+    # TODO enforce no negative numbers. can be 0.
     serving = models.FloatField()
     unit = models.ForeignKey(
-        "units.Unit", on_delete=models.CASCADE, null=True, blank=True
+        "units.Unit",
+        on_delete=models.CASCADE,
     )
 
     barcode = models.CharField(max_length=50, blank=True, null=True)
@@ -25,7 +30,15 @@ class Food(models.Model):
     last_used_at = models.DateTimeField(null=True, blank=True, db_index=True)
     is_favorite = models.BooleanField(default=False)
 
-    usda_fdc_id = models.PositiveIntegerField(
+    external_source = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+
+    external_id = models.CharField(
+        max_length=100,
         null=True,
         blank=True,
         db_index=True,

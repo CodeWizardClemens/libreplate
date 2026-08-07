@@ -82,7 +82,8 @@ export default function FoodEditPage() {
   const [brand, setBrand] = useState("");
   const [description, setDescription] = useState("");
   const [serving, setServing] = useState<number | "">("");
-  const [unitID, setUnit] = useState<number>(0);
+  const [unitID, setUnitID] = useState(0);
+  const [unitName, setUnitName] = useState("");
   const [barcode, setBarcode] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
   const [nutrients, setNutrients] = useState<FoodNutrient[]>([]);
@@ -98,7 +99,8 @@ export default function FoodEditPage() {
     setBrand(food.brand ?? "");
     setDescription(food.description ?? "");
     setServing(food.serving ?? "");
-    setUnit(food.unit_id ?? 0);
+    setUnitID(food.unit.id);
+    setUnitName(food.unit.name);
     setBarcode(food.barcode ?? "");
     setIsFavorite(food.is_favorite ?? false);
   }, [foodQuery.data]);
@@ -114,19 +116,21 @@ export default function FoodEditPage() {
     const relevantNutrients = availableNutrients.filter(
       (nutrient: Nutrient) =>
         nutrient.show_in_food_edit ||
-        food.nutrients?.some((n) => n.nutrient_id === nutrient.id),
+        food.nutrients?.some((n) => n.nutrient.id === nutrient.id),
     );
 
     const merged: FoodNutrient[] = relevantNutrients.map(
       (nutrient: Nutrient) => {
         const existing = food.nutrients?.find(
-          (n) => n.nutrient_id === nutrient.id,
+          (n) => n.nutrient.id === nutrient.id,
         );
 
         return {
-          nutrient_id: nutrient.id,
-          nutrient_name: nutrient.name,
-          nutrient_unit: nutrient.unit ?? "",
+          nutrient: {
+            id: nutrient.id,
+            name: nutrient.name,
+            unit: nutrient.unit,
+          },
           amount: existing?.amount ?? 0,
         };
       },
@@ -136,11 +140,11 @@ export default function FoodEditPage() {
   }, [foodQuery.data, nutrientsQuery.data]);
 
   if (foodQuery.isPending || nutrientsQuery.isPending) {
-    return <div className="container py-3">Loading...</div>;
+    return <div>Loading...</div>;
   }
 
   if (foodQuery.isError || nutrientsQuery.isError) {
-    return <div className="container py-3">Failed to load food.</div>;
+    return <div>Failed to load food.</div>;
   }
 
   function updateNutrientAmount(index: number, amount: number) {
@@ -169,7 +173,7 @@ export default function FoodEditPage() {
           barcode: barcode || null,
           is_favorite: isFavorite,
           nutrients: nutrients.map((n) => ({
-            nutrient_id: n.nutrient_id,
+            nutrient_id: n.nutrient.id,
             amount: Number(n.amount),
           })),
         },
@@ -193,14 +197,13 @@ export default function FoodEditPage() {
   }
 
   return (
-    <div className="container py-3">
-      <div className="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <div className="d-flex justify-content-between mb-3">
         <button
           type="button"
           className="btn btn-outline-secondary"
           onClick={() => navigate("/foods")}
         >
-          <i className="bi bi-arrow-left me-1" />
           Back
         </button>
 
@@ -264,8 +267,8 @@ export default function FoodEditPage() {
               <label className="form-label">Unit</label>
               <input
                 className="form-control"
-                value={unitID}
-                onChange={(e) => setUnit(Number(e.target.value))}
+                value={unitName}
+                readOnly
               />
             </div>
 
@@ -305,31 +308,27 @@ export default function FoodEditPage() {
 
           {nutrients.map((nutrient, index) => (
             <div
-              key={nutrient.nutrient_id}
+              key={nutrient.nutrient.id}
               className="d-flex align-items-center gap-2 mb-2"
             >
               <div
                 className="text-truncate"
-                style={{
-                  width: "160px",
-                }}
+                style={{ width: "160px" }}
               >
-                {nutrient.nutrient_name}
+                {nutrient.nutrient.name}
               </div>
 
               <input
                 type="number"
                 className="form-control form-control-sm text-end"
-                style={{
-                  width: "90px",
-                }}
+                style={{ width: "90px" }}
                 value={nutrient.amount}
                 onChange={(e) =>
                   updateNutrientAmount(index, Number(e.target.value))
                 }
               />
 
-              <span className="text-muted">{nutrient.nutrient_unit}</span>
+              <span className="text-muted">{nutrient.nutrient.unit}</span>
             </div>
           ))}
 

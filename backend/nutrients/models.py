@@ -58,6 +58,7 @@ class Nutrient(models.Model):
         blank=True,
     )
 
+    # TODO make non specific later on. (external ID)
     usda_nutrient_number = models.IntegerField(
         blank=True,
         null=True,

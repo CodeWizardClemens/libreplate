@@ -1,14 +1,14 @@
-from django.urls import path
+from rest_framework.routers import DefaultRouter
 
-from .api import USDASaveAPIView, USDASearchAPIView
+from .api import FoodIntegrationViewSet
 
-urlpatterns = [
-    path(
-        "usda/search/",
-        USDASearchAPIView.as_view(),
-    ),
-    path(
-        "usda/save/",
-        USDASaveAPIView.as_view(),
-    ),
-]
+router = DefaultRouter()
+
+router.register(
+    prefix="",
+    viewset=FoodIntegrationViewSet,
+    basename="integration",
+)
+
+
+urlpatterns = router.urls

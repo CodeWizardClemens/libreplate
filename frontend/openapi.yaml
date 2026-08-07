@@ -128,6 +128,7 @@ paths:
         name: id
         schema:
           type: integer
+        description: A unique integer value identifying this food.
         required: true
       tags:
       - foods
@@ -147,6 +148,7 @@ paths:
         name: id
         schema:
           type: integer
+        description: A unique integer value identifying this food.
         required: true
       tags:
       - foods
@@ -178,6 +180,7 @@ paths:
         name: id
         schema:
           type: integer
+        description: A unique integer value identifying this food.
         required: true
       tags:
       - foods
@@ -208,6 +211,7 @@ paths:
         name: id
         schema:
           type: integer
+        description: A unique integer value identifying this food.
         required: true
       tags:
       - foods
@@ -230,7 +234,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/FoodTag'
+                  $ref: '#/components/schemas/Tag'
           description: ''
     post:
       operationId: foods_tags_create
@@ -240,13 +244,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FoodTag'
+              $ref: '#/components/schemas/Tag'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/FoodTag'
+              $ref: '#/components/schemas/Tag'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/FoodTag'
+              $ref: '#/components/schemas/Tag'
         required: true
       security:
       - cookieAuth: []
@@ -255,9 +259,29 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FoodTag'
+                $ref: '#/components/schemas/Tag'
           description: ''
   /api/foods/tags/{id}/:
+    get:
+      operationId: foods_tags_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this food tag.
+        required: true
+      tags:
+      - foods
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+          description: ''
     put:
       operationId: foods_tags_update
       parameters:
@@ -265,6 +289,7 @@ paths:
         name: id
         schema:
           type: integer
+        description: A unique integer value identifying this food tag.
         required: true
       tags:
       - foods
@@ -272,13 +297,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FoodTag'
+              $ref: '#/components/schemas/Tag'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/FoodTag'
+              $ref: '#/components/schemas/Tag'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/FoodTag'
+              $ref: '#/components/schemas/Tag'
         required: true
       security:
       - cookieAuth: []
@@ -287,7 +312,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FoodTag'
+                $ref: '#/components/schemas/Tag'
           description: ''
     patch:
       operationId: foods_tags_partial_update
@@ -296,6 +321,7 @@ paths:
         name: id
         schema:
           type: integer
+        description: A unique integer value identifying this food tag.
         required: true
       tags:
       - foods
@@ -303,13 +329,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedFoodTag'
+              $ref: '#/components/schemas/PatchedTag'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedFoodTag'
+              $ref: '#/components/schemas/PatchedTag'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedFoodTag'
+              $ref: '#/components/schemas/PatchedTag'
       security:
       - cookieAuth: []
       responses:
@@ -317,7 +343,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FoodTag'
+                $ref: '#/components/schemas/Tag'
           description: ''
     delete:
       operationId: foods_tags_destroy
@@ -326,6 +352,7 @@ paths:
         name: id
         schema:
           type: integer
+        description: A unique integer value identifying this food tag.
         required: true
       tags:
       - foods
@@ -556,47 +583,53 @@ paths:
       responses:
         '204':
           description: No response body
-  /api/integrations/usda/save/:
+  /api/integrations/add/:
     post:
-      operationId: integrations_usda_save_create
+      operationId: integrations_add_create
       tags:
       - integrations
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/USDASave'
+              $ref: '#/components/schemas/FoodIntegrationAdd'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/USDASave'
+              $ref: '#/components/schemas/FoodIntegrationAdd'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/USDASave'
+              $ref: '#/components/schemas/FoodIntegrationAdd'
         required: true
       security:
       - cookieAuth: []
       responses:
-        '201':
+        '200':
           content:
             application/json:
               schema:
-                description: Food successfully saved.
+                $ref: '#/components/schemas/Food'
           description: ''
-        '400':
-          content:
-            application/json:
-              schema:
-                description: Invalid FDC ID or USDA error.
-          description: ''
-  /api/integrations/usda/search/:
+  /api/integrations/search/:
     get:
-      operationId: integrations_usda_search_retrieve
+      operationId: integrations_search_list
       parameters:
       - in: query
-        name: term
+        name: limit
+        schema:
+          type: integer
+        description: Maximum number of results to return for all integrations combined.
+      - in: query
+        name: query
         schema:
           type: string
-        description: Search term for USDA foods.
+        description: Search term for the food integration providers.
+        required: true
+      - in: query
+        name: services
+        schema:
+          type: string
+        description: 'Comma separated integration services to search. Available: Dirk,
+          USDA.'
         required: true
       tags:
       - integrations
@@ -607,13 +640,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/USDAFoodSearchResponse'
-          description: ''
-        '400':
-          content:
-            application/json:
-              schema:
-                description: Invalid search parameters or USDA error.
+                type: array
+                items:
+                  $ref: '#/components/schemas/Food'
           description: ''
   /api/meals/:
     get:
@@ -1870,11 +1899,13 @@ components:
         serving:
           type: number
           format: double
+        unit:
+          allOf:
+          - $ref: '#/components/schemas/UnitBrief'
+          readOnly: true
         unit_id:
           type: integer
-        unit_name:
-          type: string
-          readOnly: true
+          writeOnly: true
         barcode:
           type: string
           nullable: true
@@ -1888,10 +1919,11 @@ components:
           nullable: true
         is_favorite:
           type: boolean
-        usda_fdc_id:
-          type: integer
-          maximum: 2147483647
-          minimum: 0
+        external_source:
+          type: string
+          nullable: true
+        external_id:
+          type: string
           nullable: true
         tags:
           type: array
@@ -1913,39 +1945,35 @@ components:
       - name
       - serving
       - tags
+      - unit
       - unit_id
-      - unit_name
+    FoodIntegrationAdd:
+      type: object
+      properties:
+        service:
+          $ref: '#/components/schemas/ServiceEnum'
+        external_id:
+          type: string
+      required:
+      - external_id
+      - service
     FoodNutrient:
       type: object
       properties:
+        nutrient:
+          allOf:
+          - $ref: '#/components/schemas/NutrientBrief'
+          readOnly: true
         nutrient_id:
           type: integer
-        nutrient_name:
-          type: string
-          readOnly: true
-        nutrient_unit:
-          type: string
-          readOnly: true
+          writeOnly: true
         amount:
           type: number
           format: double
       required:
       - amount
+      - nutrient
       - nutrient_id
-      - nutrient_name
-      - nutrient_unit
-    FoodTag:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        name:
-          type: string
-          maxLength: 50
-      required:
-      - id
-      - name
     GroceryList:
       type: object
       properties:
@@ -2171,6 +2199,24 @@ components:
       - show_in_recipes
       - unit
       - usda_nutrient_number
+    NutrientBrief:
+      type: object
+      description: A compact nutrient representation.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        unit:
+          type: string
+          nullable: true
+          description: Display unit for this nutrient's amount (e.g. g, mg, kcal).
+          maxLength: 20
+      required:
+      - id
+      - name
     PatchedDefaultMeal:
       type: object
       properties:
@@ -2198,11 +2244,13 @@ components:
         serving:
           type: number
           format: double
+        unit:
+          allOf:
+          - $ref: '#/components/schemas/UnitBrief'
+          readOnly: true
         unit_id:
           type: integer
-        unit_name:
-          type: string
-          readOnly: true
+          writeOnly: true
         barcode:
           type: string
           nullable: true
@@ -2216,10 +2264,11 @@ components:
           nullable: true
         is_favorite:
           type: boolean
-        usda_fdc_id:
-          type: integer
-          maximum: 2147483647
-          minimum: 0
+        external_source:
+          type: string
+          nullable: true
+        external_id:
+          type: string
           nullable: true
         tags:
           type: array
@@ -2236,15 +2285,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FoodNutrient'
-    PatchedFoodTag:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        name:
-          type: string
-          maxLength: 50
     PatchedGroceryListFood:
       type: object
       properties:
@@ -2403,6 +2443,13 @@ components:
         name:
           type: string
           maxLength: 50
+    PatchedTag:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
     Recipe:
       type: object
       properties:
@@ -2541,6 +2588,14 @@ components:
       required:
       - id
       - name
+    ServiceEnum:
+      enum:
+      - Dirk
+      - USDA
+      type: string
+      description: |-
+        * `Dirk` - Dirk
+        * `USDA` - USDA
     Tag:
       type: object
       properties:
@@ -2551,23 +2606,6 @@ components:
       required:
       - id
       - name
-    USDAFoodSearchResponse:
-      type: object
-      properties:
-        foods:
-          type: array
-          items:
-            $ref: '#/components/schemas/Food'
-      required:
-      - foods
-    USDASave:
-      type: object
-      properties:
-        fdc_id:
-          type: integer
-          minimum: 1
-      required:
-      - fdc_id
     Unit:
       type: object
       properties:
@@ -2588,6 +2626,22 @@ components:
           type: boolean
         visible_in_foods:
           type: boolean
+      required:
+      - id
+      - name
+    UnitBrief:
+      type: object
+      description: A compact unit representation.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
+        abbreviation:
+          type: string
+          maxLength: 15
       required:
       - id
       - name

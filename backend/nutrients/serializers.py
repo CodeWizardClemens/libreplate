@@ -3,6 +3,19 @@ from rest_framework import serializers
 from .models import Nutrient
 
 
+class NutrientBriefSerializer(serializers.ModelSerializer):
+    """
+    A compact nutrient representation.
+    """
+
+    class Meta:
+        model = Nutrient
+
+        # TODO Unit should be a nested nutrient serializer, not a string.
+        # Or at LEAST, it should be flattened.
+        fields = ["id", "name", "unit"]
+
+
 class NutrientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Nutrient

@@ -19,7 +19,7 @@ export default function FoodCard({ food, onDelete, onToggleFavorite }: Props) {
   }
 
   const energy = food.nutrients?.find(
-    (nutrient) => nutrient.nutrient_name.toLowerCase() === "energy",
+    (nutrient) => nutrient.nutrient.name.toLowerCase() === "energy",
   );
 
   return (
@@ -41,7 +41,7 @@ export default function FoodCard({ food, onDelete, onToggleFavorite }: Props) {
             {energy?.amount ?? 0}
             {" kcals"}
             <i className="bi bi-people ms-2 me-1"></i>
-            {food.serving} {food.unit_name}
+            {food.serving} {food.unit.name}
           </>
         )
       }

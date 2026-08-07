@@ -30,6 +30,9 @@ from .utils import (
     venv_run,
 )
 
+# TODO add comment for cache table setup
+# python manage.py createcachetable django_cache
+
 
 def isort_cmd(check_only: bool = False) -> str:
     args = [

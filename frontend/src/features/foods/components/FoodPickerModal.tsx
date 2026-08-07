@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 
 import type { Food } from "@/api/generated";
 import {
+  integrationsAddCreate,
+  integrationsSearchList,
   foodsList,
-  integrationsUsdaSearchRetrieve,
-  integrationsUsdaSaveCreate,
 } from "@/api/generated";
 import Modal from "@/components/ui/Modal";
 
@@ -14,22 +14,26 @@ interface FoodPickerModalProps {
   onSelect: (foods: Food[]) => void;
 }
 
+interface SearchFood extends Food {
+  selectionId: string;
+}
+
+const RESULTS_HEIGHT = 360;
+
 function getCalories(food: Food): number | null {
   const nutrients = food.nutrients ?? [];
 
   const byUnit = nutrients.find(
-    (n) => n.nutrient_unit?.toLowerCase() === "kcal",
+    (n) => n.nutrient.unit?.toLowerCase() === "kcal",
   );
 
   if (byUnit) {
     return byUnit.amount;
   }
 
-  const byName = nutrients.find(
-    (n) => n.nutrient_name && /energy|calorie/i.test(n.nutrient_name),
-  );
+  const byName = nutrients.find((n) => /energy|calorie/i.test(n.nutrient.name));
 
-  return byName ? byName.amount : null;
+  return byName?.amount ?? null;
 }
 
 export default function FoodPickerModal({
@@ -40,19 +44,22 @@ export default function FoodPickerModal({
   const [search, setSearch] = useState("");
 
   const [localFoods, setLocalFoods] = useState<Food[]>([]);
-  const [usdaFoods, setUsdaFoods] = useState<any[]>([]);
+  const [searchFoods, setSearchFoods] = useState<SearchFood[]>([]);
 
   const [selectedLocalIds, setSelectedLocalIds] = useState<Set<number>>(
     new Set(),
   );
-  const [selectedUsdaIds, setSelectedUsdaIds] = useState<Set<string>>(
+
+  const [selectedSearchIds, setSelectedSearchIds] = useState<Set<string>>(
     new Set(),
   );
 
-  const [isUsdaSearch, setIsUsdaSearch] = useState(false);
+  const [isSearchResult, setIsSearchResult] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
@@ -65,6 +72,7 @@ export default function FoodPickerModal({
 
       try {
         const response = await foodsList();
+
         setLocalFoods(response.data ?? []);
       } catch {
         setIsError(true);
@@ -80,49 +88,46 @@ export default function FoodPickerModal({
     food.name.toLowerCase().includes(search.toLowerCase()),
   );
 
-  async function handleSearchKeyDown(
-    event: React.KeyboardEvent<HTMLInputElement>,
-  ) {
-    if (event.key !== "Enter") {
-      setIsUsdaSearch(false);
-      return;
-    }
-
+  async function searchFoodsExternal() {
     if (!search.trim()) {
       return;
     }
 
     setIsLoading(true);
     setIsError(false);
-    setIsUsdaSearch(true);
+    setIsSearchResult(true);
 
     try {
-      const response = await integrationsUsdaSearchRetrieve({
+      const response = await integrationsSearchList({
         query: {
-          term: search.trim(),
+          query: search.trim(),
+          services: "Dirk",
+          limit: 20,
         },
       });
 
-      setUsdaFoods(
-        (response.data?.foods ?? []).map((food: any) => ({
+      setSearchFoods(
+        (response.data ?? []).map((food: Food) => ({
           ...food,
           selectionId: crypto.randomUUID(),
-        })),
+        })) as SearchFood[],
       );
 
       setSelectedLocalIds(new Set());
-      setSelectedUsdaIds(new Set());
-    } catch {
+      setSelectedSearchIds(new Set());
+    } catch (error) {
+      console.error(error);
+
+      setSearchFoods([]);
       setIsError(true);
-      setUsdaFoods([]);
     } finally {
       setIsLoading(false);
     }
   }
 
   function toggleLocalFood(id: number) {
-    setSelectedLocalIds((prev) => {
-      const next = new Set(prev);
+    setSelectedLocalIds((current) => {
+      const next = new Set(current);
 
       if (next.has(id)) {
         next.delete(id);
@@ -134,9 +139,9 @@ export default function FoodPickerModal({
     });
   }
 
-  function toggleUsdaFood(id: string) {
-    setSelectedUsdaIds((prev) => {
-      const next = new Set(prev);
+  function toggleSearchFood(id: string) {
+    setSelectedSearchIds((current) => {
+      const next = new Set(current);
 
       if (next.has(id)) {
         next.delete(id);
@@ -146,28 +151,14 @@ export default function FoodPickerModal({
 
       return next;
     });
-  }
-
-  async function saveUsdaFood(usdaFood: any): Promise<Food | null> {
-    try {
-      const response = await integrationsUsdaSaveCreate({
-        body: {
-          fdc_id: usdaFood.usda_fdc_id,
-        },
-      });
-
-      return response.data ? (response.data as Food) : null;
-    } catch {
-      return null;
-    }
   }
 
   function reset() {
     setSearch("");
+    setSearchFoods([]);
     setSelectedLocalIds(new Set());
-    setSelectedUsdaIds(new Set());
-    setUsdaFoods([]);
-    setIsUsdaSearch(false);
+    setSelectedSearchIds(new Set());
+    setIsSearchResult(false);
   }
 
   function handleClose() {
@@ -176,36 +167,64 @@ export default function FoodPickerModal({
   }
 
   async function handleConfirm() {
-    const selectedFoods: Food[] = [];
-
-    if (isUsdaSearch) {
-      for (const food of usdaFoods) {
-        if (!selectedUsdaIds.has(food.selectionId)) {
-          continue;
-        }
-
-        const savedFood = await saveUsdaFood(food);
-
-        if (savedFood) {
-          selectedFoods.push(savedFood);
-        }
-      }
-    } else {
-      selectedFoods.push(
-        ...localFoods.filter((food) => selectedLocalIds.has(food.id)),
+    if (isSearchResult) {
+      const selected = searchFoods.filter((food) =>
+        selectedSearchIds.has(food.selectionId),
       );
-    }
 
-    if (selectedFoods.length === 0) {
+      if (!selected.length) {
+        return;
+      }
+
+      setIsSubmitting(true);
+      setIsError(false);
+
+      try {
+        const createdFoods = await Promise.all(
+          selected.map(async (food) => {
+            if (!food.external_source || !food.external_id) {
+              throw new Error("Missing integration details for food");
+            }
+
+            const response = await integrationsAddCreate({
+              body: {
+                service: food.external_source as "Dirk" | "USDA",
+                external_id: food.external_id,
+              },
+            });
+
+            if (!response.data) {
+              throw new Error("Failed to add food");
+            }
+
+            return response.data;
+          }),
+        );
+
+        onSelect(createdFoods);
+        reset();
+      } catch (error) {
+        console.error(error);
+        setIsError(true);
+      } finally {
+        setIsSubmitting(false);
+      }
+
       return;
     }
 
-    onSelect(selectedFoods);
+    const foods = localFoods.filter((food) => selectedLocalIds.has(food.id));
+
+    if (!foods.length) {
+      return;
+    }
+
+    onSelect(foods);
     reset();
   }
 
-  const selectedCount = isUsdaSearch
-    ? selectedUsdaIds.size
+  const selectedCount = isSearchResult
+    ? selectedSearchIds.size
     : selectedLocalIds.size;
 
   return (
@@ -221,37 +240,53 @@ export default function FoodPickerModal({
 
           <button
             className="btn btn-primary"
+            disabled={selectedCount === 0 || isSubmitting}
             onClick={handleConfirm}
-            disabled={selectedCount === 0}
           >
-            Add {selectedCount > 0 ? selectedCount : ""} food
-            {selectedCount === 1 ? "" : "s"}
+            {isSubmitting
+              ? "Adding..."
+              : `Add ${selectedCount || ""} food${
+                  selectedCount === 1 ? "" : "s"
+                }`}
           </button>
         </div>
       }
     >
-      <div className="mb-3">
-        <input
-          className="form-control"
-          placeholder="Search food..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setIsUsdaSearch(false);
-          }}
-          onKeyDown={handleSearchKeyDown}
-        />
-      </div>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          searchFoodsExternal();
+        }}
+      >
+        <div className="mb-3">
+          <input
+            className="form-control"
+            placeholder="Search food..."
+            value={search}
+            onChange={(event) => {
+              setSearch(event.target.value);
+              setIsSearchResult(false);
+            }}
+          />
+        </div>
+      </form>
 
-      {isLoading && <p>Loading foods...</p>}
+      {isError && (
+        <p className="text-danger">
+          {isSearchResult
+            ? "Failed to add the selected food(s)."
+            : "Failed to load foods."}
+        </p>
+      )}
 
-      {isError && <p className="text-danger">Failed to load foods.</p>}
+      <div className="overflow-auto" style={{ height: RESULTS_HEIGHT }}>
+        {isLoading && <p>Loading foods...</p>}
 
-      <div className="overflow-auto">
-        {!isUsdaSearch &&
+        {!isLoading &&
+          !isSearchResult &&
           filteredLocalFoods.map((food) => {
+            const checked = selectedLocalIds.has(food.id);
             const calories = getCalories(food);
-            const isChecked = selectedLocalIds.has(food.id);
 
             return (
               <label
@@ -259,29 +294,31 @@ export default function FoodPickerModal({
                 className="d-flex justify-content-between align-items-center rounded px-2 py-1 mb-1"
                 style={{
                   cursor: "pointer",
-                  background: isChecked ? "#f0f6ff" : "transparent",
+                  background: checked ? "#f0f6ff" : undefined,
                 }}
               >
-                <span className="d-flex align-items-center gap-2">
+                <span>
                   <input
+                    className="me-2"
                     type="checkbox"
-                    checked={isChecked}
+                    checked={checked}
                     onChange={() => toggleLocalFood(food.id)}
                   />
 
-                  <span>{food.name}</span>
+                  {food.name}
                 </span>
 
-                <span className="text-muted small">
+                <small className="text-muted">
                   {calories !== null ? `${Math.round(calories)} kcal` : "—"}
-                </span>
+                </small>
               </label>
             );
           })}
 
-        {isUsdaSearch &&
-          usdaFoods.map((food) => {
-            const isChecked = selectedUsdaIds.has(food.selectionId);
+        {!isLoading &&
+          isSearchResult &&
+          searchFoods.map((food) => {
+            const checked = selectedSearchIds.has(food.selectionId);
 
             return (
               <label
@@ -289,30 +326,31 @@ export default function FoodPickerModal({
                 className="d-flex justify-content-between align-items-center rounded px-2 py-1 mb-1"
                 style={{
                   cursor: "pointer",
-                  background: isChecked ? "#f0f6ff" : "transparent",
+                  background: checked ? "#f0f6ff" : undefined,
                 }}
               >
-                <span className="d-flex align-items-center gap-2">
+                <span>
                   <input
+                    className="me-2"
                     type="checkbox"
-                    checked={isChecked}
-                    onChange={() => toggleUsdaFood(food.selectionId)}
+                    checked={checked}
+                    onChange={() => toggleSearchFood(food.selectionId)}
                   />
 
-                  <span>{food.description}</span>
+                  {food.name}
                 </span>
 
-                <span className="text-muted small">USDA</span>
+                <small className="text-muted">{food.external_source}</small>
               </label>
             );
           })}
 
-        {!isLoading && !isUsdaSearch && filteredLocalFoods.length === 0 && (
+        {!isLoading && !isSearchResult && filteredLocalFoods.length === 0 && (
           <p className="text-muted">No foods found.</p>
         )}
 
-        {!isLoading && isUsdaSearch && usdaFoods.length === 0 && (
-          <p className="text-muted">No USDA foods found.</p>
+        {!isLoading && isSearchResult && searchFoods.length === 0 && (
+          <p className="text-muted">No foods found.</p>
         )}
       </div>
     </Modal>

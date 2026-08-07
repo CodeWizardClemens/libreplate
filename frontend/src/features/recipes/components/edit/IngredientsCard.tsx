@@ -41,7 +41,7 @@ function emptyTotals(): NutrientTotals {
 function getNutrient(food: Food, names: string[]) {
   return (
     food.nutrients?.find((n) =>
-      names.some((name) => n.nutrient_name.toLowerCase().includes(name)),
+      names.some((name) => n.nutrient.name.toLowerCase().includes(name)),
     )?.amount ?? 0
   );
 }

@@ -17,7 +17,7 @@ export function computeMealTotals(mealFoods: MealFood[]) {
     for (const nutrient of mf.food?.nutrients ?? []) {
       const amount = (nutrient.amount ?? 0) * multiplier;
 
-      switch (nutrient.nutrient_name?.toLowerCase()) {
+      switch (nutrient.nutrient.name?.toLowerCase()) {
         case "energy":
         case "calories":
         case "kcal":

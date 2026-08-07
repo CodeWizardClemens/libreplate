@@ -1,15 +1,8 @@
 import { useMemo, useState } from "react";
 
+import type { Food } from "@/api/generated";
 import Modal from "@/components/ui/Modal";
 import MacroPieChart from "@/components/ui/MacroPieChart";
-
-type Food = {
-  name: string;
-  nutrients?: {
-    amount?: number | null;
-    nutrient_name?: string | null;
-  }[];
-};
 
 type Props = {
   food: Food;
@@ -44,9 +37,9 @@ function computeFoodNutrients(
   const multiplier = (servingSize * numberOfServings) / 100;
 
   for (const nutrient of food.nutrients ?? []) {
-    const amount = (nutrient.amount ?? 0) * multiplier;
+    const amount = nutrient.amount * multiplier;
 
-    switch (nutrient.nutrient_name?.toLowerCase()) {
+    switch (nutrient.nutrient.name?.toLowerCase()) {
       case "energy":
       case "calories":
       case "kcal":
