@@ -8,6 +8,7 @@ def create_cache_table(c: Context) -> None:
     """
     Create the Django database cache table.
     """
+    info("Create Django cache table")
     django_run(c, "createcachetable django_cache")
 
 
