@@ -63,7 +63,7 @@ export default function MealCard({ meal, onAdd, onDiaryChanged }: Props) {
   return (
     <div className="col-12">
       <div className="card">
-        <div className="card-body">
+        <div className="card-body px-3 py-3">
           <TotalsModal
             isOpen={isTotalsModalOpen}
             onClose={() => setIsTotalsModalOpen(false)}
@@ -90,7 +90,7 @@ export default function MealCard({ meal, onAdd, onDiaryChanged }: Props) {
                 onClick={() => setIsTotalsModalOpen(true)}
                 style={{ cursor: "pointer" }}
               >
-                <h2 className="h5 mb-1">{meal.name}</h2>
+                <h2 className="h5 m-0">{meal.name}</h2>
 
                 <div className="small text-muted d-flex gap-3">
                   <span>Kcal {totals.energy.toFixed(0)}</span>

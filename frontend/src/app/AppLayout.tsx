@@ -6,9 +6,7 @@ import { Outlet, useMatches } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import TopNavbar from "./TopNavbar";
 
-type RouteHandle = {
-  title?: string;
-};
+type RouteHandle = { title?: string };
 
 export default function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -23,11 +21,9 @@ export default function AppLayout() {
   return (
     <div className="d-flex flex-column vh-100 overflow-hidden">
       <TopNavbar title={title} onMenuClick={() => setSidebarOpen(true)} />
-
       <Sidebar show={sidebarOpen} onHide={() => setSidebarOpen(false)} />
-
-      <main className="flex-grow-1 overflow-auto pt-3">
-        <Container fluid="lg">
+      <main className="flex-grow-1 overflow-auto pt-2">
+        <Container fluid className="p-0">
           <Outlet />
         </Container>
       </main>

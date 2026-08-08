@@ -18,7 +18,7 @@ export default function DailyTotalsBar({ meals }: Props) {
   return (
     <>
       <div
-        className="card mb-3"
+        className="card mb-2"
         onClick={() => setIsOpen(true)}
         style={{ cursor: "pointer" }}
       >

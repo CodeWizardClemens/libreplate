@@ -35,7 +35,7 @@ export default function FoodItem({ item, onSave, onDelete }: Props) {
   return (
     <>
       <li
-        className="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+        className="list-group-item list-group-item-action d-flex align-items-center px-1 py-1"
         role="button"
         tabIndex={0}
         onClick={() => setIsEditOpen(true)}
@@ -47,10 +47,16 @@ export default function FoodItem({ item, onSave, onDelete }: Props) {
         }}
         style={{ cursor: "pointer" }}
       >
-        {item.food.name}
+        <span
+          className="text-truncate"
+          style={{ minWidth: 0, flex: "1 1 auto" }}
+          title={item.food.name}
+        >
+          {item.food.name}
+        </span>
 
-        <span className="d-flex align-items-center gap-3 text-muted">
-          <span>
+        <span className="d-flex align-items-center gap-0 text-muted flex-shrink-0 ms-3">
+          <span className="text-nowrap">
             {item.serving_size ?? 0}g × {item.number_of_servings ?? 0}
           </span>
 

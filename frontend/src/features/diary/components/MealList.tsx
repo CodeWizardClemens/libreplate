@@ -10,7 +10,7 @@ type Props = {
 
 export default function MealList({ meals, onAdd, onDiaryChanged }: Props) {
   return (
-    <div className="row g-3">
+    <div className="row g-2">
       {meals.map((meal) => (
         <MealCard
           key={meal.default_meal.id}

@@ -42,7 +42,7 @@ export default function DiaryHeader({
   });
 
   return (
-    <div className="d-flex justify-content-center mb-3">
+    <div className="d-flex justify-content-center mb-2">
       <div className="d-flex flex-wrap justify-content-center align-items-center gap-2">
         <button
           onClick={onPrevious}
@@ -55,7 +55,7 @@ export default function DiaryHeader({
 
         <div
           className="position-relative flex-shrink-0"
-          style={{ minWidth: "170px" }}
+          style={{ minWidth: "180px" }}
         >
           <input
             ref={dateInputRef}

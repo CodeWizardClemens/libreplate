@@ -139,6 +139,7 @@ def user_add_dummy(c: Context):
     )
 
 
+# TODO remove dist/assets/ from React checkers.
 @task(
     aliases=["c"],
     help={"verbose": "Show stdout output from commands."},
